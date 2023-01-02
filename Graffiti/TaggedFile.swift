@@ -9,27 +9,19 @@ import Foundation
 
 
 struct Tag : Equatable, Hashable, Identifiable, Codable {
-    
     var id: UUID = UUID()
-    var value: String
+    let value: String
 }
 
 class TaggedFile: Identifiable, Equatable, ObservableObject {
     static func == (lhs: TaggedFile, rhs: TaggedFile) -> Bool {
-        return lhs.parent == rhs.parent && lhs.filename == rhs.filename
+        lhs.parent == rhs.parent && lhs.filename == rhs.filename
     }
-    
-    var id: String {
-        "\(parent)\(filename)"
-    }
-    
-    var parent: String
-    var filename: String
-    
-    var backend: TagBackend
-    
+       
+    let parent: String
+    let filename: String
+    private let backend: TagBackend
     private(set) var tags: [Tag] = []
-    
     
     var tagString: String {
         tags.map { $0.value }.joined(separator: ", ")
@@ -37,6 +29,10 @@ class TaggedFile: Identifiable, Equatable, ObservableObject {
     
     var tagCount: String {
         tags.count.description
+    }
+    
+    var id: String {
+        "\(parent)\(filename)"
     }
     
     init(parent: String, filename: String, backend: TagBackend = XattrTagBackend()) {
@@ -62,5 +58,9 @@ class TaggedFile: Identifiable, Equatable, ObservableObject {
     func clearTags() {
         backend.clearTags(of: self)
         tags.removeAll()
+    }
+    
+    func commit() {
+        backend.commitTransactions()
     }
 }

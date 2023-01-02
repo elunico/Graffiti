@@ -13,14 +13,6 @@ extension URL {
     }
 }
 
-extension String: Identifiable {
-    public var id: UUID {
-        UUID()
-    }
-}
-
-
-
 struct TagView: View {
     @StateObject var file: TaggedFile
     @State var selected: Tag.ID?
@@ -60,7 +52,6 @@ struct TagView: View {
                 file.objectWillChange.send()
                 done(file)
             }
-            
         }.padding()
     }
 }
@@ -81,7 +72,7 @@ struct ContentView: View {
                 selectFolder {
                     directory = $0[0]
                     let content = try! FileManager().contentsOfDirectory(atPath: directory!.absolutePath)
-                    self.files = content.map { TaggedFile(parent: directory!.absolutePath, filename: $0) }
+                    self.files = content.map { TaggedFile(parent: directory!.absolutePath, filename: $0, backend: LazyBackend(wrapping: XattrTagBackend())) }
                 }
             }
             Text("Tagging: \(directory?.absoluteString ?? "<none>")")
@@ -101,20 +92,25 @@ struct ContentView: View {
             
         }
         .confirmationDialog("Do you want to clear ALL tags",
-          isPresented: $isPresentingConfirm) {
+                            isPresented: $isPresentingConfirm) {
             Button("Clear All") {
                 for file in files {
                     file.clearTags()
                 }
             }
         } message: {
-          Text("This will remove EVERY tag from EVERY file in this directory\nYou cannot undo this action")
+            Text("This will remove EVERY tag from EVERY file in this directory\nYou cannot undo this action")
         }
         .sheet(isPresented: $editing, onDismiss: {
             needsUpdate.toggle()
             print(files.first(where: {$0.id == selected})!.tags)
         }, content: {
             TagView(file: files.first(where: {$0.id == selected})!, done: { editing = false;  $0.objectWillChange.send(); needsUpdate.toggle() })
+        })
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification), perform: { output in
+            for taggedFile in files {
+                taggedFile.commit()
+            }
         })
         .padding()
     }
