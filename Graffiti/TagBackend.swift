@@ -67,6 +67,7 @@ class LazyBackend: TagBackend {
                 backing.clearTags(of: file)
             }
         }
+        transactions.removeAll()
     }
 }
 
