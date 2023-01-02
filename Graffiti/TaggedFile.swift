@@ -35,6 +35,10 @@ class TaggedFile: Identifiable, Equatable, ObservableObject {
         tags.map { $0.value }.joined(separator: ", ")
     }
     
+    var tagCount: String {
+        tags.count.description
+    }
+    
     init(parent: String, filename: String, backend: TagBackend = XattrTagBackend()) {
         self.parent = parent
         self.filename = filename

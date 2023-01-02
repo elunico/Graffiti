@@ -35,9 +35,11 @@ struct TagView: View {
     var body: some View {
         VStack {
             Text("Tags for file \(file.id)")
+            
             Table(file.tags, selection: $selected, columns: {
                 TableColumn("Tag", value: \Tag.value)
             }).onDeleteCommand(perform: self.performDelete)
+            
             TextField("Add Tag", text: $currentTag, prompt: Text("Tag"))
             
             HStack {
@@ -45,6 +47,7 @@ struct TagView: View {
                     if currentTag.isEmpty || currentTag.allSatisfy({$0.isWhitespace}) {
                         return
                     }
+                    
                     file.addTag(Tag(value: currentTag))
                     currentTag = ""
                 }.disabled(currentTag == "")
@@ -52,15 +55,15 @@ struct TagView: View {
                 Button("Delete Tag") {
                     self.performDelete()
                 }.disabled(selected == nil)
-            }
+            }.padding()
             Button("Close") {
+                file.objectWillChange.send()
                 done(file)
             }
             
         }.padding()
     }
 }
-
 
 
 struct ContentView: View {
@@ -85,6 +88,7 @@ struct ContentView: View {
             Table(files, selection: $selected, columns: {
                 TableColumn("Path", value: \TaggedFile.id)
                 TableColumn("Tags", value: \TaggedFile.tagString)
+                TableColumn("Count", value: \TaggedFile.tagCount)
             })
             Button("Edit Tags") {
                 guard selected != nil else { return }

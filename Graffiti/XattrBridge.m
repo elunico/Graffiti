@@ -41,14 +41,14 @@
     }
     s = [s stringByAppendingString:value];
     long v= [XattrBridge setXAttrAttributeForFile:path valueOf:s withKey:key andError:error    ];
-    NSLog(@"append %d\n", v);
-    NSLog(@"append %@, %@, %@\n", path, s, key);
-    NSLog(@"append %s\n", strerror(errno));
     return v;
 }
 
 +(NSInteger)setXAttrAttributeForFile:(NSString *)path valueOf: (NSString *)value withKey: (NSString *)key andError:(NSError **)error {
-    NSLog(@"set: %s, %s, %s, %ld\n", path.UTF8String, key.UTF8String, value.UTF8String, value.length);
+    if (value.length >= 4096) {
+        @throw [NSException exceptionWithName:@"IndexOutOfBounds" reason:@"The value for an xattr attribute was too long. An xattr can be at most 4095 chars long" userInfo:nil];
+        return -127; // in debug builds a user can click "continue" and we do not want to write out the value
+    }
     return setxattr(path.UTF8String, key.UTF8String, (void *) value.UTF8String, value.length, 0, 0);
 }
 
