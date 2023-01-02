@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DC1B7BC52962066200DEED22 /* XattrBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC42962066200DEED22 /* XattrBridge.m */; };
+		DC1B7BC82962299B00DEED22 /* TaggedFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC72962299B00DEED22 /* TaggedFile.swift */; };
+		DC1B7BCA296229C600DEED22 /* TagBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC9296229C600DEED22 /* TagBackend.swift */; };
 		DC52448D2960ACB200821407 /* GraffitiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC52448C2960ACB200821407 /* GraffitiApp.swift */; };
 		DC52448F2960ACB200821407 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC52448E2960ACB200821407 /* ContentView.swift */; };
 		DC5244912960ACB300821407 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DC5244902960ACB300821407 /* Assets.xcassets */; };
@@ -14,6 +17,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		DC1B7BC32962066200DEED22 /* XattrBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XattrBridge.h; sourceTree = "<group>"; };
+		DC1B7BC42962066200DEED22 /* XattrBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XattrBridge.m; sourceTree = "<group>"; };
+		DC1B7BC6296209D200DEED22 /* Graffiti-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Graffiti-Bridging-Header.h"; sourceTree = "<group>"; };
+		DC1B7BC72962299B00DEED22 /* TaggedFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaggedFile.swift; sourceTree = "<group>"; };
+		DC1B7BC9296229C600DEED22 /* TagBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagBackend.swift; sourceTree = "<group>"; };
 		DC5244892960ACB200821407 /* Graffiti.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Graffiti.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC52448C2960ACB200821407 /* GraffitiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraffitiApp.swift; sourceTree = "<group>"; };
 		DC52448E2960ACB200821407 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -52,8 +60,13 @@
 		DC52448B2960ACB200821407 /* Graffiti */ = {
 			isa = PBXGroup;
 			children = (
+				DC1B7BC32962066200DEED22 /* XattrBridge.h */,
+				DC1B7BC6296209D200DEED22 /* Graffiti-Bridging-Header.h */,
+				DC1B7BC42962066200DEED22 /* XattrBridge.m */,
 				DC52448C2960ACB200821407 /* GraffitiApp.swift */,
 				DC52448E2960ACB200821407 /* ContentView.swift */,
+				DC1B7BC9296229C600DEED22 /* TagBackend.swift */,
+				DC1B7BC72962299B00DEED22 /* TaggedFile.swift */,
 				DC5244902960ACB300821407 /* Assets.xcassets */,
 				DC5244952960ACB300821407 /* Graffiti.entitlements */,
 				DC5244922960ACB300821407 /* Preview Content */,
@@ -101,6 +114,7 @@
 				TargetAttributes = {
 					DC5244882960ACB200821407 = {
 						CreatedOnToolsVersion = 14.2;
+						LastSwiftMigration = 1420;
 					};
 				};
 			};
@@ -139,8 +153,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DC1B7BC52962066200DEED22 /* XattrBridge.m in Sources */,
+				DC1B7BCA296229C600DEED22 /* TagBackend.swift in Sources */,
 				DC52448F2960ACB200821407 /* ContentView.swift in Sources */,
 				DC52448D2960ACB200821407 /* GraffitiApp.swift in Sources */,
+				DC1B7BC82962299B00DEED22 /* TaggedFile.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -265,6 +282,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Graffiti/Graffiti.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -283,6 +301,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Graffiti/Graffiti-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -292,6 +312,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Graffiti/Graffiti.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -310,6 +331,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Graffiti/Graffiti-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
