@@ -61,15 +61,12 @@ struct ContentView: View {
     @State var directory: URL? = nil
     @State var files: [TaggedFile] = []
     @State var selected: TaggedFile.ID?
+    
     @State var editing: Bool = false
     @State var needsUpdate: Bool = false
-    
     @State var isPresentingConfirm: Bool = false
     
-    
-    
     var body: some View {
-        
         VStack {
             Button("Choose Directory") {
                 selectFolder {
@@ -92,7 +89,6 @@ struct ContentView: View {
             Button("Clear All Tags") {
                 isPresentingConfirm = true
             }
-            
         }
         .confirmationDialog("Do you want to clear ALL tags",
                             isPresented: $isPresentingConfirm) {
@@ -136,7 +132,6 @@ func selectFolder(callback: @escaping ([URL]) -> ()) {
     folderPicker.canResolveUbiquitousConflicts = true
     
     folderPicker.begin { response in
-        
         if response == .OK {
             callback(folderPicker.urls)
         }
