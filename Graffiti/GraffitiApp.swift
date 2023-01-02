@@ -7,8 +7,9 @@
 
 import SwiftUI
 
+
 @main
-struct GraffitiApp: App {
+struct GraffitiApp: App {    
     var body: some Scene {
         WindowGroup {
             ContentView()

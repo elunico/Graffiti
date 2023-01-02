@@ -66,7 +66,10 @@ struct ContentView: View {
     
     @State var isPresentingConfirm: Bool = false
     
+    
+    
     var body: some View {
+        
         VStack {
             Button("Choose Directory") {
                 selectFolder {
@@ -107,12 +110,15 @@ struct ContentView: View {
         }, content: {
             TagView(file: files.first(where: {$0.id == selected})!, done: { editing = false;  $0.objectWillChange.send(); needsUpdate.toggle() })
         })
-        .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification), perform: { output in
-            for taggedFile in files {
-                taggedFile.commit()
-            }
-        })
+        .onDisappear(perform: self.teardown)
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification), perform: {output in self.teardown()})
         .padding()
+    }
+    
+    func teardown() {
+        for file in files {
+            file.commit()
+        }
     }
 }
 
