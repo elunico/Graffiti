@@ -14,6 +14,11 @@
 +(NSString *)getXAttrAttributeForFile:(NSString *)path withKey: (NSString *)key andError:(NSError **)error {
     void *buffer = malloc(4096);
     
+    if (buffer == NULL) {
+        NSException *e = [NSException exceptionWithName:@"MemoryError" reason:@"malloc() returned null" userInfo:nil];
+        @throw e;
+    }
+    
     long bytes = getxattr(path.UTF8String, key.UTF8String, buffer, 4095, 0, 0);
     
     if (bytes < 0L) {
@@ -40,7 +45,7 @@
         s = [s stringByAppendingString:delim];
     }
     s = [s stringByAppendingString:value];
-    long v= [XattrBridge setXAttrAttributeForFile:path valueOf:s withKey:key andError:error    ];
+    long v = [XattrBridge setXAttrAttributeForFile:path valueOf:s withKey:key andError:error];
     return v;
 }
 
@@ -52,9 +57,12 @@
     return setxattr(path.UTF8String, key.UTF8String, (void *) value.UTF8String, value.length, 0, 0);
 }
 
-+(NSArray *)getXAttrAttributesForFile:(NSString *)path withKey: (NSString *)key delimitedBy: (NSString *)delim andError:(NSError **)error {
++(NSArray<NSString *> *)getXAttrAttributesForFile:(NSString *)path withKey: (NSString *)key delimitedBy: (NSString *)delim andError:(NSError **)error {
     NSString *data = [XattrBridge getXAttrAttributeForFile:path withKey:key andError:error];
-    NSArray * content = [data componentsSeparatedByString:delim];
+    if (data == nil) {
+        return [NSArray new];
+    }
+    NSArray *content = [data componentsSeparatedByString:delim];
     return content;
 }
 
