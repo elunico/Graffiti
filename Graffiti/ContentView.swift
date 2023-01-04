@@ -13,106 +13,79 @@ extension URL {
     }
 }
 
-struct TagView: View {
-    @StateObject var file: TaggedFile
-    @State var selected: Tag.ID?
-    @State var currentTag: String = ""
-    var done: (TaggedFile) -> ()
-    
-    func performDelete() {
-        guard let index = selected else { return }
-        file.removeTag(withID: index)
-    }
-    
-    var body: some View {
-        VStack {
-            Text("Tags for file \(file.id)")
-            
-            Table(file.tags, selection: $selected, columns: {
-                TableColumn("Tag", value: \Tag.value)
-            }).onDeleteCommand(perform: self.performDelete)
-            
-            TextField("Add Tag", text: $currentTag, prompt: Text("Tag"))
-            
-            HStack {
-                Button("Add Tag") {
-                    if currentTag.isEmpty || currentTag.allSatisfy({$0.isWhitespace}) {
-                        return
-                    }
-                    
-                    file.addTag(Tag(value: currentTag))
-                    currentTag = ""
-                }.disabled(currentTag == "")
-                Spacer()
-                Button("Delete Tag") {
-                    self.performDelete()
-                }.disabled(selected == nil)
-            }.padding()
-            Button("Close") {
-                file.objectWillChange.send()
-                done(file)
+extension View {
+    func onClearAll(message: String, isPresented: Binding<Bool>, clearAction: @escaping () -> ()) -> some View {
+        self.confirmationDialog("Are you sure you want to clear all?",
+                            isPresented: isPresented) {
+            Button("Clear All") {
+                clearAction()
             }
-        }.padding()
+        } message: {
+            Text(message)
+        }
     }
 }
 
-
 struct ContentView: View {
     @State var directory: URL? = nil
-    @State var files: [TaggedFile] = []
+    @StateObject var files: TaggedDirectory = .empty
     @State var selected: TaggedFile.ID?
+    @State var query: String = ""
     
     @State var editing: Bool = false
-    @State var needsUpdate: Bool = false
     @State var isPresentingConfirm: Bool = false
     
+    @State var dummy: String = ""
+    
     var body: some View {
-        VStack {
-            Button("Choose Directory") {
-                selectFolder {
-                    directory = $0[0]
-                    let content = try! FileManager().contentsOfDirectory(atPath: directory!.absolutePath)
-                    self.files = content.map { TaggedFile(parent: directory!.absolutePath, filename: $0, backend: LazyBackend(wrapping: XattrTagBackend())) }
+        GeometryReader { geometry in
+            VStack {
+                Button("Choose Directory") {
+                    selectFolder {
+                        self.directory = $0[0]
+                        self.files.load(directory: $0[0].absolutePath, backend: LazyBackend(wrapping: XattrTagBackend()))
+                    }
+                }
+                HStack {
+                    Text("Tagging: \(directory?.absoluteString ?? "<none>")")
+                    Spacer()
+                    TextField("Search", text: $query)
+                        .frame(minWidth: 25.0, idealWidth: geometry.size.width / 8, maxWidth: 300.0, alignment: .topTrailing)
+                        .help("Enter your search term. Use & and | for boolean operations. Use !word to avoid 'word' in results ")
+                }
+                Table(files.filter(query: query), selection: $selected, columns: {
+                    TableColumn("Path", value: \TaggedFile.id)
+                    TableColumn("Tags", value: \TaggedFile.tagString)
+                    TableColumn("Count", value: \TaggedFile.tagCount)
+                })
+                Button("Edit Tags") {
+                    guard selected != nil else { return }
+                    editing = true
+                }.disabled(selected == nil)
+                Spacer()
+                Button("Clear All Tags") {
+                    isPresentingConfirm = true
                 }
             }
-            Text("Tagging: \(directory?.absoluteString ?? "<none>")")
-            Table(files, selection: $selected, columns: {
-                TableColumn("Path", value: \TaggedFile.id)
-                TableColumn("Tags", value: \TaggedFile.tagString)
-                TableColumn("Count", value: \TaggedFile.tagCount)
-            })
-            Button("Edit Tags") {
-                guard selected != nil else { return }
-                editing = true
-            }.disabled(selected == nil)
-            Spacer()
-            Button("Clear All Tags") {
-                isPresentingConfirm = true
-            }
-        }
-        .confirmationDialog("Do you want to clear ALL tags",
-                            isPresented: $isPresentingConfirm) {
-            Button("Clear All") {
-                for file in files {
+            .onClearAll(message: "This will remove EVERY tag from EVERY file in this directory\nYou cannot undo this action", isPresented: $isPresentingConfirm, clearAction: {
+                for file in files.filter(query: query) {
                     file.clearTags()
                 }
-            }
-        } message: {
-            Text("This will remove EVERY tag from EVERY file in this directory\nYou cannot undo this action")
+            })
+            .sheet(isPresented: $editing, onDismiss: {
+                print(files.getFile(withID: selected!)!.tags)
+            }, content: {
+                TagView(file: files.getFile(withID: selected!)!, done: { _ in editing = false })
+            })
         }
-        .sheet(isPresented: $editing, onDismiss: {
-            needsUpdate.toggle()
-            print(files.first(where: {$0.id == selected})!.tags)
-        }, content: {
-            TagView(file: files.first(where: {$0.id == selected})!, done: { editing = false;  $0.objectWillChange.send(); needsUpdate.toggle() })
-        })
         .onDisappear(perform: self.teardown)
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification), perform: {output in self.teardown()})
         .padding()
     }
+        
     
     func teardown() {
-        for file in files {
+        for file in files.files {
             file.commit()
         }
     }

@@ -7,12 +7,6 @@
 
 import Foundation
 
-
-struct Tag : Equatable, Hashable, Identifiable, Codable {
-    var id: UUID = UUID()
-    let value: String
-}
-
 class TaggedFile: Identifiable, Equatable, ObservableObject {
     static func == (lhs: TaggedFile, rhs: TaggedFile) -> Bool {
         lhs.parent == rhs.parent && lhs.filename == rhs.filename
