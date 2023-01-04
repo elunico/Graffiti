@@ -10,7 +10,7 @@ import Foundation
 protocol TagBackend {
     func addTag(_ tag: Tag, to file: TaggedFile)
     func removeTag(withID id: Tag.ID, from file: TaggedFile)
-    func loadTags(for path: String) -> [Tag]
+    func loadTags(for path: String) -> Set<Tag>
     func clearTags(of file: TaggedFile)
     
     // used to implement lazy backend systems or other time delay ones
@@ -20,7 +20,7 @@ protocol TagBackend {
 }
 
 extension TagBackend {
-    // do nothing by default 
+    // do nothing by default
     func commitTransactions() {
         
     }

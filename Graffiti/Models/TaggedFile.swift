@@ -7,15 +7,19 @@
 
 import Foundation
 
-class TaggedFile: Identifiable, Equatable, ObservableObject {
+class TaggedFile: Identifiable, Equatable, Hashable, ObservableObject {
     static func == (lhs: TaggedFile, rhs: TaggedFile) -> Bool {
         lhs.parent == rhs.parent && lhs.filename == rhs.filename
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
        
     let parent: String
     let filename: String
     private let backend: TagBackend
-    private(set) var tags: [Tag] = []
+    private(set) var tags: Set<Tag> = Set()
     
     var tagString: String {
         tags.map { $0.value }.joined(separator: ", ")
@@ -39,7 +43,7 @@ class TaggedFile: Identifiable, Equatable, ObservableObject {
     }
     
     func addTag(_ tag: Tag) {
-        tags.append(tag)
+        tags.insert(tag)
         backend.addTag(tag, to: self)
     }
 

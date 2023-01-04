@@ -27,68 +27,53 @@ extension View {
 }
 
 struct ContentView: View {
-    @State var directory: URL? = nil
-    @StateObject var files: TaggedDirectory = .empty
-    @State var selected: TaggedFile.ID?
-    @State var query: String = ""
+    enum Choice: Hashable {
+        case json, plist, xattr
+        case none
+    }
     
-    @State var editing: Bool = false
-    @State var isPresentingConfirm: Bool = false
-    
-    @State var dummy: String = ""
+    @State var formatChoice: Choice = .xattr
+    @State var lazyChoice: Bool = false
+    @State var showingOptions: Bool = true
     
     var body: some View {
-        GeometryReader { geometry in
+        if showingOptions {
             VStack {
-                Button("Choose Directory") {
-                    selectFolder {
-                        self.directory = $0[0]
-                        self.files.load(directory: $0[0].absolutePath, backend: LazyBackend(wrapping: XattrTagBackend()))
-                    }
-                }
-                HStack {
-                    Text("Tagging: \(directory?.absoluteString ?? "<none>")")
-                    Spacer()
-                    TextField("Search", text: $query)
-                        .frame(minWidth: 25.0, idealWidth: geometry.size.width / 8, maxWidth: 300.0, alignment: .topTrailing)
-                        .help("Enter your search term. Use & and | for boolean operations. Use !word to avoid 'word' in results ")
-                }
-                Table(files.filter(query: query), selection: $selected, columns: {
-                    TableColumn("Path", value: \TaggedFile.id)
-                    TableColumn("Tags", value: \TaggedFile.tagString)
-                    TableColumn("Count", value: \TaggedFile.tagCount)
+                Text("Choose a save format")
+                Picker("Format", selection: $formatChoice, content: {
+                    Text("JSON File").tag(Choice.json).disabled(true) // not implemented
+                    Text("plist File").tag(Choice.plist).disabled(true)  // not implemented
+                    Text("xattr attributes").tag(Choice.xattr)
                 })
-                Button("Edit Tags") {
-                    guard selected != nil else { return }
-                    editing = true
-                }.disabled(selected == nil)
-                Spacer()
-                Button("Clear All Tags") {
-                    isPresentingConfirm = true
+                Toggle(isOn: $lazyChoice, label: {
+                    Text("Lazy Writing?")
+                })
+                Button("Go!") {
+                    showingOptions = false
                 }
-            }
-            .onClearAll(message: "This will remove EVERY tag from EVERY file in this directory\nYou cannot undo this action", isPresented: $isPresentingConfirm, clearAction: {
-                for file in files.filter(query: query) {
-                    file.clearTags()
+            }.padding()
+        } else {
+            
+            let backend: TagBackend = ({
+                var backend: TagBackend
+                if formatChoice == .xattr {
+                    backend = XattrTagBackend()
+                } else {
+                    fatalError()
                 }
-            })
-            .sheet(isPresented: $editing, onDismiss: {
-                print(files.getFile(withID: selected!)!.tags)
-            }, content: {
-                TagView(file: files.getFile(withID: selected!)!, done: { _ in editing = false })
-            })
+                
+                if lazyChoice {
+                    backend = LazyBackend(wrapping: backend)
+                }
+                return backend
+            })()
+            
+            MainView(backend: backend, showOptions: { showingOptions = true })
         }
-        .onDisappear(perform: self.teardown)
-        .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification), perform: {output in self.teardown()})
-        .padding()
+        
     }
         
     
-    func teardown() {
-        for file in files.files {
-            file.commit()
-        }
-    }
 }
 
 func selectFolder(callback: @escaping ([URL]) -> ()) {
@@ -111,8 +96,8 @@ func selectFolder(callback: @escaping ([URL]) -> ()) {
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
-}
+//struct ContentView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        ContentView()
+//    }
+//}

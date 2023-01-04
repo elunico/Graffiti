@@ -8,6 +8,8 @@
 import Foundation
 
 struct Tag : Equatable, Hashable, Identifiable, Codable {
-    var id: UUID = UUID()
+//    var id: UUID = UUID()
     let value: String
+    
+    var id: String { value }
 }
