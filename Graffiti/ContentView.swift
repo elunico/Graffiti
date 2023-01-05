@@ -38,20 +38,22 @@ struct ContentView: View {
     
     var body: some View {
         if showingOptions {
-            VStack {
-                Text("Choose a save format")
-                Picker("Format", selection: $formatChoice, content: {
-                    Text("JSON File").tag(Choice.json).disabled(true) // not implemented
-                    Text("plist File").tag(Choice.plist).disabled(true)  // not implemented
-                    Text("xattr attributes").tag(Choice.xattr)
-                })
-                Toggle(isOn: $lazyChoice, label: {
-                    Text("Lazy Writing?")
-                })
-                Button("Go!") {
-                    showingOptions = false
-                }
-            }.padding()
+            GeometryReader { geometry in
+                VStack {
+                    Text("Choose a save format")
+                    Picker("Format", selection: $formatChoice, content: {
+                        Text("JSON File").tag(Choice.json).disabled(true) // not implemented
+                        Text("plist File").tag(Choice.plist).disabled(true)  // not implemented
+                        Text("xattr attributes").tag(Choice.xattr)
+                    })
+                    Toggle(isOn: $lazyChoice, label: {
+                        Text("Lazy Writing?")
+                    })
+                    Button("Go!") {
+                        showingOptions = false
+                    }
+                }.padding()
+            }
         } else {
             
             let backend: TagBackend = ({

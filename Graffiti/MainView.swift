@@ -71,6 +71,8 @@ struct MainView: View {
         }
         .onDisappear(perform: self.teardown)
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification), perform: {output in self.teardown()})
+        .frame(minWidth: 500.0, minHeight: 500.0, alignment: .center)
+
         .padding()
     }
     

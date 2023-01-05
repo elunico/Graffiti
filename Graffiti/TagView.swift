@@ -38,6 +38,7 @@ struct TagView: View {
     @State var files: Set<TaggedFile>
     @State var selected: Tag.ID?
     @State var currentTag: String = ""
+    @State var showingHelp = false
     var done: (Set<TaggedFile>) -> ()
     
     func performDelete() {
@@ -46,46 +47,67 @@ struct TagView: View {
     }
     
     var body: some View {
-        VStack {
-            if files.count == 1 {
-                Text("Tags for file \(files.first!.id)")
-            } else {
-                let s = files.map { $0.filename }.joined(separator: "\n")
-                Text("Tags for \(files.count) files")
-                    .help("Files:\n\(s)")
-                Text("This list includes all the tags across all of the selected files.")
-                Text("Each tag may not be present on any one individual file.")
-                Text("Any tag added in this view will be added to all selected files")
-            }
-            
-            Table(files.map { $0.tags }.flatten().unique(), selection: $selected, columns: {
-                TableColumn("Tag", value: \Tag.value)
-            }).onDeleteCommand(perform: self.performDelete)
-            
-            TextField("Add Tag", text: $currentTag, prompt: Text("Tag"))
-                .onChange(of: currentTag) { _ in
-                    // all credits to Leo Dabus:
-                    currentTag.removeAll(where: {  ",&|!".contains($0) })
-                    
+        GeometryReader { geometry in
+            VStack {
+                if files.count == 1 {
+                    Text("Tags for file \(files.first!.id)")
+                } else {
+                    let s = files.map { $0.filename }.joined(separator: "\n")
+                    Label("Tags for \(files.count) files", systemImage: "rectangle.and.text.magnifyingglass")
+                        .help(s)
+                        .foregroundColor(.accentColor)
+                        .onTapGesture {
+                            showingHelp = true
+                        }
+                    Text("This list includes all the tags across all of the selected files. Each tag may not be present on any one individual file. Any tag added in this view will be added to all selected files")
                 }
-            
-            HStack {
-                Button("Add Tag") {
-                    if currentTag.isEmpty || currentTag.allSatisfy({$0.isWhitespace}) {
-                        return
+                
+                Table(files.map { $0.tags }.flatten().unique(), selection: $selected, columns: {
+                    TableColumn("Tag", value: \Tag.value)
+                }).onDeleteCommand(perform: self.performDelete)
+                
+                TextField("Add Tag", text: $currentTag, prompt: Text("Tag"))
+                    .onChange(of: currentTag) { _ in
+                        // all credits to Leo Dabus:
+                        currentTag.removeAll(where: {  ",&|!".contains($0) })
+                        
                     }
-                    
-                    files.forEach { $0.addTag(Tag(value: currentTag)) }
-                    currentTag = ""
-                }.disabled(currentTag == "")
-                Spacer()
-                Button("Delete Tag") {
-                    self.performDelete()
-                }.disabled(selected == nil)
-            }.padding()
-            Button("Close") {
-                done(files)
+                
+                HStack {
+                    Button("Add Tag") {
+                        if currentTag.isEmpty || currentTag.allSatisfy({$0.isWhitespace}) {
+                            return
+                        }
+                        
+                        files.forEach { $0.addTag(Tag(value: currentTag)) }
+                        currentTag = ""
+                    }.disabled(currentTag == "")
+                    Spacer()
+                    Button("Delete Tag") {
+                        self.performDelete()
+                    }.disabled(selected == nil)
+                }.padding()
+                Button("Close") {
+                    done(files)
+                }
             }
         }.padding()
+            .frame(minWidth: 500.0, minHeight: 500.0,  alignment: Alignment.center)
+            .sheet(isPresented: $showingHelp, content: {
+                VStack {
+                    Text("Files Being Edited")
+                        .font(.headline)
+                    Table(Array(files), columns: {
+                        TableColumn("Filename", value: \TaggedFile.filename)
+                    })
+                    Text("Note that you can view this list of files by hovering over the 'Tags of n files' text")
+                        .font(.caption2)
+                    Button("Close") {
+                        showingHelp = false
+                    }
+                }.padding()
+                    .frame(minHeight: 400.0)
+            })
+
     }
 }
