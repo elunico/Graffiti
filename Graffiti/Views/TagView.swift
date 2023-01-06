@@ -94,19 +94,7 @@ struct TagView: View {
         }.padding()
             .frame(minWidth: 500.0, minHeight: 500.0,  alignment: Alignment.center)
             .sheet(isPresented: $showingHelp, content: {
-                VStack {
-                    Text("Files Being Edited")
-                        .font(.headline)
-                    Table(Array(files), columns: {
-                        TableColumn("Filename", value: \TaggedFile.filename)
-                    })
-                    Text("Note that you can view this list of files by hovering over the 'Tags of n files' text")
-                        .font(.caption2)
-                    Button("Close") {
-                        showingHelp = false
-                    }
-                }.padding()
-                    .frame(minHeight: 400.0)
+                FilesEditingInspectorView(done: { showingHelp = false }, removeFileWithID: { id in files.remove(at: files.firstIndex(where: {$0.id == id})!) }, files: files)
             })
 
     }

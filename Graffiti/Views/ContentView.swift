@@ -41,18 +41,21 @@ struct ContentView: View {
             GeometryReader { geometry in
                 VStack {
                     Text("Choose a save format")
-                    Picker("Format", selection: $formatChoice, content: {
+                        .font(.headline)
+                    
+                    Picker("", selection: $formatChoice, content: {
                         Text("JSON File").tag(Choice.json).disabled(true) // not implemented
                         Text("plist File").tag(Choice.plist).disabled(true)  // not implemented
                         Text("xattr attributes").tag(Choice.xattr)
-                    })
+                    }).frame(minWidth: geometry.size.width / 2, maxWidth: geometry.size.width / 2)
                     Toggle(isOn: $lazyChoice, label: {
                         Text("Lazy Writing?")
                     })
                     Button("Go!") {
                         showingOptions = false
                     }
-                }.padding()
+                }.frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
+                .padding()
             }
         } else {
             
@@ -98,8 +101,8 @@ func selectFolder(callback: @escaping ([URL]) -> ()) {
     }
 }
 
-//struct ContentView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        ContentView()
-//    }
-//}
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
+}

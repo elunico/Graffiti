@@ -8,6 +8,15 @@
 import Foundation
 import SwiftUI
 
+func compareString(_ a: String, _ b: String) -> ComparisonResult {
+    if a < b {
+        return .orderedAscending
+    } else if a > b {
+        return .orderedDescending
+    } else {
+        return .orderedSame
+    }
+}
 
 struct MainView: View {
     @State var backend: TagBackend
@@ -40,12 +49,14 @@ struct MainView: View {
                         .frame(minWidth: 25.0, idealWidth: geometry.size.width / 8, maxWidth: 300.0, alignment: .topTrailing)
                         .help("Enter your search term. Use & and | for boolean operations. Use !word to avoid 'word' in results ")
                 }
-        
-                Table(files.filter(query: query), selection: $selected, columns: {
-                    TableColumn("Path", value: \TaggedFile.filename)
-                    TableColumn("Tags", value: \TaggedFile.tagString)
-                    TableColumn("Count", value: \TaggedFile.tagCount)
-                })
+                GeometryReader { tableGeometry in
+                    Table(files.filteredFiles, selection: $selected, columns: {
+                        TableColumn("Path", value: \TaggedFile.filename).width(ideal: tableGeometry.size.width * 5 / 15)
+                        TableColumn("Kind", value: \TaggedFile.fileKind).width(ideal: tableGeometry.size.width * 2 / 15)
+                        TableColumn("Tags", value: \TaggedFile.tagString).width(ideal: tableGeometry.size.width * 5 / 15)
+                        TableColumn("Count", value: \TaggedFile.tagCount).width(ideal: tableGeometry.size.width / 15)
+                    })
+                }
                 HStack {
                     Button("Change save format") {
                         showOptions()
@@ -54,14 +65,14 @@ struct MainView: View {
                     Button("Edit Tags") {
                         editing = true
                     }.disabled(selected.count == 0)
-                 
+                    
                     Button("Clear All Tags") {
                         isPresentingConfirm = true
                     }
                 }
             }
             .onClearAll(message: "This will remove EVERY tag from EVERY file in this directory\nYou cannot undo this action", isPresented: $isPresentingConfirm, clearAction: {
-                for file in files.filter(query: query) {
+                for file in files.filteredFiles {
                     file.clearTags()
                 }
             })
@@ -72,7 +83,8 @@ struct MainView: View {
         .onDisappear(perform: self.teardown)
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification), perform: {output in self.teardown()})
         .frame(minWidth: 500.0, minHeight: 500.0, alignment: .center)
-
+        .environmentObject(files)
+        
         .padding()
     }
     

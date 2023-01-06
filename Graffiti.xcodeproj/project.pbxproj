@@ -10,6 +10,7 @@
 		DC1B7BC52962066200DEED22 /* XattrBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC42962066200DEED22 /* XattrBridge.m */; };
 		DC1B7BC82962299B00DEED22 /* TaggedFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC72962299B00DEED22 /* TaggedFile.swift */; };
 		DC1B7BCA296229C600DEED22 /* TagBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC9296229C600DEED22 /* TagBackend.swift */; };
+		DC2809B22967722F003915A5 /* FilesEditingInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2809B12967722F003915A5 /* FilesEditingInspectorView.swift */; };
 		DC52448D2960ACB200821407 /* GraffitiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC52448C2960ACB200821407 /* GraffitiApp.swift */; };
 		DC52448F2960ACB200821407 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC52448E2960ACB200821407 /* ContentView.swift */; };
 		DC5244912960ACB300821407 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DC5244902960ACB300821407 /* Assets.xcassets */; };
@@ -28,6 +29,7 @@
 		DC1B7BC6296209D200DEED22 /* Graffiti-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Graffiti-Bridging-Header.h"; sourceTree = "<group>"; };
 		DC1B7BC72962299B00DEED22 /* TaggedFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaggedFile.swift; sourceTree = "<group>"; };
 		DC1B7BC9296229C600DEED22 /* TagBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagBackend.swift; sourceTree = "<group>"; };
+		DC2809B12967722F003915A5 /* FilesEditingInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesEditingInspectorView.swift; sourceTree = "<group>"; };
 		DC5244892960ACB200821407 /* Graffiti.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Graffiti.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC52448C2960ACB200821407 /* GraffitiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraffitiApp.swift; sourceTree = "<group>"; };
 		DC52448E2960ACB200821407 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -78,9 +80,7 @@
 				DC1B7BC6296209D200DEED22 /* Graffiti-Bridging-Header.h */,
 				DC1B7BC42962066200DEED22 /* XattrBridge.m */,
 				DC52448C2960ACB200821407 /* GraffitiApp.swift */,
-				DC52448E2960ACB200821407 /* ContentView.swift */,
-				DCFA39C9296604740002690A /* MainView.swift */,
-				DCFA39BF2965DCC20002690A /* TagView.swift */,
+				DCE8E1582967D45F002D0A05 /* Views */,
 				DC5244902960ACB300821407 /* Assets.xcassets */,
 				DC5244952960ACB300821407 /* Graffiti.entitlements */,
 				DC5244922960ACB300821407 /* Preview Content */,
@@ -94,6 +94,17 @@
 				DC5244932960ACB300821407 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		DCE8E1582967D45F002D0A05 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				DC52448E2960ACB200821407 /* ContentView.swift */,
+				DCFA39C9296604740002690A /* MainView.swift */,
+				DCFA39BF2965DCC20002690A /* TagView.swift */,
+				DC2809B12967722F003915A5 /* FilesEditingInspectorView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		DCFA39C12965DD090002690A /* Models */ = {
@@ -194,6 +205,7 @@
 				DC52448D2960ACB200821407 /* GraffitiApp.swift in Sources */,
 				DCFA39C62965DD560002690A /* LazyBackend.swift in Sources */,
 				DCFA39C82965DD680002690A /* XattrTagBackend.swift in Sources */,
+				DC2809B22967722F003915A5 /* FilesEditingInspectorView.swift in Sources */,
 				DCFA39CA296604740002690A /* MainView.swift in Sources */,
 				DCFA39C02965DCC20002690A /* TagView.swift in Sources */,
 				DC1B7BC82962299B00DEED22 /* TaggedFile.swift in Sources */,

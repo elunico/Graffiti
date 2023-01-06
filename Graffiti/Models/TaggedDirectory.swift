@@ -10,10 +10,14 @@ import Foundation
 class TaggedDirectory: ObservableObject {
     static let empty: TaggedDirectory = TaggedDirectory()
     
+    static let alwaysTrue: (TaggedFile) -> Bool = { _ in true }
+    
     @Published var directory: String
     var backend: TagBackend
     @Published var files: [TaggedFile] = []
     private var indexMap: [TaggedFile.ID: Int] = [:]
+    private var filterPredicate: (TaggedFile) -> Bool = alwaysTrue
+    private var cachedFiles: [TaggedFile]? = nil
     
     private init() {
         self.directory = ""
@@ -49,9 +53,67 @@ class TaggedDirectory: ObservableObject {
         files
     }
     
-    func filter(query: String) -> [TaggedFile] {
-        files.filter { query.isEmpty || $0.tagString.contains(query) || $0.filename.contains(query) }
+//    var filteredFiles : [TaggedFile] {
+//        files.filter(filterPredicate)
+//    }
+    
+    var filteredFiles: [TaggedFile] {
+        cachedFiles != nil ? cachedFiles! : files
     }
     
+    func exclude(fileID: String) {
+        filterPredicate = { (file2: TaggedFile) in self.filterPredicate(file2) && fileID != file2.id }
+        cachedFiles = files.filter(filterPredicate)
+    }
     
+    func include(file: TaggedFile) {
+        // todo: identity or equality? 
+        filterPredicate = { (file2: TaggedFile) in self.filterPredicate(file2) || file == file2 }
+        cachedFiles = files.filter(filterPredicate)
+    }
+    
+    func setFilter(from query: String) {
+        if query.isEmpty {
+            filterPredicate = TaggedDirectory.alwaysTrue
+            return
+        }
+        let results = query.split(separator: "|").map{ $0.trimmingCharacters(in: .whitespacesAndNewlines) }.map{ $0.split(separator: "&").map{ s in s.trimmingCharacters(in: .whitespacesAndNewlines)} }
+        filterPredicate = {
+            file in results.anySatisfy {
+                conjunction in conjunction.allSatisfy {
+                    text in
+                    let substr = text[text.index(after: text.startIndex)...]
+                    return (text.hasPrefix("!") && !file.tagString.contains(substr) && !file.filename.contains(substr)) || (!text.hasPrefix("!") && ((file.tagString.contains(text) || file.filename.contains(text))))
+                }
+            }
+        }
+        cachedFiles = files.filter(filterPredicate)
+    }
+    
+    private func filter(query: String) -> [TaggedFile] {
+        if query.isEmpty {
+            return files
+        }
+        let results = query.split(separator: "|").map{ $0.trimmingCharacters(in: .whitespacesAndNewlines) }.map{ $0.split(separator: "&").map{ s in s.trimmingCharacters(in: .whitespacesAndNewlines)} }
+        return files.filter {
+            file in results.anySatisfy {
+                conjunction in conjunction.allSatisfy {
+                    text in
+                    let substr = text[text.index(after: text.startIndex)...]
+                    return (text.hasPrefix("!") && !file.tagString.contains(substr) && !file.filename.contains(substr)) || (!text.hasPrefix("!") && ((file.tagString.contains(text) || file.filename.contains(text))))
+                }
+            }
+        }
+    }
+}
+
+func printing<T>(_ t: T) -> T {
+    print(t)
+    return t
+}
+
+extension Array {
+    func anySatisfy(_ predicate: (Element) -> Bool) -> Bool {
+        !self.allSatisfy { !predicate($0) }
+    }
 }

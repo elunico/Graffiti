@@ -18,16 +18,10 @@ class TaggedFile: Identifiable, Equatable, Hashable, ObservableObject {
        
     let parent: String
     let filename: String
+    let isDirectory: Bool
     private let backend: TagBackend
     private(set) var tags: Set<Tag> = Set()
     
-    var tagString: String {
-        tags.map { $0.value }.joined(separator: ", ")
-    }
-    
-    var tagCount: String {
-        tags.count.description
-    }
     
     var id: String {
         "\(parent)\(filename)"
@@ -36,6 +30,12 @@ class TaggedFile: Identifiable, Equatable, Hashable, ObservableObject {
     init(parent: String, filename: String, backend: TagBackend = XattrTagBackend()) {
         self.parent = parent
         self.filename = filename
+        var b: ObjCBool = false
+        if FileManager.default.fileExists(atPath: "\(parent)\(filename)", isDirectory: &b) {
+            self.isDirectory = b.boolValue
+        } else {
+            self.isDirectory = false 
+        }
         self.backend = backend
         let attrs = backend.loadTags(for: "\(parent)\(filename)")
         print(attrs)
@@ -60,5 +60,20 @@ class TaggedFile: Identifiable, Equatable, Hashable, ObservableObject {
     
     func commit() {
         backend.commitTransactions()
+    }
+}
+
+extension TaggedFile {
+    // KeyPaths for Table view
+    var tagString: String {
+        tags.map { $0.value }.joined(separator: ", ")
+    }
+    
+    var tagCount: String {
+        tags.count.description
+    }
+ 
+    var fileKind: String {
+        isDirectory ? "directory" : "file"
     }
 }
