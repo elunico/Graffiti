@@ -46,11 +46,12 @@ struct MainView: View {
                     Text("Tagging: \(directory?.absoluteString ?? "<none>")")
                     Spacer()
                     TextField("Search", text: $query)
-                        .frame(minWidth: 25.0, idealWidth: geometry.size.width / 8, maxWidth: 300.0, alignment: .topTrailing)
+                                                .frame(minWidth: 25.0, idealWidth: geometry.size.width / 8, maxWidth: 300.0, alignment: .topTrailing)
                         .help("Enter your search term. Use & and | for boolean operations. Use !word to avoid 'word' in results ")
+                        
                 }
                 GeometryReader { tableGeometry in
-                    Table(files.filteredFiles, selection: $selected, columns: {
+                    Table(files.filter(by: query), selection: $selected, columns: {
                         TableColumn("Path", value: \TaggedFile.filename).width(ideal: tableGeometry.size.width * 5 / 15)
                         TableColumn("Kind", value: \TaggedFile.fileKind).width(ideal: tableGeometry.size.width * 2 / 15)
                         TableColumn("Tags", value: \TaggedFile.tagString).width(ideal: tableGeometry.size.width * 5 / 15)

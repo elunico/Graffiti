@@ -17,8 +17,11 @@ class TaggedDirectory: ObservableObject {
     @Published var files: [TaggedFile] = []
     private var indexMap: [TaggedFile.ID: Int] = [:]
     private var filterPredicate: (TaggedFile) -> Bool = alwaysTrue
-    private var cachedFiles: [TaggedFile]? = nil
-    
+    private var cachedFiles: [TaggedFile]? = nil{
+        willSet {
+            print("Setting \(newValue ?? [])")
+        }
+    }
     private init() {
         self.directory = ""
         self.backend = XattrTagBackend()
@@ -61,17 +64,6 @@ class TaggedDirectory: ObservableObject {
         cachedFiles != nil ? cachedFiles! : files
     }
     
-    func exclude(fileID: String) {
-        filterPredicate = { (file2: TaggedFile) in self.filterPredicate(file2) && fileID != file2.id }
-        cachedFiles = files.filter(filterPredicate)
-    }
-    
-    func include(file: TaggedFile) {
-        // todo: identity or equality? 
-        filterPredicate = { (file2: TaggedFile) in self.filterPredicate(file2) || file == file2 }
-        cachedFiles = files.filter(filterPredicate)
-    }
-    
     func setFilter(from query: String) {
         if query.isEmpty {
             filterPredicate = TaggedDirectory.alwaysTrue
@@ -90,12 +82,12 @@ class TaggedDirectory: ObservableObject {
         cachedFiles = files.filter(filterPredicate)
     }
     
-    private func filter(query: String) -> [TaggedFile] {
+    func filter(by query: String) -> [TaggedFile] {
         if query.isEmpty {
             return files
         }
         let results = query.split(separator: "|").map{ $0.trimmingCharacters(in: .whitespacesAndNewlines) }.map{ $0.split(separator: "&").map{ s in s.trimmingCharacters(in: .whitespacesAndNewlines)} }
-        return files.filter {
+        let files = files.filter {
             file in results.anySatisfy {
                 conjunction in conjunction.allSatisfy {
                     text in
@@ -104,6 +96,8 @@ class TaggedDirectory: ObservableObject {
                 }
             }
         }
+        cachedFiles = files
+        return files
     }
 }
 
