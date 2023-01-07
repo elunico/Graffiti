@@ -7,25 +7,12 @@
 
 import Foundation
 
-class TaggedFile: Identifiable, Equatable, Hashable, ObservableObject {
-    static func == (lhs: TaggedFile, rhs: TaggedFile) -> Bool {
-        lhs.parent == rhs.parent && lhs.filename == rhs.filename
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-       
+class TaggedFile: ObservableObject {
     let parent: String
     let filename: String
     let isDirectory: Bool
     private let backend: TagBackend
     private(set) var tags: Set<Tag> = Set()
-    
-    
-    var id: String {
-        "\(parent)\(filename)"
-    }
     
     init(parent: String, filename: String, backend: TagBackend = XattrTagBackend()) {
         self.parent = parent
@@ -60,6 +47,22 @@ class TaggedFile: Identifiable, Equatable, Hashable, ObservableObject {
     
     func commit() {
         backend.commitTransactions()
+    }
+}
+
+extension TaggedFile: Identifiable {
+    var id: String {
+        "\(parent)\(filename)"
+    }
+}
+
+extension TaggedFile: Equatable, Hashable {
+    static func == (lhs: TaggedFile, rhs: TaggedFile) -> Bool {
+        lhs.parent == rhs.parent && lhs.filename == rhs.filename
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }
 

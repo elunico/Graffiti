@@ -7,9 +7,10 @@
 
 import Foundation
 
-struct Tag : Equatable, Hashable, Identifiable, Codable {
-//    var id: UUID = UUID()
+struct Tag : Equatable, Hashable, Codable {
     let value: String
-    
+}
+
+extension Tag: Identifiable {
     var id: String { value }
 }

@@ -9,19 +9,20 @@ import Foundation
 
 class TaggedDirectory: ObservableObject {
     static let empty: TaggedDirectory = TaggedDirectory()
-    
-    static let alwaysTrue: (TaggedFile) -> Bool = { _ in true }
+    private static let alwaysTrue: (TaggedFile) -> Bool = { _ in true }
     
     @Published var directory: String
-    var backend: TagBackend
     @Published var files: [TaggedFile] = []
+    private var backend: TagBackend
     private var indexMap: [TaggedFile.ID: Int] = [:]
+    
     private var filterPredicate: (TaggedFile) -> Bool = alwaysTrue
-    private var cachedFiles: [TaggedFile]? = nil{
-        willSet {
-            print("Setting \(newValue ?? [])")
-        }
+    private var cachedFiles: [TaggedFile]? = nil
+
+    var allFiles: [TaggedFile] {
+        files
     }
+    
     private init() {
         self.directory = ""
         self.backend = XattrTagBackend()
@@ -51,15 +52,10 @@ class TaggedDirectory: ObservableObject {
     func getFiles(withIDs ids: Set<String>) -> Set<TaggedFile> {
         Set(ids.map { indexMap[$0] }.filter { $0 != nil }.map { files[$0!] })
     }
-    
-    var allFiles: [TaggedFile] {
-        files
-    }
-    
-//    var filteredFiles : [TaggedFile] {
-//        files.filter(filterPredicate)
-//    }
-    
+}
+
+// Functions for filtering
+extension TaggedDirectory {
     var filteredFiles: [TaggedFile] {
         cachedFiles != nil ? cachedFiles! : files
     }
@@ -99,11 +95,6 @@ class TaggedDirectory: ObservableObject {
         cachedFiles = files
         return files
     }
-}
-
-func printing<T>(_ t: T) -> T {
-    print(t)
-    return t
 }
 
 extension Array {
