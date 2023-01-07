@@ -9,6 +9,10 @@ import Foundation
 
 
 class XattrTagBackend: TagBackend {
+    var implementationProhibitedCharacters: Set<Character> {
+        Set([","])
+    }
+    
     static let kXattrDomain = "com.tom.graffiti-tags"
     let delimiter: String
     

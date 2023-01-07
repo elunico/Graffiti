@@ -9,6 +9,11 @@ import Foundation
 
 
 class LazyBackend: TagBackend {
+   
+    var implementationProhibitedCharacters: Set<Character> {
+        backing.implementationProhibitedCharacters
+    }
+    
     enum Transaction {
         case Add(tag: Tag, file: TaggedFile)
         case RemoveTag(id: Tag.ID, file: TaggedFile)

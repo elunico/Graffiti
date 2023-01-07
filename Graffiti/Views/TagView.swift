@@ -39,6 +39,7 @@ struct TagView: View {
     @State var selected: Tag.ID?
     @State var currentTag: String = ""
     @State var showingHelp = false
+    var prohibitedCharacters: Set<Character>
     var done: (Set<TaggedFile>) -> ()
     
     func performDelete() {
@@ -69,7 +70,7 @@ struct TagView: View {
                 TextField("Add Tag", text: $currentTag, prompt: Text("Tag"))
                     .onChange(of: currentTag) { _ in
                         // all credits to Leo Dabus:
-                        currentTag.removeAll(where: {  ",&|!".contains($0) })
+                        currentTag.removeAll(where: { prohibitedCharacters.contains($0) })
                         
                     }
                 

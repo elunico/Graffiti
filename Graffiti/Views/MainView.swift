@@ -66,7 +66,7 @@ struct MainView: View {
                 }
             })
             .sheet(isPresented: $editing,  content: {
-                TagView(files: files.getFiles(withIDs: selected), done: { _ in editing = false })
+                TagView(files: files.getFiles(withIDs: selected), prohibitedCharacters: backend.prohibitedCharacters, done: { _ in editing = false })
             })
         }
         .onDisappear(perform: self.teardown)
