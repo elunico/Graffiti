@@ -14,6 +14,13 @@ class TaggedFile: ObservableObject {
     private let backend: TagBackend
     private(set) var tags: Set<Tag> = Set()
     
+    convenience init(atPath path: String, backend: TagBackend) {
+        var components = path.components(separatedBy: "/")
+        let filename = components.removeLast()
+        let parent = components.joined(separator: "/")
+        self.init(parent: parent, filename: filename, backend: backend)
+    }
+    
     init(parent: String, filename: String, backend: TagBackend = XattrTagBackend()) {
         self.parent = parent
         self.filename = filename
@@ -24,7 +31,7 @@ class TaggedFile: ObservableObject {
             self.isDirectory = false 
         }
         self.backend = backend
-        let attrs = backend.loadTags(for: "\(parent)\(filename)")
+        let attrs = backend.loadTags(at: "\(parent)\(filename)")
         print(attrs)
         self.tags = attrs 
     }

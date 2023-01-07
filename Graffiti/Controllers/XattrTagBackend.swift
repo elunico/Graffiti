@@ -34,7 +34,7 @@ class XattrTagBackend: TagBackend {
         XattrBridge.setXAttrAttributeForFile("\(file.parent)\(file.filename)", valueOf: s, withKey: XattrTagBackend.kXattrDomain, andError: nil)
     }
     
-    func loadTags(for path: String) -> Set<Tag> {
+    func loadTags(at path: String) -> Set<Tag> {
         Set(XattrBridge.getXAttrAttributes(forFile: path, withKey: XattrTagBackend.kXattrDomain, delimitedBy: delimiter, andError: nil).map { $0 as? String }.filter { $0 != nil && $0?.isEmpty != true }.map { Tag(value: $0!) })
     }
     

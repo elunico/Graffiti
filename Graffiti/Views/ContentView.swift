@@ -28,33 +28,55 @@ extension View {
 
 struct ContentView: View {
     enum Choice: Hashable {
-        case json, plist, xattr
+        case xattr, csv
         case none
     }
     
     @State var formatChoice: Choice = .xattr
     @State var lazyChoice: Bool = false
     @State var showingOptions: Bool = true
+    @State var directory: URL? = nil
     
     var body: some View {
         if showingOptions {
             GeometryReader { geometry in
                 VStack {
-                    Text("Choose a save format")
-                        .font(.headline)
-                    
-                    Picker("", selection: $formatChoice, content: {
-                        Text("JSON File").tag(Choice.json).disabled(true) // not implemented
-                        Text("plist File").tag(Choice.plist).disabled(true)  // not implemented
-                        Text("xattr attributes").tag(Choice.xattr)
-                    }).frame(minWidth: geometry.size.width / 2, maxWidth: geometry.size.width / 2)
-                    Toggle(isOn: $lazyChoice, label: {
-                        Text("Lazy Writing?")
-                    })
-                    Button("Go!") {
-                        showingOptions = false
+                    Group {
+                        Text("Graffiti").font(.largeTitle)
+                        Text("A File Tagging Application").font(.title2)
                     }
-                }.frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
+                    Spacer().frame(height: 50.0)
+                    Group {
+                        Group {
+                            Button("Choose Directory") {
+                                selectFolder {
+                                    self.directory = $0[0]
+                                }
+                            }
+                            Text("Selected: \(directory?.absolutePath ?? "<none>")")
+                        }
+                        Spacer().frame(height: 50.0)
+                        Group {
+                            Text("Choose a save format")
+                                .font(.headline)
+                            
+                            Picker("", selection: $formatChoice, content: {
+                                Text("CSV File").tag(Choice.csv)
+                                Text("xattr attributes").tag(Choice.xattr)
+                            }).frame(minWidth: 200.0, maxWidth: 300.0)
+                            Toggle(isOn: $lazyChoice, label: {
+                                Text("Lazy Writing?")
+                            })
+                        }
+                    }
+                    Button("Go!") {
+                        if directory != nil {
+                            showingOptions = false
+                        }
+                    }.disabled(directory == nil)
+//                    Spacer()
+                }
+                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
                 .padding()
             }
         } else {
@@ -63,6 +85,8 @@ struct ContentView: View {
                 var backend: TagBackend
                 if formatChoice == .xattr {
                     backend = XattrTagBackend()
+                } else if formatChoice == .csv {
+                    backend = FileTagBackend(forFilesIn: self.directory!, writer: CSVFileWriter())
                 } else {
                     fatalError()
                 }
@@ -73,7 +97,7 @@ struct ContentView: View {
                 return backend
             })()
             
-            MainView(backend: backend, showOptions: { showingOptions = true })
+            MainView(backend: backend, directory: self.directory, showOptions: { showingOptions = true })
         }
         
     }

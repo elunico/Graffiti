@@ -35,8 +35,8 @@ class LazyBackend: TagBackend {
         transactions.append(.RemoveTag(id: id, file: file))
     }
     
-    func loadTags(for path: String) -> Set<Tag> {
-        backing.loadTags(for: path)
+    func loadTags(at path: String) -> Set<Tag> {
+        backing.loadTags(at: path)
     }
     
     func clearTags(of file: TaggedFile) {

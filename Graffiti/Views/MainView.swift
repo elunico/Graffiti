@@ -10,7 +10,7 @@ import SwiftUI
 
 struct MainView: View {
     @State var backend: TagBackend
-    @State private var directory: URL? = nil
+    @State var directory: URL?
     @StateObject var files: TaggedDirectory = .empty
     @State private var selected: Set<TaggedFile.ID> = Set()
     @State private var query: String = ""
@@ -23,14 +23,9 @@ struct MainView: View {
     var body: some View {
         GeometryReader { geometry in
             VStack {
-                Button("Choose Directory") {
-                    selectFolder {
-                        self.directory = $0[0]
-                        self.files.load(directory: $0[0].absolutePath, backend: backend)
-                    }
-                }
+
                 HStack {
-                    Text("Tagging: \(directory?.absoluteString ?? "<none>")")
+                    Text("Tagging: \(directory?.absolutePath ?? "<none>")")
                     Spacer()
                     TextField("Search", text: $query)
                         .frame(minWidth: 25.0, idealWidth: geometry.size.width / 8, maxWidth: 300.0, alignment: .topTrailing)
@@ -80,6 +75,10 @@ struct MainView: View {
             }
         })
         .padding()
+        .onAppear {
+            guard let path = self.directory?.absolutePath else { return }
+            self.files.load(directory: path, backend: backend)
+        }
     }
     
     
