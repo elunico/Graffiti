@@ -43,6 +43,7 @@ struct MainView: View {
                 }
                 HStack {
                     Button("Change save format") {
+                        self.teardown()
                         showOptions()
                     }
                     Spacer()
@@ -70,7 +71,6 @@ struct MainView: View {
         .environmentObject(files)
         .onTapGesture(count: 2, perform: {
             for file in files.getFiles(withIDs: selected) {
-                print("opening file \(file)")
                 NSWorkspace.shared.openFile(file.id)
             }
         })
@@ -86,5 +86,8 @@ struct MainView: View {
         for file in files.files {
             file.commit()
         }
+        self.files.files.removeAll(keepingCapacity: true)
+        self.files.clearFilter()
+        
     }
 }

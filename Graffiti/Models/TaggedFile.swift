@@ -32,7 +32,6 @@ class TaggedFile: ObservableObject {
         }
         self.backend = backend
         let attrs = backend.loadTags(at: "\(parent)\(filename)")
-        print(attrs)
         self.tags = attrs 
     }
     

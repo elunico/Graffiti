@@ -30,7 +30,6 @@ class XattrTagBackend: TagBackend {
     
     func removeTag(withID id: Tag.ID, from file: TaggedFile) {
         let s = xattrString(file: file);
-        print("Attr string \(s)")
         XattrBridge.setXAttrAttributeForFile("\(file.parent)\(file.filename)", valueOf: s, withKey: XattrTagBackend.kXattrDomain, andError: nil)
     }
     

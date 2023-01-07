@@ -20,9 +20,7 @@ class CSVFileWriter: FileWriter {
     
     func loadFrom(path: String) throws -> [String: Set<Tag>] {
         var retValue: [String: Set<Tag>] = [:]
-        
-        print("in loadFrom \(path)")
-        
+                
         if !FileManager.default.fileExists(atPath: path) {
             FileManager.default.createFile(atPath: path, contents: CSVFileWriter.headerRow.data(using: .utf8))
         }

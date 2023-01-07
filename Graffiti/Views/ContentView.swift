@@ -27,12 +27,12 @@ extension View {
 }
 
 struct ContentView: View {
-    enum Choice: Hashable {
+    enum Format: Hashable {
         case xattr, csv
         case none
     }
     
-    @State var formatChoice: Choice = .xattr
+    @State var formatChoice: Format = .xattr
     @State var lazyChoice: Bool = false
     @State var showingOptions: Bool = true
     @State var directory: URL? = nil
@@ -61,8 +61,8 @@ struct ContentView: View {
                                 .font(.headline)
                             
                             Picker("", selection: $formatChoice, content: {
-                                Text("CSV File").tag(Choice.csv)
-                                Text("xattr attributes").tag(Choice.xattr)
+                                Text("CSV File").tag(Format.csv)
+                                Text("xattr attributes").tag(Format.xattr)
                             }).frame(minWidth: 200.0, maxWidth: 300.0)
                             Toggle(isOn: $lazyChoice, label: {
                                 Text("Lazy Writing?")

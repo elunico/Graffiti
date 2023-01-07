@@ -95,6 +95,10 @@ extension TaggedDirectory {
         cachedFiles = files
         return files
     }
+    
+    func clearFilter() {
+        setFilter(from: "")
+    }
 }
 
 extension Array {

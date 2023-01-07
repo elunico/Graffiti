@@ -22,9 +22,8 @@ class FileTagBackend: TagBackend {
         self.directory = directory
         self.writer = writer
         // todo: fix this
-        var intermediate = try! writer.loadFrom(path: "\(directory.absolutePath)\(FileTagBackend.filePrefix)\(writer.fileExtension)")
+        let intermediate = try! writer.loadFrom(path: "\(directory.absolutePath)\(FileTagBackend.filePrefix)\(writer.fileExtension)")
         for (path, tags) in intermediate {
-            print("path: \(path)")
             self.tags[path] = tags
         }
     }
@@ -63,7 +62,6 @@ class FileTagBackend: TagBackend {
     static let filePrefix = "com-tom-graffiti.tagfile";
     var saveFile: String {
         let path = "\(directory.absolutePath)\(FileTagBackend.filePrefix)\(writer.fileExtension)"
-        print(path)
         return path
     }
     
