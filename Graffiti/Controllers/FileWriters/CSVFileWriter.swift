@@ -13,7 +13,7 @@ class CSVFileWriter: FileWriter {
     static let headerRow: String = "path,tags\n"
     
     var fileProhibitedCharacters: Set<Character> {
-        Set([CSVFileWriter.kTagSeparator.first!])
+        Set([CSVFileWriter.kTagSeparator.first!, ","])
     }
     
     var fileExtension: String = ".csv"
