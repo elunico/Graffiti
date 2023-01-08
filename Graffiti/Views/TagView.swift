@@ -71,17 +71,14 @@ struct TagView: View {
                     .onChange(of: currentTag) { _ in
                         // all credits to Leo Dabus:
                         currentTag.removeAll(where: { prohibitedCharacters.contains($0) })
-                        
+                    }.onSubmit {
+                        self.addCurrentTag()
                     }
+                    
                 
                 HStack {
                     Button("Add Tag") {
-                        if currentTag.isEmpty || currentTag.allSatisfy({$0.isWhitespace}) {
-                            return
-                        }
-                        
-                        files.forEach { $0.addTag(Tag(value: currentTag)) }
-                        currentTag = ""
+                        self.addCurrentTag()
                     }.disabled(currentTag == "")
                     Spacer()
                     Button("Delete Tag") {
@@ -98,5 +95,14 @@ struct TagView: View {
                 FilesEditingInspectorView(done: { showingHelp = false }, removeFileWithID: { id in files.remove(at: files.firstIndex(where: {$0.id == id})!) }, files: files)
             })
 
+    }
+    
+    func addCurrentTag() {
+        if currentTag.isEmpty || currentTag.allSatisfy({$0.isWhitespace}) {
+            return
+        }
+        
+        files.forEach { $0.addTag(Tag(value: currentTag)) }
+        currentTag = ""
     }
 }

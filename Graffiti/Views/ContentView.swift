@@ -27,8 +27,17 @@ extension View {
 }
 
 struct ContentView: View {
-    enum Format: Hashable {
-        case xattr, csv
+    enum Format: Hashable, CustomStringConvertible {
+        var description: String {
+            switch self {
+            case .plist: return "plist"
+            case .csv: return "csv"
+            case .xattr: return "xattr"
+            case .none: return "<<none>>"
+            }
+        }
+        
+        case xattr, csv, plist
         case none
     }
     
@@ -62,6 +71,7 @@ struct ContentView: View {
                             
                             Picker("", selection: $formatChoice, content: {
                                 Text("CSV File").tag(Format.csv)
+                                Text("plist File").tag(Format.plist)
                                 Text("xattr attributes").tag(Format.xattr)
                             }).frame(minWidth: 200.0, maxWidth: 300.0)
                             Toggle(isOn: $lazyChoice, label: {
@@ -87,6 +97,8 @@ struct ContentView: View {
                     backend = XattrTagBackend()
                 } else if formatChoice == .csv {
                     backend = FileTagBackend(forFilesIn: self.directory!, writer: CSVFileWriter())
+                } else if formatChoice == .plist {
+                    backend = FileTagBackend(forFilesIn: self.directory!, writer: PropertyListFileWriter())
                 } else {
                     fatalError()
                 }
@@ -97,7 +109,7 @@ struct ContentView: View {
                 return backend
             })()
             
-            MainView(backend: backend, directory: self.directory, showOptions: { showingOptions = true })
+            MainView(choice: formatChoice, backend: backend, directory: self.directory, showOptions: { showingOptions = true })
         }
         
     }

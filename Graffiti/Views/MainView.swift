@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 
 struct MainView: View {
+    @State var choice: ContentView.Format
     @State var backend: TagBackend
     @State var directory: URL?
     @StateObject var files: TaggedDirectory = .empty
@@ -23,14 +24,15 @@ struct MainView: View {
     var body: some View {
         GeometryReader { geometry in
             VStack {
-
                 HStack {
-                    Text("Tagging: \(directory?.absolutePath ?? "<none>")")
+                    VStack {
+                        Text("Tagging: \(directory?.absolutePath ?? "<none>")")
+                        Text("Save format: \(choice.description)")
+                    }
                     Spacer()
                     TextField("Search", text: $query)
                         .frame(minWidth: 25.0, idealWidth: geometry.size.width / 8, maxWidth: 300.0, alignment: .topTrailing)
                         .help("Enter your search term. Use & and | for boolean operations. Use !word to avoid 'word' in results ")
-                    
                 }
                 GeometryReader { tableGeometry in
                     Table(files.filter(by: query), selection: $selected, columns: {
@@ -69,11 +71,6 @@ struct MainView: View {
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification), perform: {output in self.teardown()})
         .frame(minWidth: 500.0, minHeight: 500.0, alignment: .center)
         .environmentObject(files)
-        .onTapGesture(count: 2, perform: {
-            for file in files.getFiles(withIDs: selected) {
-                NSWorkspace.shared.openFile(file.id)
-            }
-        })
         .padding()
         .onAppear {
             guard let path = self.directory?.absolutePath else { return }

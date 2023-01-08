@@ -8,6 +8,8 @@
 import Foundation
 
 struct Tag : Equatable, Hashable, Codable {
+    static let valueFieldName: String = "value"
+    
     let value: String
 }
 
