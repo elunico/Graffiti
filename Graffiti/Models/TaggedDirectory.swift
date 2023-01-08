@@ -52,6 +52,10 @@ class TaggedDirectory: ObservableObject {
     func getFiles(withIDs ids: Set<String>) -> Set<TaggedFile> {
         Set(ids.map { indexMap[$0] }.filter { $0 != nil }.map { files[$0!] })
     }
+    
+    var tagStore: String? {
+        (backend as? FileTagBackend)?.saveFile
+    }
 }
 
 // Functions for filtering

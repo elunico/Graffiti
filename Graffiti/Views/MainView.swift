@@ -28,6 +28,9 @@ struct MainView: View {
                     VStack {
                         Text("Tagging: \(directory?.absolutePath ?? "<none>")")
                         Text("Save format: \(choice.description)")
+                        Button("Show") {
+                            NSWorkspace.shared.selectFile(files.tagStore, inFileViewerRootedAtPath: directory!.absolutePath)
+                        }
                     }
                     Spacer()
                     TextField("Search", text: $query)
