@@ -55,5 +55,6 @@ class LazyBackend: TagBackend {
             }
         }
         transactions.removeAll()
+        backing.commitTransactions()
     }
 }
