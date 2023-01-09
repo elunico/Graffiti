@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 extension URL {
     var absolutePath: String {
@@ -16,7 +17,7 @@ extension URL {
 extension View {
     func onClearAll(message: String, isPresented: Binding<Bool>, clearAction: @escaping () -> ()) -> some View {
         self.confirmationDialog("Are you sure you want to clear all?",
-                            isPresented: isPresented) {
+                                isPresented: isPresented) {
             Button("Clear All") {
                 clearAction()
             }
@@ -27,13 +28,22 @@ extension View {
 }
 
 struct ContentView: View {
-    enum Format: Hashable, CustomStringConvertible {
+    enum Format: Hashable, CustomStringConvertible, CaseIterable {
         var description: String {
+            switch self {
+            case .plist: return "Property List"
+            case .csv: return "Comma-Separated Values"
+            case .xattr: return "Extended File Attributes"
+            case .none: return "<<none>>"
+            }
+        }
+        
+        var fileExtension: String? {
             switch self {
             case .plist: return "plist"
             case .csv: return "csv"
-            case .xattr: return "xattr"
-            case .none: return "<<none>>"
+            case .xattr: return nil
+            case .none: return nil
             }
         }
         
@@ -46,6 +56,8 @@ struct ContentView: View {
     @State var showingOptions: Bool = true
     @State var directory: URL? = nil
     
+    @State var targeted: Bool = false
+    
     var body: some View {
         if showingOptions {
             GeometryReader { geometry in
@@ -53,10 +65,14 @@ struct ContentView: View {
                     Group {
                         Text("Graffiti").font(.largeTitle)
                         Text("A File Tagging Application").font(.title2)
+                        Divider().frame(width: geometry.size.width / 2)
                     }
-                    Spacer().frame(height: 50.0)
+                    //                    Spacer().frame(height: 50.0)
                     Group {
                         Group {
+                            Label("Choose a directory", systemImage: "1.circle")
+                                .font(.title)
+                            Text("Drag and drop an existing plist or csv tag store \nor drag and a drop a directory, or use the button to get started").font(.subheadline).padding()
                             Button("Choose Directory") {
                                 selectFolder {
                                     self.directory = $0[0]
@@ -64,31 +80,66 @@ struct ContentView: View {
                             }
                             Text("Selected: \(directory?.absolutePath ?? "<none>")")
                         }
-                        Spacer().frame(height: 50.0)
+                        Spacer().frame(height: 25.0)
+                            .frame(width: geometry.size.width / 3)
                         Group {
-                            Text("Choose a save format")
-                                .font(.headline)
+                            Label("Choose a save format", systemImage: "2.circle")
+                                .font(.title)
                             
                             Picker("", selection: $formatChoice, content: {
                                 Text("CSV File").tag(Format.csv)
-                                Text("plist File").tag(Format.plist)
-                                Text("xattr attributes").tag(Format.xattr)
-                            }).frame(minWidth: 200.0, maxWidth: 300.0)
+                                    .help("Saves all tags of all files in a directory to a single CSV file also placed in that directory")
+                                Text("Property List File").tag(Format.plist)
+                                    .help("Saves all tags of all files in a directory to a single CSV file also placed in that directory")
+                                Text("Extended File Attributes").tag(Format.xattr)
+                                    .help("Saves all tags of each files as extended attributes (xattr) of that file. The file retains its tags even when moved")
+                            })
+                            .pickerStyle(RadioGroupPickerStyle())
+                            .frame(minWidth: 200.0, maxWidth: 300.0)
+                            .padding()
                             Toggle(isOn: $lazyChoice, label: {
                                 Text("Lazy Writing?")
                             })
                         }
+                        Spacer().frame(height: 25.0)
+                            .frame(width: geometry.size.width / 3)
                     }
-                    Button("Go!") {
+                    Label("Start Tagging!", systemImage: "3.circle")
+                        .font(.title)
+                    Button {
                         if directory != nil {
                             showingOptions = false
                         }
+                    } label: {
+                        Label("Go!", systemImage: "arrowshape.forward")
                     }.disabled(directory == nil)
-//                    Spacer()
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
                 .padding()
             }
+            .onDrop(of: ["public.file-url"], isTargeted: $targeted) { providers -> Bool in
+                
+                providers.first?.loadDataRepresentation(forTypeIdentifier: "public.file-url", completionHandler: { (data, error) in
+                    if let data = data, let path = String(data: data, encoding: .utf8), let url = URL(string: path) {
+                        var isDir: ObjCBool = false
+                        if FileManager.default.fileExists(atPath: url.absolutePath, isDirectory: &isDir) && isDir.boolValue {
+                            directory = url
+                            showingOptions = false
+                        } else {
+                            for format in Format.allCases {
+                                if let f = format.fileExtension, url.pathExtension == f {
+                                    directory = url.deletingLastPathComponent()
+                                    formatChoice = format
+                                    showingOptions = false
+                                    break 
+                                }
+                            }
+                        }
+                    }
+                })
+                return true
+            }
+            .frame(minWidth: 600.0, minHeight: 600.0, alignment: .center)
         } else {
             
             let backend: TagBackend = ({
@@ -113,7 +164,7 @@ struct ContentView: View {
         }
         
     }
-        
+    
     
 }
 

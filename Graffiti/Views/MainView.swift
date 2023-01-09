@@ -8,6 +8,12 @@
 import Foundation
 import SwiftUI
 
+extension String {
+    var lastPathComponent: String? {
+        self.components(separatedBy: "/").last
+    }
+}
+
 struct MainView: View {
     @State var choice: ContentView.Format
     @State var backend: TagBackend
@@ -18,7 +24,8 @@ struct MainView: View {
     
     @State private var editing: Bool = false
     @State private var isPresentingConfirm: Bool = false
-        
+    @State private var showingMoreInfo: Bool = false
+    
     var showOptions: () -> ()
     
     var body: some View {
@@ -26,10 +33,19 @@ struct MainView: View {
             VStack {
                 HStack {
                     VStack {
-                        Text("Tagging: \(directory?.absolutePath ?? "<none>")")
-                        Text("Save format: \(choice.description)")
-                        Button("Show") {
-                            NSWorkspace.shared.selectFile(files.tagStore, inFileViewerRootedAtPath: directory!.absolutePath)
+                        HStack {
+                            Text("Tagging: \(directory?.absolutePath ?? "<none>")")
+                            Button(action: {showingMoreInfo.toggle()}, label: {
+                                Label(showingMoreInfo ? "Less" : "More", systemImage: "info.circle")
+                            })
+                            
+                        }
+                        if showingMoreInfo {
+                            Text("Save format: \(choice.description)")
+                            Text("Tag Store: \(files.tagStore?.lastPathComponent ?? "<per file>")")
+                            Button(files.tagStore == nil ? "Open Current Folder" : "Reveal Tag Store") {
+                                NSWorkspace.shared.selectFile(files.tagStore, inFileViewerRootedAtPath: directory!.absolutePath)
+                            }
                         }
                     }
                     Spacer()
@@ -38,13 +54,39 @@ struct MainView: View {
                         .help("Enter your search term. Use & and | for boolean operations. Use !word to avoid 'word' in results ")
                 }
                 GeometryReader { tableGeometry in
-                    Table(files.filter(by: query), selection: $selected, columns: {
-                        TableColumn("Path", value: \TaggedFile.filename).width(ideal: tableGeometry.size.width * 5 / 15)
-                        TableColumn("Kind", value: \TaggedFile.fileKind).width(ideal: tableGeometry.size.width * 2 / 15)
-                        TableColumn("Tags", value: \TaggedFile.tagString).width(ideal: tableGeometry.size.width * 5 / 15)
-                        TableColumn("Count", value: \TaggedFile.tagCount).width(ideal: tableGeometry.size.width / 15)
+                    Table(of: TaggedFile.self, selection: $selected, columns: {
+                        TableColumn("File") { item in
+                            Text(item.filename)
+                        }.width(ideal: tableGeometry.size.width * 5 / 15)
+                        TableColumn("Kind") { item in
+                            Text(item.fileKind)
+                        }.width(ideal: tableGeometry.size.width * 2 / 15)
+                        TableColumn("Tags") { item in
+                            Text(item.tagString)
+                        }.width(ideal: tableGeometry.size.width * 5 / 15)
+                        TableColumn("Count") { item in
+                            Text(item.tagCount)
+                        }.width(ideal: tableGeometry.size.width / 15)
+                    }, rows: {
+                        ForEach(files.filter(by: query)) { item in
+                            TableRow(item)
+                                .contextMenu {
+                                    Button(action:  {
+                                        guard let path = directory?.absolutePath else { return }
+                                        
+                                        if !NSWorkspace.shared.selectFile(item.id, inFileViewerRootedAtPath: path) {
+                                            NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: path)
+                                        }
+                                    }, label: { Label("Reveal \(item.filename) in Finder", systemImage: "magnifyingglass") })
+                                    Button(action:  {
+                                        NSWorkspace.shared.openFile(item.id)
+                                    }, label: { Label("Open \(item.filename)", systemImage: "arrow.forward.circle") })
+                                    Button(action:  {
+                                        item.clearTags()
+                                    }, label: { Label("Clear All Tags for \(item.filename)", systemImage: "xmark.circle") })
+                                }
+                        }
                     })
-                    
                 }
                 HStack {
                     Button("Change save format") {
