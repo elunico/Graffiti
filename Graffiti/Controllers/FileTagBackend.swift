@@ -18,11 +18,11 @@ class FileTagBackend: TagBackend {
     var directory: URL
     var dirty: Bool = false
     
-    init(forFilesIn directory: URL, writer: FileWriter) {
+    init?(forFilesIn directory: URL, writer: FileWriter) {
         self.directory = directory
         self.writer = writer
         // todo: fix this
-        let intermediate = try! writer.loadFrom(path: "\(directory.absolutePath)\(FileTagBackend.filePrefix)\(writer.fileExtension)")
+        guard let intermediate = try? writer.loadFrom(path: "\(directory.absolutePath)\(FileTagBackend.filePrefix)\(writer.fileExtension)") else { return nil }
         for (path, tags) in intermediate {
             self.tags[path] = tags
         }

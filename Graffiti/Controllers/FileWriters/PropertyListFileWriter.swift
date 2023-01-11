@@ -20,7 +20,10 @@ class PropertyListFileWriter: FileWriter {
         let data = try Data(contentsOf: URL(fileURLWithPath: path))
         let object = try PropertyListSerialization.propertyList(from: data, format: nil)
         
-        var dict = object as! [String: [[String: String]]]
+        let dict = object as? [String: [[String: String]]]
+        guard let dict else {
+            throw FileWriterError.InvalidFileFormat
+        }
         
         for (path, listOfDicts) in dict {
             let s: [Tag] = listOfDicts.map { d in Tag(value: d[Tag.valueFieldName]!) }
@@ -38,13 +41,8 @@ class PropertyListFileWriter: FileWriter {
         FileManager.default.createFile(atPath: path, contents: data)
     }
     
-    var fileProhibitedCharacters: Set<Character> {
-        Set()
-    }
-    
-    var fileExtension: String {
-        ".plist"
-    }
-    
-    
+    let fileProhibitedCharacters: Set<Character> = Set()
+        
+    let fileExtension: String = ".plist"
+        
 }

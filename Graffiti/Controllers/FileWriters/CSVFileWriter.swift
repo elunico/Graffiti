@@ -12,11 +12,9 @@ class CSVFileWriter: FileWriter {
     static let kTagSeparator: String = ";"
     static let headerRow: String = "path,tags\n"
     
-    var fileProhibitedCharacters: Set<Character> {
-        Set([CSVFileWriter.kTagSeparator.first!, ",", "\n"])
-    }
-    
-    var fileExtension: String = ".csv"
+    let fileProhibitedCharacters: Set<Character> = Set([CSVFileWriter.kTagSeparator.first!, ",", "\n"])
+       
+    let fileExtension: String = ".csv"
     
     func loadFrom(path: String) throws -> [String: Set<Tag>] {
         var retValue: [String: Set<Tag>] = [:]

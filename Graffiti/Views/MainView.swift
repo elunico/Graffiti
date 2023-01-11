@@ -47,6 +47,7 @@ struct MainView: View {
                                 NSWorkspace.shared.selectFile(files.tagStore, inFileViewerRootedAtPath: directory!.absolutePath)
                             }
                         }
+                        
                     }
                     Spacer()
                     TextField("Search", text: $query)
@@ -69,22 +70,41 @@ struct MainView: View {
                         }.width(ideal: tableGeometry.size.width / 15)
                     }, rows: {
                         ForEach(files.filter(by: query)) { item in
-                            TableRow(item)
-                                .contextMenu {
-                                    Button(action:  {
-                                        guard let path = directory?.absolutePath else { return }
-                                        
-                                        if !NSWorkspace.shared.selectFile(item.id, inFileViewerRootedAtPath: path) {
-                                            NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: path)
-                                        }
-                                    }, label: { Label("Reveal \(item.filename) in Finder", systemImage: "magnifyingglass") })
-                                    Button(action:  {
-                                        NSWorkspace.shared.openFile(item.id)
-                                    }, label: { Label("Open \(item.filename)", systemImage: "arrow.forward.circle") })
-                                    Button(action:  {
-                                        item.clearTags()
-                                    }, label: { Label("Clear All Tags for \(item.filename)", systemImage: "xmark.circle") })
-                                }
+                            if selected.count <= 1 {
+                                TableRow(item)
+                                    .contextMenu {
+                                        Button(action:  {
+                                            guard let path = directory?.absolutePath else { return }
+                                            
+                                            if !NSWorkspace.shared.selectFile(item.id, inFileViewerRootedAtPath: path) {
+                                                NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: path)
+                                            }
+                                        }, label: { Label("Reveal \(item.filename) in Finder", systemImage: "magnifyingglass") })
+                                        Button(action:  {
+                                            NSWorkspace.shared.openFile(item.id)
+                                        }, label: { Label("Open \(item.filename)", systemImage: "arrow.forward.circle") })
+                                        Button(action:  {
+                                            item.clearTags()
+                                        }, label: { Label("Clear All Tags for \(item.filename)", systemImage: "xmark.circle") })
+                                    }
+                            } else {
+                                TableRow(item)
+                                    .contextMenu {
+                                        Button(action:  {
+                                            guard let path = directory?.absolutePath else { return }
+                                            
+                                            if !NSWorkspace.shared.selectFile(item.id, inFileViewerRootedAtPath: path) {
+                                                NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: path)
+                                            }
+                                        }, label: { Label("Reveal \(item.filename) in Finder", systemImage: "magnifyingglass") })
+                                        Button(action:  {
+                                            NSWorkspace.shared.openFile(item.id)
+                                        }, label: { Label("Open \(item.filename)", systemImage: "arrow.forward.circle") })
+                                        Button(action:  {
+                                            item.clearTags()
+                                        }, label: { Label("Clear All Tags for \(item.filename)", systemImage: "xmark.circle") })
+                                    }
+                            }
                         }
                     })
                 }
@@ -103,7 +123,7 @@ struct MainView: View {
                     }
                 }
             }
-            .onClearAll(message: "This will remove EVERY tag from EVERY file in this directory\nYou cannot undo this action", isPresented: $isPresentingConfirm, clearAction: {
+            .onClearAll(message: "This will remove EVERY tag from EVERY file currently visible in the table\nYou cannot undo this action", isPresented: $isPresentingConfirm, clearAction: {
                 for file in files.filteredFiles {
                     file.clearTags()
                 }

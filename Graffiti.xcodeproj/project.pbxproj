@@ -25,6 +25,7 @@
 		DCFA39C62965DD560002690A /* LazyBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C52965DD560002690A /* LazyBackend.swift */; };
 		DCFA39C82965DD680002690A /* XattrTagBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C72965DD680002690A /* XattrTagBackend.swift */; };
 		DCFA39CA296604740002690A /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C9296604740002690A /* MainView.swift */; };
+		DCFDE988296F4AEC005F00E9 /* JSONFileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFDE987296F4AEC005F00E9 /* JSONFileWriter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +51,7 @@
 		DCFA39C52965DD560002690A /* LazyBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazyBackend.swift; sourceTree = "<group>"; };
 		DCFA39C72965DD680002690A /* XattrTagBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XattrTagBackend.swift; sourceTree = "<group>"; };
 		DCFA39C9296604740002690A /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		DCFDE987296F4AEC005F00E9 /* JSONFileWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONFileWriter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +123,7 @@
 				DCEAB1A0296A04DE00843BE4 /* CSVFileWriter.swift */,
 				DCEAB1A2296A056B00843BE4 /* FileWriter.swift */,
 				DC2E803B296A40450015AE26 /* PropertyListFileWriter.swift */,
+				DCFDE987296F4AEC005F00E9 /* JSONFileWriter.swift */,
 			);
 			path = FileWriters;
 			sourceTree = "<group>";
@@ -228,6 +231,7 @@
 				DCEAB19E296A018A00843BE4 /* FileTagBackend.swift in Sources */,
 				DCFA39C82965DD680002690A /* XattrTagBackend.swift in Sources */,
 				DC2809B22967722F003915A5 /* FilesEditingInspectorView.swift in Sources */,
+				DCFDE988296F4AEC005F00E9 /* JSONFileWriter.swift in Sources */,
 				DCFA39CA296604740002690A /* MainView.swift in Sources */,
 				DCFA39C02965DCC20002690A /* TagView.swift in Sources */,
 				DC1B7BC82962299B00DEED22 /* TaggedFile.swift in Sources */,

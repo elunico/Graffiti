@@ -74,8 +74,6 @@ struct TagView: View {
                     }.onSubmit {
                         self.addCurrentTag()
                     }
-                    
-                
                 HStack {
                     Button("Add Tag") {
                         self.addCurrentTag()
@@ -94,7 +92,6 @@ struct TagView: View {
             .sheet(isPresented: $showingHelp, content: {
                 FilesEditingInspectorView(done: { showingHelp = false }, removeFileWithID: { id in files.remove(at: files.firstIndex(where: {$0.id == id})!) }, files: files)
             })
-
     }
     
     func addCurrentTag() {

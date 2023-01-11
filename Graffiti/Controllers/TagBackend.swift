@@ -34,7 +34,7 @@ extension TagBackend {
         /// of the tag backend can also prohibit characters hence the union
         /// This property is not declared in the protocol in order to prevent people
         /// from accidentally excluding the 3 special search characters
-        Set(["&", "!", "|"]).union(implementationProhibitedCharacters)
+        Set(["&", "!", "|", "\n", "\t", "\r"]).union(implementationProhibitedCharacters)
     }
 }
 
