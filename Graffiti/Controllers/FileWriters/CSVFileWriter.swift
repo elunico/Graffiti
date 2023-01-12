@@ -25,10 +25,16 @@ class CSVFileWriter: FileWriter {
         
         let string = try String(contentsOfFile: path, encoding: .utf8)
         var lines = string.split(separator: "\n")
+        if lines.count == 0 {
+            throw FileWriterError.InvalidFileFormat
+        }
         // discard header row
         lines.remove(at: 0)
         for line in lines {
             let cols = line.components(separatedBy: ",")
+            if cols.count < 2 {
+                throw FileWriterError.InvalidFileFormat
+            }
             let tags = cols[1].components(separatedBy: CSVFileWriter.kTagSeparator)
             retValue[cols[0]] = Set(tags.map { Tag(value: $0) })
         }
