@@ -29,16 +29,12 @@ class XattrTagBackend: TagBackend {
     }
     
     func removeTag(withID id: Tag.ID, from file: TaggedFile) {
-        let s = xattrString(file: file);
+        let s = file.tags.filter { $0.id != id }.map { $0.value }.joined(separator: delimiter)
         XattrBridge.setXAttrAttributeForFile("\(file.parent)\(file.filename)", valueOf: s, withKey: XattrTagBackend.kXattrDomain, andError: nil)
     }
     
     func loadTags(at path: String) -> Set<Tag> {
         Set(XattrBridge.getXAttrAttributes(forFile: path, withKey: XattrTagBackend.kXattrDomain, delimitedBy: delimiter, andError: nil).map { $0 as? String }.filter { $0 != nil && $0?.isEmpty != true }.map { Tag(value: $0!) })
-    }
-    
-    func xattrString(file: TaggedFile) -> String {
-        file.tags.map { $0.value }.joined(separator: delimiter)
     }
     
     func clearTags(of file: TaggedFile) {

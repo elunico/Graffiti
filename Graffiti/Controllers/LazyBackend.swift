@@ -43,16 +43,20 @@ class LazyBackend: TagBackend {
         transactions.append(.clearTags(file: file))
     }
     
+    func perform(transaction: Transaction) {
+        switch transaction{
+        case .Add(let tag, let file):
+            backing.addTag(tag, to: file)
+        case .RemoveTag(let id, let file):
+            backing.removeTag(withID: id, from: file)
+        case .clearTags(let file):
+            backing.clearTags(of: file)
+        }
+    }
+    
     func commitTransactions() {
         for transaction in transactions {
-            switch transaction{
-            case .Add(let tag, let file):
-                backing.addTag(tag, to: file)
-            case .RemoveTag(let tag, let file):
-                backing.removeTag(withID: tag, from: file)
-            case .clearTags(let file):
-                backing.clearTags(of: file)
-            }
+            perform(transaction: transaction)
         }
         transactions.removeAll()
         backing.commitTransactions()

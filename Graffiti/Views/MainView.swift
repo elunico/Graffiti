@@ -41,10 +41,12 @@ struct MainView: View {
                             
                         }
                         if showingMoreInfo {
-                            Text("Save format: \(choice.description)")
-                            Text("Tag Store: \(files.tagStore?.lastPathComponent ?? "<per file>")")
-                            Button(files.tagStore == nil ? "Open Current Folder" : "Reveal Tag Store") {
-                                NSWorkspace.shared.selectFile(files.tagStore, inFileViewerRootedAtPath: directory!.absolutePath)
+                            Group {
+                                Text("Save format: \(choice.description)")
+                                Text("Tag Store: \(files.tagStore?.lastPathComponent ?? "<per file>")")
+                                Button(files.tagStore == nil ? "Open Current Folder" : "Reveal Tag Store") {
+                                    NSWorkspace.shared.selectFile(files.tagStore, inFileViewerRootedAtPath: directory!.absolutePath)
+                                }
                             }
                         }
                         

@@ -63,7 +63,7 @@ struct ContentView: View {
         case none
     }
     
-    @State var formatChoice: Format = .xattr
+    @State var formatChoice: Format = .none
     @State var lazyChoice: Bool = false
     @State var showingOptions: Bool = true
     @State var showingInvalidFileFormat: Bool = false
@@ -82,6 +82,7 @@ struct ContentView: View {
                 Button("Choose Directory") {
                     selectFolder {
                         self.directory = $0[0]
+                        self.setBackend()
                     }
                 }
                 Text("Selected: \(directory?.absolutePath ?? "<none>")")
@@ -101,7 +102,10 @@ struct ContentView: View {
                         .help("Saves all tags of all files in a directory to a single JSON file also placed in that directory")
                     Text("Extended File Attributes").tag(Format.xattr)
                         .help("Saves all tags of each files as extended attributes (xattr) of that file. The file retains its tags even when moved")
-                })
+                }).onReceive([self.formatChoice].publisher.first()) { (value) in
+                    self.setBackend()
+                    print(self.backend)
+                }
                 .pickerStyle(RadioGroupPickerStyle())
                 .frame(minWidth: 200.0, maxWidth: 300.0)
                 .padding()
@@ -137,45 +141,7 @@ struct ContentView: View {
             .padding()
         }
         .onDrop(of: ["public.file-url"], isTargeted: $targeted) { providers -> Bool in
-            
-            providers.first?.loadDataRepresentation(forTypeIdentifier: "public.file-url", completionHandler: { (data, error) in
-                if let data = data, let path = String(data: data, encoding: .utf8), let url = URL(string: path) {
-                    var isDir: ObjCBool = false
-                    if FileManager.default.fileExists(atPath: url.absolutePath, isDirectory: &isDir) && isDir.boolValue {
-                        directory = url
-                        loadedFile = nil
-                        formatChoice = .xattr
-                        showingOptions = false
-                        backend = XattrTagBackend()
-                    } else {
-                        loadedFile = url
-                        for format in Format.allCases {
-                            if let f = format.fileExtension, url.pathExtension == f {
-                                directory = url.deletingLastPathComponent()
-                                formatChoice = format
-                                backend = ({
-                                    guard var b = formatChoice.implementation(in: self.directory!) else {
-                                        return nil
-                                    }
-                                    if lazyChoice {
-                                        b = LazyBackend(wrapping: b)
-                                    }
-                                    return b
-                                })()
-                                if backend != nil {
-                                    showingOptions = false
-                                    showingInvalidFileFormat = false
-                                } else {
-                                    showingOptions = true
-                                    showingInvalidFileFormat = true
-                                }
-//                                showingOptions = false
-                                break
-                            }
-                        }
-                    }
-                }
-            })
+            receiveDrop(providers: providers)
             return true
         }
         .frame(minWidth: 600.0, minHeight: 600.0, alignment: .center)
@@ -201,11 +167,67 @@ struct ContentView: View {
         if showingOptions {
             selectionView
         } else {
-//            assert(backend != nil)
             MainView(choice: formatChoice, backend: backend!, directory: self.directory, showOptions: { showingOptions = true })
         }
         
     }
+    
+    func setBackend() {
+        self.backend = ({
+            guard let dir = self.directory, var b = formatChoice.implementation(in: dir) else {
+                return nil
+            }
+            if lazyChoice {
+                b = LazyBackend(wrapping: b)
+            }
+            return b
+        })()
+    }
+    
+    func receiveDrop(providers: [NSItemProvider]) {
+        providers.first?.loadDataRepresentation(forTypeIdentifier: "public.file-url", completionHandler: { (data, error) in
+            if let data = data, let path = String(data: data, encoding: .utf8), let url = URL(string: path) {
+                               
+                var isDir: ObjCBool = false
+                if FileManager.default.fileExists(atPath: url.absolutePath, isDirectory: &isDir) && isDir.boolValue {
+                    directory = url
+                    loadedFile = nil
+                    formatChoice = .xattr
+                    backend = XattrTagBackend()
+                } else {
+                    loadedFile = url
+                    for format in Format.allCases {
+                        if let f = format.fileExtension, url.pathExtension == f {
+                            directory = url.deletingLastPathComponent()
+                            formatChoice = format
+                            backend = ({
+                                guard var b = formatChoice.implementation(in: self.directory!) else {
+                                    return nil
+                                }
+                                if lazyChoice {
+                                    b = LazyBackend(wrapping: b)
+                                }
+                                return b
+                            })()
+                            
+                            break
+                        }
+                    }
+                }
+                if backend != nil {
+                    showingOptions = false
+                    showingInvalidFileFormat = false
+                } else {
+                    showingOptions = true
+                    showingInvalidFileFormat = true
+                }
+            }
+        })
+    }
+    
+//    func setBackend(forDirOrFile url: URL?) {
+//
+//    }
     
     
 }
