@@ -12,6 +12,11 @@ extension URL {
     var absolutePath: String {
         absoluteString.replacingOccurrences(of: "file://", with: "")
     }
+    
+    var prettyPrinted: String {
+        let home = FileManager.default.homeDirectoryForCurrentUser
+        return absolutePath.replacingOccurrences(of: home.absolutePath, with: "~/")
+    }
 }
 
 extension View {
@@ -224,11 +229,6 @@ struct ContentView: View {
             }
         })
     }
-    
-//    func setBackend(forDirOrFile url: URL?) {
-//
-//    }
-    
     
 }
 
