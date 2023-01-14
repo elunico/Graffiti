@@ -46,28 +46,46 @@ struct MainView: View {
         }
     }
     
+    var name: String {
+        let affectedFiles = files.getFiles(withIDs: selected)
+                let name = affectedFiles.count == 1 ? affectedFiles.first!.filename : "\(affectedFiles.count) files"
+        return name
+    }
+    
     func contextMenuOptions(orientation: Orientation) -> some View {
         Group {
+            Button(action: {
+                editing = true
+            }, label: {
+                Label("Edit Tags of \(name)", systemImage: "pencil")
+            }).disabled(selected.count == 0)
+
             Button(action:  {
                 guard let path = directory?.absolutePath else { return }
-                
+                                
                 if !NSWorkspace.shared.selectFile(files.getFile(withID: selected.first!)!.id, inFileViewerRootedAtPath: path) {
                     NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: path)
                 }
-            }, label: { Label("Reveal Item in Finder", systemImage: "folder.badge.questionmark") })
+            }, label: { Label("Reveal \(name) in Finder", systemImage: "folder.badge.questionmark") })
             .disabled(selected.count != 1)
+
             Button(action:  {
-                NSWorkspace.shared.openFile(files.getFile(withID: selected.first!)!.id)
-            }, label: { Label("Open Item", systemImage: "doc.viewfinder") })
+                for item in files.getFiles(withIDs: selected) {
+                    NSWorkspace.shared.openFile(item.id)
+                }
+            }, label: { Label("Open \(name)" , systemImage: "doc.viewfinder") })
             .disabled(selected.count == 0)
+            
             divider(forLayoutOrientation: orientation, measure: 25.0)
+            
             Button(action:  {
-                files.getFile(withID: selected.first!)!.clearTags()
-            }, label: { Label("Clear All Tags for Item", systemImage: "clear") })
+                isPresentingConfirm = true
+            }, label: { Label("Clear All Tags for \(name)", systemImage: "clear") })
             .disabled(selected.count == 0)
+            
             divider(forLayoutOrientation: orientation, measure: 25.0)
+            
             Button {
-                
                 guard selected.count > 0 else { return }
                 self.selectedFileURLs = files.getFiles(withIDs: selected).map { URL(fileURLWithPath: $0.id) }
                 self.selectedFileURL = URL(fileURLWithPath: files.getFile(withID: selected.first!)!.id)
@@ -75,6 +93,7 @@ struct MainView: View {
                 Label("QuickLook", systemImage: "eye")
             }.disabled(selected.count == 0)
         }
+        
     }
     
     var body: some View {
@@ -85,7 +104,7 @@ struct MainView: View {
                         HStack {
                             Text("Tagging: \(directory?.absolutePath ?? "<none>")")
                             Button(action: {showingMoreInfo.toggle()}, label: {
-                                Label(showingMoreInfo ? "Less" : "More", systemImage: "info.circle")
+                                Text(showingMoreInfo ? "Less" : "More")
                             })
                             
                         }
@@ -118,8 +137,7 @@ struct MainView: View {
                                             if files.tagStore == nil {
                                                 Image(systemName: "nosign")
                                             } else {
-                                                Image(systemName: "doc")
-                                                Text("\(files.tagStore!)")
+                                                Label("\(files.tagStore!.lastPathComponent!)", systemImage: "doc")
                                             }
                                         })
                                 }
@@ -153,7 +171,51 @@ struct MainView: View {
                         ForEach(files.filter(by: query)) { item in
                             TableRow(item)
                                 .contextMenu {
-                                    contextMenuOptions(orientation: .vertically)
+                                    Group {
+                                        Button(action: {
+                                            if !selected.contains(item.id) {
+                                                selected = Set([item.id])
+                                            }
+                                            editing = true
+                                        }, label: {
+                                            Label("Edit Tags of \(selected.contains(item.id) ? "\(selected.count) items" : item.filename)", systemImage: "pencil")
+                                        }).disabled(selected.count == 0)
+
+                                        Button(action:  {
+                                            guard let path = directory?.absolutePath else { return }
+                                            
+                                            if !NSWorkspace.shared.selectFile(item.id, inFileViewerRootedAtPath: path) {
+                                                NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: path)
+                                            }
+                                        }, label: { Label("Reveal \(item.filename) in Finder", systemImage: "folder.badge.questionmark") })
+                                        .disabled(selected.count != 1)
+
+                                        Button(action:  {
+                                                NSWorkspace.shared.openFile(item.id)
+                                            
+                                        }, label: { Label("Open \(selected.contains(item.id) ? "\(selected.count) items" : item.filename)" , systemImage: "doc.viewfinder") })
+                                        .disabled(selected.count == 0)
+                                        
+                                        divider(forLayoutOrientation: .horizontally, measure: 25.0)
+                                        
+                                        Button(action:  {
+                                            if !selected.contains(item.id) {
+                                                selected = Set([item.id])
+                                            }
+                                            isPresentingConfirm = true
+                                        }, label: { Label("Clear All Tags for \(selected.contains(item.id) ? "\(selected.count) items" : item.filename)", systemImage: "clear") })
+                                        .disabled(selected.count == 0)
+                                        
+                                        divider(forLayoutOrientation: .horizontally, measure: 25.0)
+                                        
+                                        Button {
+                                            guard selected.count > 0 else { return }
+                                            self.selectedFileURLs = files.getFiles(withIDs: selected).map { URL(fileURLWithPath: $0.id) }
+                                            self.selectedFileURL = URL(fileURLWithPath: files.getFile(withID: selected.first!)!.id)
+                                        } label: {
+                                            Label("QuickLook", systemImage: "eye")
+                                        }.disabled(selected.count == 0)
+                                    }
                                 }
                         }
                     })
@@ -174,9 +236,15 @@ struct MainView: View {
                     }
                 }
             }
-            .onClearAll(message: "This will remove EVERY tag from EVERY file currently visible in the table\nYou cannot undo this action", isPresented: $isPresentingConfirm, clearAction: {
-                for file in files.filteredFiles {
-                    file.clearTags()
+            .onClearAll(message: (selected.count == 0 ? "This will remove EVERY tag from EVERY file currently in view in the table" : "This will remove EVERY tag from every SELECTED file in the table") + "\nYou cannot undo this action", isPresented: $isPresentingConfirm, clearAction: {
+                if selected.count == 0 {
+                    for file in files.filteredFiles {
+                        file.clearTags()
+                    }
+                } else {
+                    for file in files.getFiles(withIDs: selected) {
+                        file.clearTags()
+                    }
                 }
             })
             
