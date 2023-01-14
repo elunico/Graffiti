@@ -135,12 +135,12 @@ struct ContentView: View {
                 Label("Start Tagging!", systemImage: "3.circle")
                     .font(.title)
                 Button {
-                    if directory != nil {
+                    if directory != nil && formatChoice != .none {
                         showingOptions = false
                     }
                 } label: {
                     Label("Go!", systemImage: "arrowshape.forward")
-                }.disabled(directory == nil)
+                }.disabled(directory == nil || formatChoice == .none)
             }
             .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
             .padding()
@@ -172,7 +172,7 @@ struct ContentView: View {
         if showingOptions {
             selectionView
         } else {
-            MainView(choice: formatChoice, backend: backend!, directory: self.directory, showOptions: { showingOptions = true })
+            MainView(choice: formatChoice, backend: backend!, directory: self.directory, showOptions: { showingOptions = true; formatChoice = .none; })
         }
         
     }

@@ -92,31 +92,38 @@ struct MainView: View {
                         if showingMoreInfo {
                             Group {
                                 Text("Save format: \(choice.description)")
-                                Text("Tag Store: \(files.tagStore?.lastPathComponent ?? "<per file>")")
+                                if files.tagStore != nil {
+                                    Label("Tag Store: \(files.tagStore?.lastPathComponent ?? "<per file>")", systemImage: "doc")
+                                    
+                                        .onDrag({
+                                            do {
+                                                guard let ts = files.tagStore else { return NSItemProvider() }
+                                                let url = URL(fileURLWithPath: ts)
+                                                let temporaryDirectoryURL =
+                                                try FileManager.default.url(for: .itemReplacementDirectory,
+                                                                            in: .userDomainMask,
+                                                                            appropriateFor: url,
+                                                                            create: true)
+                                                
+                                                
+                                                let temporaryFileURL = temporaryDirectoryURL.appendingPathComponent(ts.lastPathComponent!)
+                                                
+                                                guard let data = try? Data(contentsOf: url) else { return  NSItemProvider()}
+                                                guard let _ = try? data.write(to: temporaryFileURL, options: .atomic) else { return  NSItemProvider()}
+                                                return NSItemProvider(item: temporaryFileURL as NSSecureCoding, typeIdentifier: "public.file-url")
+                                            } catch {
+                                                return NSItemProvider()
+                                            }
+                                        }, preview: {
+                                            if files.tagStore == nil {
+                                                Image(systemName: "nosign")
+                                            } else {
+                                                Image(systemName: "doc")
+                                                Text("\(files.tagStore!)")
+                                            }
+                                        })
+                                }
                                 
-                                    .onDrag({
-                                        do {
-                                            guard let ts = files.tagStore else { return NSItemProvider() }
-                                            let url = URL(fileURLWithPath: ts)
-                                            let temporaryDirectoryURL =
-                                            try FileManager.default.url(for: .itemReplacementDirectory,
-                                                                        in: .userDomainMask,
-                                                                        appropriateFor: url,
-                                                                        create: true)
-                                            
-                                            
-                                            let temporaryFileURL = temporaryDirectoryURL.appendingPathComponent(ts.lastPathComponent!)
-                                            
-                                            guard let data = try? Data(contentsOf: url) else { return  NSItemProvider()}
-                                            guard let _ = try? data.write(to: temporaryFileURL, options: .atomic) else { return  NSItemProvider()}
-                                            return NSItemProvider(item: temporaryFileURL as NSSecureCoding, typeIdentifier: "public.file-url")
-                                        } catch {
-                                            return NSItemProvider()
-                                        }
-                                    }, preview: {
-                                        Image(systemName: "doc")
-                                        Text("\(files.tagStore!)")
-                                    })
                                 Button(files.tagStore == nil ? "Open Current Folder" : "Reveal Tag Store") {
                                     NSWorkspace.shared.selectFile(files.tagStore, inFileViewerRootedAtPath: directory!.absolutePath)
                                 }
