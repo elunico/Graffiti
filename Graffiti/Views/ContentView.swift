@@ -106,7 +106,6 @@ struct ContentView: View {
                 Button("Choose Directory") {
                     selectFolder {
                         self.directory = $0[0]
-                        self.setBackend { _ in () }
                     }
                 }
                 Text("Selected: \(directory?.absolutePath ?? "<none>")")
@@ -172,15 +171,24 @@ struct ContentView: View {
         .sheet(isPresented: $showingInvalidFileFormat, content: {
             VStack {
                 Text("Invalid File Format").font(.title).padding()
-                if FileTagBackend.self == type(of: backend) {
-                    Text("The file provided at \(loadedFile?.absolutePath ?? "<nil>") is incorrectly formatted")
-                    Text("The data may have been corrupted or the file might not be a Graffiti file")
-                } else {
-                    Text("The directory at \(directory?.absolutePath ?? "<nil>") could not be opened")
-                    Text("Ensure that it exists and you have permission to access it")
+                Text("The directory could not be opened. If make sure you have permission to access this directory")
+                if let ext = formatChoice.fileExtension {
+                    Text("If there is a com-tom-graffiti.tagstore.\(ext) file in that directory, it is corrupt and must be deleted before opening the directory")
                 }
-                Button("Close") {
-                    showingInvalidFileFormat = false
+                HStack {
+                    Button("Close") {
+                        showingInvalidFileFormat = false
+                    }
+                    if let ext = formatChoice.fileExtension, let url = directory?.appendingPathComponent("\(FileTagBackend.filePrefix).\(ext)") {
+                        Button("Delete File") {
+                            // TODO: oh boy
+                            try! FileManager.default.removeItem(at: url)
+                            showingInvalidFileFormat = false
+                            setBackend {
+                                showingOptions = !$0
+                            }
+                        }
+                    }
                 }
             }.padding()
                 
@@ -221,20 +229,23 @@ struct ContentView: View {
         DispatchQueue.main.async {
             guard let dir = self.directory else { return completed(false) }
             let either = formatChoice.implementation(in: dir)
+            print(either)
             
             switch(either) {
             case (nil, nil):
                 backend = nil
+                isLoading = false
+                completed(false)
             case (let b, nil):
                 backend = b
+                isLoading = false
+                completed(true)
             case (_, let error):
                 showingInvalidFileFormat = true
                 backend = nil
                 isLoading = false
                 completed(false)
             }
-            isLoading = false
-            completed(true)
         }
         
     }
