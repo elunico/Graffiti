@@ -29,6 +29,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		DC0301EA29737CD500097EBF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		DC1B7BC32962066200DEED22 /* XattrBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XattrBridge.h; sourceTree = "<group>"; };
 		DC1B7BC42962066200DEED22 /* XattrBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XattrBridge.m; sourceTree = "<group>"; };
 		DC1B7BC6296209D200DEED22 /* Graffiti-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Graffiti-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -84,6 +85,7 @@
 		DC52448B2960ACB200821407 /* Graffiti */ = {
 			isa = PBXGroup;
 			children = (
+				DC0301EA29737CD500097EBF /* Info.plist */,
 				DCFA39C42965DD400002690A /* Controllers */,
 				DCFA39C12965DD090002690A /* Models */,
 				DC1B7BC32962066200DEED22 /* XattrBridge.h */,
@@ -374,6 +376,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Graffiti/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -405,6 +409,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Graffiti/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

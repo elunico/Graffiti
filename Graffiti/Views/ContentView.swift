@@ -54,14 +54,31 @@ struct ContentView: View {
             }
         }
         
-        func implementation(in directory: URL) -> TagBackend? {
-            switch self {
-            case .plist: return FileTagBackend(forFilesIn: directory, writer: PropertyListFileWriter())
-            case .csv: return FileTagBackend(forFilesIn: directory, writer: CSVFileWriter())
-            case .xattr: return XattrTagBackend()
-            case .json: return FileTagBackend(forFilesIn: directory, writer: JSONFileWriter())
-            case .none: return nil
+        func implementation(in directory: URL) -> (TagBackend?, Error?) {
+            if self == .none {
+                return (nil, nil)
             }
+            var b: TagBackend?
+
+            if self == .plist {
+                b = FileTagBackend(forFilesIn: directory, writer: PropertyListFileWriter())
+            }
+            if self == .csv {
+                b = FileTagBackend(forFilesIn: directory, writer: CSVFileWriter())
+            }
+            if self == .xattr{
+                b = XattrTagBackend()
+            }
+            if self == .json {
+                b = FileTagBackend(forFilesIn: directory, writer: JSONFileWriter())
+            }
+
+            if b == nil {
+                return (nil, FileWriterError.InvalidFileFormat)
+            }
+
+            return (b, nil)
+            
         }
         
         case xattr, csv, plist, json
@@ -75,6 +92,7 @@ struct ContentView: View {
     @State var loadedFile: URL? = nil
     @State var directory: URL? = nil
     @State var backend: TagBackend? = nil
+    @State var isImporting: Bool = false
     
     @State var targeted: Bool = false
     
@@ -107,10 +125,7 @@ struct ContentView: View {
                         .help("Saves all tags of all files in a directory to a single JSON file also placed in that directory")
                     Text("Extended File Attributes").tag(Format.xattr)
                         .help("Saves all tags of each files as extended attributes (xattr) of that file. The file retains its tags even when moved")
-                }).onReceive([self.formatChoice].publisher.first()) { (value) in
-                    self.setBackend()
-                    print(self.backend)
-                }
+                })
                 .pickerStyle(RadioGroupPickerStyle())
                 .frame(minWidth: 200.0, maxWidth: 300.0)
                 .padding()
@@ -136,7 +151,7 @@ struct ContentView: View {
                     .font(.title)
                 Button {
                     if directory != nil && formatChoice != .none {
-                        showingOptions = false
+                        showingOptions = !self.setBackend()
                     }
                 } label: {
                     Label("Go!", systemImage: "arrowshape.forward")
@@ -153,7 +168,7 @@ struct ContentView: View {
         .sheet(isPresented: $showingInvalidFileFormat, content: {
             VStack {
                 Text("Invalid File Format").font(.title).padding()
-                if loadedFile != nil {
+                if FileTagBackend.self == type(of: backend) {
                     Text("The file provided at \(loadedFile?.absolutePath ?? "<nil>") is incorrectly formatted")
                     Text("The data may have been corrupted or the file might not be a Graffiti file")
                 } else {
@@ -171,61 +186,81 @@ struct ContentView: View {
     var body: some View {
         if showingOptions {
             selectionView
+                .fileImporter(
+                            isPresented: $isImporting,
+                            allowedContentTypes: [.plainText],
+                            allowsMultipleSelection: false
+                        ) { result in
+                            do {
+                                guard let selectedFile: URL = try result.get().first else { return }
+                                if FileManager.default.fileExists(atPath: selectedFile.absolutePath) {
+                                    loadDroppedFile(selectedFile)
+                                }
+                                
+                            } catch {
+                                // Handle failure.
+                                print("Unable to read file contents")
+                                print(error.localizedDescription)
+                            }
+                        }
         } else {
             MainView(choice: formatChoice, backend: backend!, directory: self.directory, showOptions: { showingOptions = true; formatChoice = .none; })
         }
         
     }
     
-    func setBackend() {
-        self.backend = ({
-            guard let dir = self.directory, var b = formatChoice.implementation(in: dir) else {
-                return nil
+    func setBackend() -> Bool {
+        guard let dir = self.directory else { return false }
+        let either = formatChoice.implementation(in: dir)
+        
+        switch(either) {
+        case (nil, nil):
+            backend = nil
+        case (let b, nil):
+            backend = b
+        case (_, let error):
+            showingInvalidFileFormat = true
+            backend = nil
+            return false
+        }
+        return true
+        
+    }
+    
+    func loadDroppedFile(_ url: URL) {
+        var isDir: ObjCBool = false
+        if FileManager.default.fileExists(atPath: url.absolutePath, isDirectory: &isDir) && isDir.boolValue {
+            directory = url
+            loadedFile = nil
+            formatChoice = .xattr
+            backend = XattrTagBackend()
+        } else {
+            loadedFile = url
+            for format in Format.allCases {
+                if let f = format.fileExtension, url.pathExtension == f {
+                    directory = url.deletingLastPathComponent()
+                    formatChoice = format
+                    self.setBackend()
+                    
+                    break
+                }
             }
-            if lazyChoice {
-                b = LazyBackend(wrapping: b)
-            }
-            return b
-        })()
+        }
+        if backend != nil {
+            showingOptions = false
+            showingInvalidFileFormat = false
+        } else {
+            showingOptions = true
+            showingInvalidFileFormat = true
+        }
+    
     }
     
     func receiveDrop(providers: [NSItemProvider]) {
         providers.first?.loadDataRepresentation(forTypeIdentifier: "public.file-url", completionHandler: { (data, error) in
             if let data = data, let path = String(data: data, encoding: .utf8), let url = URL(string: path) {
-                               
-                var isDir: ObjCBool = false
-                if FileManager.default.fileExists(atPath: url.absolutePath, isDirectory: &isDir) && isDir.boolValue {
-                    directory = url
-                    loadedFile = nil
-                    formatChoice = .xattr
-                    backend = XattrTagBackend()
-                } else {
-                    loadedFile = url
-                    for format in Format.allCases {
-                        if let f = format.fileExtension, url.pathExtension == f {
-                            directory = url.deletingLastPathComponent()
-                            formatChoice = format
-                            backend = ({
-                                guard var b = formatChoice.implementation(in: self.directory!) else {
-                                    return nil
-                                }
-                                if lazyChoice {
-                                    b = LazyBackend(wrapping: b)
-                                }
-                                return b
-                            })()
-                            
-                            break
-                        }
-                    }
-                }
-                if backend != nil {
-                    showingOptions = false
-                    showingInvalidFileFormat = false
-                } else {
-                    showingOptions = true
-                    showingInvalidFileFormat = true
-                }
+                
+                loadDroppedFile(url)
             }
         })
     }
