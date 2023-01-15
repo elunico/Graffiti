@@ -102,7 +102,6 @@ struct MainView: View {
                                                                                 appropriateFor: url,
                                                                                 create: true)
                                                     
-                                                    
                                                     let temporaryFileURL = temporaryDirectoryURL.appendingPathComponent(ts.lastPathComponent!)
                                                     
                                                     guard let data = try? Data(contentsOf: url) else { return  NSItemProvider()}
@@ -119,107 +118,99 @@ struct MainView: View {
                                                 }
                                             })
                                     }
-                                    
                                     Button(files.tagStore == nil ? "Open Current Folder" : "Reveal Tag Store") {
                                         NSWorkspace.shared.selectFile(files.tagStore, inFileViewerRootedAtPath: directory!.absolutePath)
                                     }
                                 }
                                 Spacer()
-                                
                             }
                         }
-                        
                     }
-                    
                     Spacer()
-                    
                 }
                 GeometryReader { tableGeometry in
-                    Table(of: TaggedFile.self, selection: $selected, sortOrder: $sorter, columns: {
-                        TableColumn("File", sortUsing: Sorter()) { item in
-                            Text(item.filename)
-                        }.width(ideal: tableGeometry.size.width * 5 / 15)
-                    
-                        
-                        
-                        TableColumn(richKind  ? "Kind" : "Extension") { item in
-                            if richKind  {
-                                if let mditem = MDItemCreate(nil, item.id as CFString),
-                                   let mdnames = MDItemCopyAttributeNames(mditem),
-                                   let mdattrs = MDItemCopyAttributes(mditem, mdnames) as? [String:Any],
-                                   let mdkind = mdattrs[kMDItemKind as String] as? String {
-                                    Text("\(mdkind)")
-                                } else {
-                                    Text("<unknown>")
-                                }
-                            } else {
-                                Text("\(URL(fileURLWithPath: item.id).pathExtension)")
-                            }
-//                            Text((try? URL(fileURLWithPath: item.id).resourceValues(forKeys: [.typeIdentifierKey]).typeIdentifier) ?? "<unknown>")
-                        }.width(ideal: tableGeometry.size.width * 2 / 15)
-                        TableColumn("Tags") { item in
-                            Text(item.tagString)
-                        }.width(ideal: tableGeometry.size.width * 5 / 15)
-                        TableColumn("Count") { item in
-                            Text(item.tagCount)
-                        }.width(ideal: tableGeometry.size.width / 15)
-                    }, rows: {
-                        ForEach(files.filter(by: query)) { item in
-                            TableRow(item)
-                                .contextMenu {
-                                    Group {
-                                        Button(action: {
-                                            if !selected.contains(item.id) {
-                                                selected = Set([item.id])
-                                            }
-                                            editing = true
-                                        }, label: {
-                                            Label("Edit Tags of \(selected.contains(item.id) ? "\(selected.count) items" : item.filename)", systemImage: "pencil")
-                                        })
-
-                                                                                    
-                                        Button(action:  {
-                                            guard let path = directory?.absolutePath else { return }
-                                            
-                                            if !NSWorkspace.shared.selectFile(item.id, inFileViewerRootedAtPath: path) {
-                                                NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: path)
-                                            }
-                                        }, label: { Label("Reveal \(item.filename) in Finder", systemImage: "folder.badge.questionmark") })
-                                        .disabled(selected.count != 1)
-
-                                        
-                                        Button(action:  {
-                                            NSWorkspace.shared.openFile(item.id)
-                                            
-                                        }, label: { Label("Open \(selected.contains(item.id) ? "\(selected.count) items" : item.filename)" , systemImage: "doc.viewfinder") })
-                                        
-
-                                        
-                                        divider(forLayoutOrientation: .horizontally, measure: 25.0)
-                                        
-                                        Button(action:  {
-                                            if !selected.contains(item.id) {
-                                                selected = Set([item.id])
-                                            }
-                                            isPresentingConfirm = true
-                                        }, label: { Label("Clear All Tags for \(selected.contains(item.id) ? "\(selected.count) items" : item.filename)", systemImage: "clear") })
-                                        
-                                        
-                                        divider(forLayoutOrientation: .horizontally, measure: 25.0)
-                                        
-                                        Button {
-                                            guard selected.count > 0 else { return }
-                                            self.selectedFileURLs = [ URL(fileURLWithPath: item.id) ]
-                                            self.selectedFileURL = URL(fileURLWithPath: item.id)
-                                        } label: {
-                                            Label("QuickLook", systemImage: "eye")
-                                        }
-
+                    VStack {
+                        Table(of: TaggedFile.self, selection: $selected, sortOrder: $sorter, columns: {
+                            TableColumn("File", sortUsing: Sorter()) { item in
+                                Text(item.filename)
+                            }.width(ideal: tableGeometry.size.width * 5 / 15)
+                            
+                            TableColumn(richKind  ? "Kind" : "Extension") { item in
+                                if richKind  {
+                                    if let mditem = MDItemCreate(nil, item.id as CFString),
+                                       let mdnames = MDItemCopyAttributeNames(mditem),
+                                       let mdattrs = MDItemCopyAttributes(mditem, mdnames) as? [String:Any],
+                                       let mdkind = mdattrs[kMDItemKind as String] as? String {
+                                        Text("\(mdkind)")
+                                    } else {
+                                        Text("<unknown>")
                                     }
+                                } else {
+                                    Text("\(URL(fileURLWithPath: item.id).pathExtension)")
                                 }
+                                //                            Text((try? URL(fileURLWithPath: item.id).resourceValues(forKeys: [.typeIdentifierKey]).typeIdentifier) ?? "<unknown>")
+                            }.width(ideal: tableGeometry.size.width * 2 / 15)
+                            TableColumn("Tags") { item in
+                                Text(item.tagString)
+                            }.width(ideal: tableGeometry.size.width * 5 / 15)
+                            TableColumn("Count") { item in
+                                Text(item.tagCount)
+                            }.width(ideal: tableGeometry.size.width / 15)
+                        }, rows: {
+                            ForEach(files.filter(by: query)) { item in
+                                TableRow(item)
+                                    .contextMenu {
+                                        Group {
+                                            Button(action: {
+                                                if !selected.contains(item.id) {
+                                                    selected = Set([item.id])
+                                                }
+                                                editing = true
+                                            }, label: {
+                                                Label("Edit Tags of \(selected.contains(item.id) ? "\(selected.count) items" : item.filename)", systemImage: "pencil")
+                                            })
+                                            
+                                            Button(action:  {
+                                                guard let path = directory?.absolutePath else { return }
+                                                
+                                                if !NSWorkspace.shared.selectFile(item.id, inFileViewerRootedAtPath: path) {
+                                                    NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: path)
+                                                }
+                                            }, label: { Label("Reveal \(item.filename) in Finder", systemImage: "folder.badge.questionmark") })
+                                            .disabled(selected.count != 1)
+                                            
+                                            Button(action:  {
+                                                NSWorkspace.shared.openFile(item.id)
+                                                
+                                            }, label: { Label("Open \(selected.contains(item.id) ? "\(selected.count) items" : item.filename)" , systemImage: "doc.viewfinder") })
+                                            
+                                            divider(forLayoutOrientation: .horizontally, measure: 25.0)
+                                            
+                                            Button(action:  {
+                                                if !selected.contains(item.id) {
+                                                    selected = Set([item.id])
+                                                }
+                                                isPresentingConfirm = true
+                                            }, label: { Label("Clear All Tags for \(selected.contains(item.id) ? "\(selected.count) items" : item.filename)", systemImage: "clear") })
+                                            
+                                            divider(forLayoutOrientation: .horizontally, measure: 25.0)
+                                            
+                                            Button {
+                                                guard selected.count > 0 else { return }
+                                                self.selectedFileURLs = [ URL(fileURLWithPath: item.id) ]
+                                                self.selectedFileURL = URL(fileURLWithPath: item.id)
+                                            } label: {
+                                                Label("QuickLook", systemImage: "eye")
+                                            }
+                                        }
+                                    }
+                            }
+                        })
+                        HStack {
+                            Spacer()
+                            Text("\(files.files.count) files")
                         }
-                    })
-                    
+                    }
                 }
             }
             .onClearAll(message: (selected.count == 0 ? "This will remove EVERY tag from EVERY file currently in view in the table" : "This will remove EVERY tag from every SELECTED file in the table") + "\nYou cannot undo this action", isPresented: $isPresentingConfirm, clearAction: {
@@ -233,7 +224,6 @@ struct MainView: View {
                     }
                 }
             })
-            
             .sheet(isPresented: $editing,  content: {
                 TagView(files: files.getFiles(withIDs: selected), prohibitedCharacters: backend.prohibitedCharacters, done: { _ in editing = false })
             })
@@ -296,14 +286,14 @@ struct MainView: View {
         .frame(minWidth: 500.0, minHeight: 500.0, alignment: .center)
         .environmentObject(files)
         .padding()
-        .navigationTitle("\(directory!.prettyPrinted) – Graffiti")
+        .navigationTitle("\(directory!.prettyPrinted) – \(files.files.count) files – Graffiti")
         .navigationDocument(directory!)
         .onAppear {
             guard let path = self.directory?.absolutePath else { return }
+            
             self.files.load(directory: path, backend: backend)
         }
     }
-    
     
     func teardown() {
         for file in files.files {

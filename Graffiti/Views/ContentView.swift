@@ -78,7 +78,6 @@ struct ContentView: View {
             }
 
             return (b, nil)
-            
         }
         
         case xattr, csv, plist, json
@@ -94,7 +93,6 @@ struct ContentView: View {
     @State var backend: TagBackend? = nil
     @State var isImporting: Bool = false
     @State var isLoading: Bool = false
-    
     @State var targeted: Bool = false
     
     var optionArea: some View {
@@ -134,7 +132,6 @@ struct ContentView: View {
                 })
             }
             Spacer().frame(height: 25.0)
-                
         }
     }
     
@@ -154,7 +151,6 @@ struct ContentView: View {
                         self.setBackend {
                             showingOptions = !$0
                         }
-                        
                     }
                 } label: {
                     Label("Go!", systemImage: "arrowshape.forward")
@@ -191,7 +187,6 @@ struct ContentView: View {
                     }
                 }
             }.padding()
-                
         })
     }
     
@@ -220,7 +215,6 @@ struct ContentView: View {
         } else {
             MainView(choice: formatChoice, backend: backend!, directory: self.directory, showOptions: { showingOptions = true; formatChoice = .none; })
         }
-        
     }
     
     func setBackend(onDone completed: @escaping (Bool) -> Void) {
@@ -247,13 +241,10 @@ struct ContentView: View {
                 completed(false)
             }
         }
-        
     }
     
     func loadDroppedFile(_ url: URL) {
         DispatchQueue.main.async {
-            
-            
             var isDir: ObjCBool = false
             if FileManager.default.fileExists(atPath: url.absolutePath, isDirectory: &isDir) && isDir.boolValue {
                 directory = url
@@ -279,20 +270,16 @@ struct ContentView: View {
                     }
                 }
             }
-            
         }
-    
     }
     
     func receiveDrop(providers: [NSItemProvider]) {
         providers.first?.loadDataRepresentation(forTypeIdentifier: "public.file-url", completionHandler: { (data, error) in
             if let data = data, let path = String(data: data, encoding: .utf8), let url = URL(string: path) {
-                
                 loadDroppedFile(url)
             }
         })
-    }
-    
+    }   
 }
 
 func selectFolder(callback: @escaping ([URL]) -> ()) {
