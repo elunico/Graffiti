@@ -283,7 +283,7 @@ struct MainView: View {
                     } label: {
                         Label("QuickLook", systemImage: "eye")
                     }.disabled(selected.count == 0)
-                        .keyboardShortcut(.upArrow, modifiers: [.command])
+                        .keyboardShortcut(.space, modifiers: [])
                 }
             }
             TextField("Search", text: $query)

@@ -93,6 +93,7 @@ struct ContentView: View {
     @State var directory: URL? = nil
     @State var backend: TagBackend? = nil
     @State var isImporting: Bool = false
+    @State var isLoading: Bool = false
     
     @State var targeted: Bool = false
     
@@ -105,7 +106,7 @@ struct ContentView: View {
                 Button("Choose Directory") {
                     selectFolder {
                         self.directory = $0[0]
-                        self.setBackend()
+                        self.setBackend { _ in () }
                     }
                 }
                 Text("Selected: \(directory?.absolutePath ?? "<none>")")
@@ -151,7 +152,10 @@ struct ContentView: View {
                     .font(.title)
                 Button {
                     if directory != nil && formatChoice != .none {
-                        showingOptions = !self.setBackend()
+                        self.setBackend {
+                            showingOptions = !$0
+                        }
+                        
                     }
                 } label: {
                     Label("Go!", systemImage: "arrowshape.forward")
@@ -184,7 +188,9 @@ struct ContentView: View {
     }
     
     var body: some View {
-        if showingOptions {
+        if isLoading {
+            ProgressView().progressViewStyle(CircularProgressViewStyle())
+        } else if showingOptions {
             selectionView
                 .fileImporter(
                             isPresented: $isImporting,
@@ -209,49 +215,60 @@ struct ContentView: View {
         
     }
     
-    func setBackend() -> Bool {
-        guard let dir = self.directory else { return false }
-        let either = formatChoice.implementation(in: dir)
+    func setBackend(onDone completed: @escaping (Bool) -> Void) {
+        isLoading = true
         
-        switch(either) {
-        case (nil, nil):
-            backend = nil
-        case (let b, nil):
-            backend = b
-        case (_, let error):
-            showingInvalidFileFormat = true
-            backend = nil
-            return false
+        DispatchQueue.main.async {
+            guard let dir = self.directory else { return completed(false) }
+            let either = formatChoice.implementation(in: dir)
+            
+            switch(either) {
+            case (nil, nil):
+                backend = nil
+            case (let b, nil):
+                backend = b
+            case (_, let error):
+                showingInvalidFileFormat = true
+                backend = nil
+                isLoading = false
+                completed(false)
+            }
+            isLoading = false
+            completed(true)
         }
-        return true
         
     }
     
     func loadDroppedFile(_ url: URL) {
-        var isDir: ObjCBool = false
-        if FileManager.default.fileExists(atPath: url.absolutePath, isDirectory: &isDir) && isDir.boolValue {
-            directory = url
-            loadedFile = nil
-            formatChoice = .xattr
-            backend = XattrTagBackend()
-        } else {
-            loadedFile = url
-            for format in Format.allCases {
-                if let f = format.fileExtension, url.pathExtension == f {
-                    directory = url.deletingLastPathComponent()
-                    formatChoice = format
-                    self.setBackend()
-                    
-                    break
+        DispatchQueue.main.async {
+            
+            
+            var isDir: ObjCBool = false
+            if FileManager.default.fileExists(atPath: url.absolutePath, isDirectory: &isDir) && isDir.boolValue {
+                directory = url
+                loadedFile = nil
+                formatChoice = .xattr
+                backend = XattrTagBackend()
+            } else {
+                loadedFile = url
+                for format in Format.allCases {
+                    if let f = format.fileExtension, url.pathExtension == f {
+                        directory = url.deletingLastPathComponent()
+                        formatChoice = format
+                        self.setBackend { _ in
+                            if backend != nil {
+                                showingOptions = false
+                                showingInvalidFileFormat = false
+                            } else {
+                                showingOptions = true
+                                showingInvalidFileFormat = true
+                            }
+                        }
+                        break
+                    }
                 }
             }
-        }
-        if backend != nil {
-            showingOptions = false
-            showingInvalidFileFormat = false
-        } else {
-            showingOptions = true
-            showingInvalidFileFormat = true
+            
         }
     
     }
