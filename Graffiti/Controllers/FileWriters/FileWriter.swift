@@ -9,14 +9,20 @@ import Foundation
 
 enum FileWriterError: Error {
     case InvalidFileFormat
+    case VersionMismatch
 }
 
 protocol FileWriter {
     /// The String keys of the return value are file paths
-    func loadFrom(path: String) throws -> [String: Set<Tag>]
+    func loadFrom(path: String) throws -> TagStore
     
     /// The String keys of the second argument are file paths
-    func saveTo(path: String, tags: [String: Set<Tag>])
+    func saveTo(path: String, tags: TagStore)
+    
+    /// provides a default path to a writeable file with a default
+    /// filename inside the directory `directory`
+    /// Default implementation is provided
+    func defaultWritePath(in directory: URL) -> String
     
     /// any implementation defined characters that cannot appear in tags
     /// This is completely implementation defined. For instance
@@ -29,4 +35,14 @@ protocol FileWriter {
     
     /// Should include a period. For instance for CSV files it would be ".csv"
     var fileExtension: String { get }
+}
+
+extension FileWriter {
+    func defaultWritePath(in directory: URL) -> String {
+        "\(directory.absolutePath)\(FileTagBackend.filePrefix)\(fileExtension)"
+    }
+    
+    func writePath(in directory: URL, named filename: String) -> String {
+        "\(directory.absolutePath)\(filename)\(fileExtension)"
+    }
 }

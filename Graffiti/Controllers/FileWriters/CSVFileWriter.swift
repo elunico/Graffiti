@@ -16,11 +16,11 @@ class CSVFileWriter: FileWriter {
        
     let fileExtension: String = ".csv"
     
-    func loadFrom(path: String) throws -> [String: Set<Tag>] {
+    func loadFrom(path: String) throws -> TagStore {
         var retValue: [String: Set<Tag>] = [:]
                 
         if !FileManager.default.fileExists(atPath: path) {
-            FileManager.default.createFile(atPath: path, contents: CSVFileWriter.headerRow.data(using: .utf8))
+            FileManager.default.createFile(atPath: path, contents: (TagStore(tagData: [:]).version.description + "\n" + CSVFileWriter.headerRow).data(using: .utf8))
         }
         
         let string = try String(contentsOfFile: path, encoding: .utf8)
@@ -28,6 +28,12 @@ class CSVFileWriter: FileWriter {
         if lines.count == 0 {
             throw FileWriterError.InvalidFileFormat
         }
+        // version saved first
+        let v = lines.remove(at: 0)
+        if v != TagStore(tagData: [:]).version.description {
+            throw FileWriterError.VersionMismatch
+        }
+        
         // discard header row
         lines.remove(at: 0)
         for line in lines {
@@ -38,11 +44,12 @@ class CSVFileWriter: FileWriter {
             let tags = cols[1].components(separatedBy: CSVFileWriter.kTagSeparator)
             retValue[cols[0]] = Set(tags.map { Tag(value: $0) })
         }
-        return retValue
+        return TagStore(tagData: retValue)
     }
     
-    func saveTo(path: String, tags: [String: Set<Tag>]) {
-        let fileContent = CSVFileWriter.headerRow + tags.map { (path: String, tags: Set<Tag>) in "\(path),\(tags.map { $0.value }.joined(separator: CSVFileWriter.kTagSeparator))" }.joined(separator: "\n")
+    func saveTo(path: String, tags: TagStore) {
+        var data = tags.tagData
+        let fileContent = tags.version.description + "\n" + CSVFileWriter.headerRow + data.map { (path: String, tags: Set<Tag>) in "\(path),\(tags.map { $0.value }.joined(separator: CSVFileWriter.kTagSeparator))" }.joined(separator: "\n")
         FileManager.default.createFile(atPath: path, contents: fileContent.data(using: .utf8))
     }
 }

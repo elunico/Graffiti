@@ -16,6 +16,8 @@
 		DC52448F2960ACB200821407 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC52448E2960ACB200821407 /* ContentView.swift */; };
 		DC5244912960ACB300821407 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DC5244902960ACB300821407 /* Assets.xcassets */; };
 		DC5244942960ACB300821407 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DC5244932960ACB300821407 /* Preview Assets.xcassets */; };
+		DC5FA2F22975032800084CB2 /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5FA2F12975032800084CB2 /* Version.swift */; };
+		DC5FA2F42975091500084CB2 /* TagStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5FA2F32975091500084CB2 /* TagStore.swift */; };
 		DC8E14632963EAE0002E1788 /* TaggedDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8E14622963EAE0002E1788 /* TaggedDirectory.swift */; };
 		DCEAB19E296A018A00843BE4 /* FileTagBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAB19D296A018A00843BE4 /* FileTagBackend.swift */; };
 		DCEAB1A1296A04DE00843BE4 /* CSVFileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAB1A0296A04DE00843BE4 /* CSVFileWriter.swift */; };
@@ -43,6 +45,8 @@
 		DC5244902960ACB300821407 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DC5244932960ACB300821407 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		DC5244952960ACB300821407 /* Graffiti.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Graffiti.entitlements; sourceTree = "<group>"; };
+		DC5FA2F12975032800084CB2 /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
+		DC5FA2F32975091500084CB2 /* TagStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagStore.swift; sourceTree = "<group>"; };
 		DC8E14622963EAE0002E1788 /* TaggedDirectory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaggedDirectory.swift; sourceTree = "<group>"; };
 		DCEAB19D296A018A00843BE4 /* FileTagBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileTagBackend.swift; sourceTree = "<group>"; };
 		DCEAB1A0296A04DE00843BE4 /* CSVFileWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVFileWriter.swift; sourceTree = "<group>"; };
@@ -136,6 +140,8 @@
 				DC1B7BC72962299B00DEED22 /* TaggedFile.swift */,
 				DCFA39C22965DD1C0002690A /* Tag.swift */,
 				DC8E14622963EAE0002E1788 /* TaggedDirectory.swift */,
+				DC5FA2F12975032800084CB2 /* Version.swift */,
+				DC5FA2F32975091500084CB2 /* TagStore.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -232,7 +238,9 @@
 				DC2E803C296A40450015AE26 /* PropertyListFileWriter.swift in Sources */,
 				DCEAB19E296A018A00843BE4 /* FileTagBackend.swift in Sources */,
 				DCFA39C82965DD680002690A /* XattrTagBackend.swift in Sources */,
+				DC5FA2F42975091500084CB2 /* TagStore.swift in Sources */,
 				DC2809B22967722F003915A5 /* FilesEditingInspectorView.swift in Sources */,
+				DC5FA2F22975032800084CB2 /* Version.swift in Sources */,
 				DCFDE988296F4AEC005F00E9 /* JSONFileWriter.swift in Sources */,
 				DCFA39CA296604740002690A /* MainView.swift in Sources */,
 				DCFA39C02965DCC20002690A /* TagView.swift in Sources */,
@@ -370,7 +378,7 @@
 				CODE_SIGN_ENTITLEMENTS = Graffiti/Graffiti.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 23JA15A;
+				CURRENT_PROJECT_VERSION = 23JA16A;
 				DEVELOPMENT_ASSET_PATHS = "\"Graffiti/Preview Content\"";
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -384,7 +392,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 4.0.0;
+				MARKETING_VERSION = 5.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -403,7 +411,7 @@
 				CODE_SIGN_ENTITLEMENTS = Graffiti/Graffiti.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 23JA15A;
+				CURRENT_PROJECT_VERSION = 23JA16A;
 				DEVELOPMENT_ASSET_PATHS = "\"Graffiti/Preview Content\"";
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -417,7 +425,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 4.0.0;
+				MARKETING_VERSION = 5.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

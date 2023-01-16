@@ -17,13 +17,16 @@ class FileTagBackend: TagBackend {
     var writer: FileWriter
     var directory: URL
     var dirty: Bool = false
+    var filename: String?
     
-    init?(forFilesIn directory: URL, writer: FileWriter) {
+    init(withFileName filename: String?, forFilesIn directory: URL, writer: FileWriter) throws {
         self.directory = directory
         self.writer = writer
+        self.filename = filename
         // todo: fix this
-        guard let intermediate = try? writer.loadFrom(path: "\(directory.absolutePath)\(FileTagBackend.filePrefix)\(writer.fileExtension)") else { return nil }
-        for (path, tags) in intermediate {
+        let intermediate = try writer.loadFrom(path: (filename == nil ? writer.defaultWritePath(in: directory) : writer.writePath(in: directory, named: filename!)))
+        let data = intermediate.tagData
+        for (path, tags) in data {
             self.tags[path] = tags
         }
     }
@@ -54,15 +57,15 @@ class FileTagBackend: TagBackend {
     
     func commitTransactions() {
         if dirty {
-            writer.saveTo(path: saveFile, tags: tags)
+            let path = saveFile
+            writer.saveTo(path: path, tags: TagStore(tagData: tags))
             dirty = false 
         }
     }
     
     static let filePrefix = "com-tom-graffiti.tagfile";
     var saveFile: String {
-        let path = "\(directory.absolutePath)\(FileTagBackend.filePrefix)\(writer.fileExtension)"
-        return path
+        filename == nil ? writer.defaultWritePath(in: directory) : writer.writePath(in: directory, named: filename!)
     }
     
 }

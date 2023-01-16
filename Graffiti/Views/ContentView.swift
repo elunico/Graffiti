@@ -54,30 +54,26 @@ struct ContentView: View {
             }
         }
         
-        func implementation(in directory: URL) -> (TagBackend?, Error?) {
+        func implementation(in directory: URL, withFileName filename: String? = nil) throws -> TagBackend? {
             if self == .none {
-                return (nil, nil)
+                return nil
             }
-            var b: TagBackend?
+            var b: TagBackend? = nil
 
             if self == .plist {
-                b = FileTagBackend(forFilesIn: directory, writer: PropertyListFileWriter())
+                b = try FileTagBackend(withFileName: filename, forFilesIn: directory, writer: PropertyListFileWriter())
             }
             if self == .csv {
-                b = FileTagBackend(forFilesIn: directory, writer: CSVFileWriter())
+                b = try FileTagBackend(withFileName: filename, forFilesIn: directory, writer: CSVFileWriter())
             }
             if self == .xattr{
                 b = XattrTagBackend()
             }
             if self == .json {
-                b = FileTagBackend(forFilesIn: directory, writer: JSONFileWriter())
+                b = try FileTagBackend(withFileName: filename, forFilesIn: directory, writer: JSONFileWriter())
             }
-
-            if b == nil {
-                return (nil, FileWriterError.InvalidFileFormat)
-            }
-
-            return (b, nil)
+            
+            return b
         }
         
         case xattr, csv, plist, json
@@ -87,13 +83,14 @@ struct ContentView: View {
     @State var formatChoice: Format = .none
     @State var lazyChoice: Bool = false
     @State var showingOptions: Bool = true
-    @State var showingInvalidFileFormat: Bool = false
+    @State var showingError: Bool = false
     @State var loadedFile: URL? = nil
     @State var directory: URL? = nil
     @State var backend: TagBackend? = nil
     @State var isImporting: Bool = false
     @State var isLoading: Bool = false
     @State var targeted: Bool = false
+    @State var errorString: String = ""
     
     var optionArea: some View {
         Group {
@@ -164,22 +161,20 @@ struct ContentView: View {
             return true
         }
         .frame(minWidth: 600.0, minHeight: 600.0, alignment: .center)
-        .sheet(isPresented: $showingInvalidFileFormat, content: {
+        .sheet(isPresented: $showingError, content: {
             VStack {
                 Text("Invalid File Format").font(.title).padding()
                 Text("The directory could not be opened. If make sure you have permission to access this directory")
-                if let ext = formatChoice.fileExtension {
-                    Text("If there is a com-tom-graffiti.tagstore.\(ext) file in that directory, it is corrupt and must be deleted before opening the directory")
-                }
+                Text(errorString)
                 HStack {
                     Button("Close") {
-                        showingInvalidFileFormat = false
+                        showingError = false
                     }
                     if let ext = formatChoice.fileExtension, let url = directory?.appendingPathComponent("\(FileTagBackend.filePrefix).\(ext)") {
                         Button("Delete File") {
                             // TODO: oh boy
                             try! FileManager.default.removeItem(at: url)
-                            showingInvalidFileFormat = false
+                            showingError = false
                             setBackend {
                                 showingOptions = !$0
                             }
@@ -222,20 +217,28 @@ struct ContentView: View {
         
         DispatchQueue.main.async {
             guard let dir = self.directory else { return completed(false) }
-            let either = formatChoice.implementation(in: dir)
-            print(either)
+            let filename = loadedFile == nil ? nil : NSString(string: loadedFile!.lastPathComponent).deletingPathExtension
             
-            switch(either) {
-            case (nil, nil):
+            do {
+                backend = try formatChoice.implementation(in: dir, withFileName: filename)
+                isLoading = false
+                showingError = false
+                completed(true)
+            } catch FileWriterError.InvalidFileFormat {
+                backend = nil
+                isLoading = false
+                errorString = "The file chosen has an invalid format."
+                showingError = true
+                completed(false)
+            } catch FileWriterError.VersionMismatch {
+                errorString = "The file chosen is from an old version of Graffiti and cannot be opened"
+                showingError = true
                 backend = nil
                 isLoading = false
                 completed(false)
-            case (let b, nil):
-                backend = b
-                isLoading = false
-                completed(true)
-            case (_, let error):
-                showingInvalidFileFormat = true
+            } catch {
+                errorString = "An unknown error occurred"
+                showingError = true
                 backend = nil
                 isLoading = false
                 completed(false)
@@ -260,10 +263,10 @@ struct ContentView: View {
                         self.setBackend { _ in
                             if backend != nil {
                                 showingOptions = false
-                                showingInvalidFileFormat = false
+                                showingError = false
                             } else {
                                 showingOptions = true
-                                showingInvalidFileFormat = true
+                                showingError = true
                             }
                         }
                         break
