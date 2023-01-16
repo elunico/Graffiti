@@ -69,7 +69,6 @@ struct TagView: View {
                 
                 TextField("Add Tag", text: $currentTag, prompt: Text("Tag"))
                     .onChange(of: currentTag) { _ in
-                        // all credits to Leo Dabus:
                         currentTag.removeAll(where: { prohibitedCharacters.contains($0) })
                     }.onSubmit {
                         self.addCurrentTag()
@@ -85,7 +84,7 @@ struct TagView: View {
                 }.padding()
                 Button("Close") {
                     done(files)
-                }
+                }.keyboardShortcut(.return, modifiers: [])
             }
         }.padding()
             .frame(minWidth: 500.0, minHeight: 500.0,  alignment: Alignment.center)

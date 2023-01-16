@@ -167,22 +167,22 @@ struct MainView: View {
                                                 }
                                                 editing = true
                                             }, label: {
-                                                Label("Edit Tags of \(selected.contains(item.id) ? "\(selected.count) items" : item.filename)", systemImage: "pencil")
+                                                Label("Edit Tags of \((selected.contains(item.id) && selected.count > 1) ? "\(selected.count) items" : item.filename)", systemImage: "pencil")
                                             })
                                             
                                             Button(action:  {
                                                 guard let path = directory?.absolutePath else { return }
+                                                selected = Set([item.id])
                                                 
                                                 if !NSWorkspace.shared.selectFile(item.id, inFileViewerRootedAtPath: path) {
                                                     NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: path)
                                                 }
                                             }, label: { Label("Reveal \(item.filename) in Finder", systemImage: "folder.badge.questionmark") })
-                                            .disabled(selected.count != 1)
-                                            
+
                                             Button(action:  {
                                                 NSWorkspace.shared.openFile(item.id)
                                                 
-                                            }, label: { Label("Open \(selected.contains(item.id) ? "\(selected.count) items" : item.filename)" , systemImage: "doc.viewfinder") })
+                                            }, label: { Label("Open \((selected.contains(item.id) && selected.count > 1) ? "\(selected.count) items" : item.filename)" , systemImage: "doc.viewfinder") })
                                             
                                             divider(forLayoutOrientation: .horizontally, measure: 25.0)
                                             
@@ -191,7 +191,7 @@ struct MainView: View {
                                                     selected = Set([item.id])
                                                 }
                                                 isPresentingConfirm = true
-                                            }, label: { Label("Clear All Tags for \(selected.contains(item.id) ? "\(selected.count) items" : item.filename)", systemImage: "clear") })
+                                            }, label: { Label("Clear All Tags for \((selected.contains(item.id) && selected.count > 1) ? "\(selected.count) items" : item.filename)", systemImage: "clear") })
                                             
                                             divider(forLayoutOrientation: .horizontally, measure: 25.0)
                                             
