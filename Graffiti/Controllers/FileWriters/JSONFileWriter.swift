@@ -12,7 +12,7 @@ class JSONFileWriter: FileWriter {
         var retValue: [String: Set<Tag>] = [:]
                 
         if !FileManager.default.fileExists(atPath: path) {
-            FileManager.default.createFile(atPath: path, contents: "{\"version\": \"\(TagStore(tagData: [:]).version.description)\", \"data\": {}}".data(using: .utf8))
+            FileManager.default.createFile(atPath: path, contents: "{\"version\": \"\(TagStore.default.version.description)\", \"data\": {}}".data(using: .utf8))
         }
         
         let object = try JSONSerialization.jsonObject(with: Data(contentsOf: URL(filePath: path)))
@@ -23,11 +23,11 @@ class JSONFileWriter: FileWriter {
             throw FileWriterError.InvalidFileFormat
         }
         
-        guard let version = dict["version"] as? String else {
+        guard let version = Version(fromDescription: (dict["version"] as? String) ?? "") else {
             throw FileWriterError.InvalidFileFormat
         }
         
-        if version != TagStore(tagData: [:]).version.description {
+        if version.isReadCompatible(with: TagStore.default.version) {
             throw FileWriterError.VersionMismatch
         }
         
@@ -40,20 +40,19 @@ class JSONFileWriter: FileWriter {
             retValue[path] = Set(s)
         }
         
-        
         return TagStore(tagData: retValue)
     }
     
-    func saveTo(path: String, tags: TagStore) {
-        var data = tags.tagData
+    func saveTo(path: String, store: TagStore) {
+        let data = store.tagData
         var t: [String: [String]] = [:]
         
         for key in data.keys {
             t[key] = data[key].map { c in Array(c) }.map { $0.map { t in t.value }}
         }
         
-        var jsonObject = [
-            "version" : tags.version.description,
+        let jsonObject = [
+            "version" : store.version.description,
             "data": t
         ] as [String : Any]
         
@@ -65,5 +64,5 @@ class JSONFileWriter: FileWriter {
     
     let fileProhibitedCharacters: Set<Character> = Set(["\""])
     
-    let fileExtension: String = ".json"
+    static let fileExtension: String = ".json"
 }

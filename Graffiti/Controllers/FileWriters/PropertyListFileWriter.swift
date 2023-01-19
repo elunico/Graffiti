@@ -32,8 +32,8 @@ class PropertyListFileWriter: FileWriter {
                 throw FileWriterError.InvalidFileFormat
             }
             
-            let cv = TagStore(tagData: [:]).version
-            if version["major"] != cv.major || version["minor"] != cv.minor || version["patch"] != cv.patch {
+            let cv = TagStore.default.version
+            if !Version(major: version["major"] ?? -1, minor: version["minor"] ?? -1, patch: version["patch"] ?? -1).isReadCompatible(with: cv) {
                 throw FileWriterError.VersionMismatch
             }
             
@@ -55,8 +55,8 @@ class PropertyListFileWriter: FileWriter {
         return TagStore(tagData: retValue)
     }
     
-    func saveTo(path: String, tags: TagStore) {
-        guard let data = try? PropertyListEncoder().encode(tags) else {
+    func saveTo(path: String, store: TagStore) {
+        guard let data = try? PropertyListEncoder().encode(store) else {
             fatalError("Could not convert tag collection to property list data")
         }
         FileManager.default.createFile(atPath: path, contents: data)
@@ -64,6 +64,6 @@ class PropertyListFileWriter: FileWriter {
     
     let fileProhibitedCharacters: Set<Character> = Set()
         
-    let fileExtension: String = ".plist"
+    static let fileExtension: String = ".plist"
         
 }

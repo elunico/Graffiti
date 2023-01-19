@@ -24,7 +24,7 @@ class FileTagBackend: TagBackend {
         self.writer = writer
         self.filename = filename
         // todo: fix this
-        let intermediate = try writer.loadFrom(path: (filename == nil ? writer.defaultWritePath(in: directory) : writer.writePath(in: directory, named: filename!)))
+        let intermediate = try writer.loadFrom(path: type(of: writer).writePath(in: directory, named: filename))
         let data = intermediate.tagData
         for (path, tags) in data {
             self.tags[path] = tags
@@ -58,14 +58,14 @@ class FileTagBackend: TagBackend {
     func commitTransactions() {
         if dirty {
             let path = saveFile
-            writer.saveTo(path: path, tags: TagStore(tagData: tags))
+            writer.saveTo(path: path, store: TagStore(tagData: tags))
             dirty = false 
         }
     }
     
     static let filePrefix = "com-tom-graffiti.tagfile";
     var saveFile: String {
-        filename == nil ? writer.defaultWritePath(in: directory) : writer.writePath(in: directory, named: filename!)
+        type(of: writer).writePath(in: directory, named: filename)
     }
     
 }

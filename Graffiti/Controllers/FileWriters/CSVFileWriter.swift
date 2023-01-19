@@ -14,13 +14,13 @@ class CSVFileWriter: FileWriter {
     
     let fileProhibitedCharacters: Set<Character> = Set([CSVFileWriter.kTagSeparator.first!, ",", "\n"])
        
-    let fileExtension: String = ".csv"
+    static let fileExtension: String = ".csv"
     
     func loadFrom(path: String) throws -> TagStore {
         var retValue: [String: Set<Tag>] = [:]
                 
         if !FileManager.default.fileExists(atPath: path) {
-            FileManager.default.createFile(atPath: path, contents: (TagStore(tagData: [:]).version.description + "\n" + CSVFileWriter.headerRow).data(using: .utf8))
+            FileManager.default.createFile(atPath: path, contents: (TagStore.default.version.description + "\n" + CSVFileWriter.headerRow).data(using: .utf8))
         }
         
         let string = try String(contentsOfFile: path, encoding: .utf8)
@@ -29,8 +29,8 @@ class CSVFileWriter: FileWriter {
             throw FileWriterError.InvalidFileFormat
         }
         // version saved first
-        let v = lines.remove(at: 0)
-        if v != TagStore(tagData: [:]).version.description {
+        let v = Version(fromDescription: String(lines.remove(at: 0)))
+        if v == nil || !TagStore.default.version.isReadCompatible(with: v!) {
             throw FileWriterError.VersionMismatch
         }
         
@@ -47,9 +47,9 @@ class CSVFileWriter: FileWriter {
         return TagStore(tagData: retValue)
     }
     
-    func saveTo(path: String, tags: TagStore) {
-        var data = tags.tagData
-        let fileContent = tags.version.description + "\n" + CSVFileWriter.headerRow + data.map { (path: String, tags: Set<Tag>) in "\(path),\(tags.map { $0.value }.joined(separator: CSVFileWriter.kTagSeparator))" }.joined(separator: "\n")
+    func saveTo(path: String, store: TagStore) {
+        let data = store.tagData
+        let fileContent = store.version.description + "\n" + CSVFileWriter.headerRow + data.map { (path: String, tags: Set<Tag>) in "\(path),\(tags.map { $0.value }.joined(separator: CSVFileWriter.kTagSeparator))" }.joined(separator: "\n")
         FileManager.default.createFile(atPath: path, contents: fileContent.data(using: .utf8))
     }
 }

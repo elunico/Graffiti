@@ -13,17 +13,6 @@ enum FileWriterError: Error {
 }
 
 protocol FileWriter {
-    /// The String keys of the return value are file paths
-    func loadFrom(path: String) throws -> TagStore
-    
-    /// The String keys of the second argument are file paths
-    func saveTo(path: String, tags: TagStore)
-    
-    /// provides a default path to a writeable file with a default
-    /// filename inside the directory `directory`
-    /// Default implementation is provided
-    func defaultWritePath(in directory: URL) -> String
-    
     /// any implementation defined characters that cannot appear in tags
     /// This is completely implementation defined. For instance
     /// JSON files could store each tag in its own string so it may prohibit "
@@ -33,16 +22,36 @@ protocol FileWriter {
     /// therefore, without checking this property
     var fileProhibitedCharacters: Set<Character> { get }
     
+    /// The String keys of the return value are file paths
+    func loadFrom(path: String) throws -> TagStore
+    
+    /// The String keys of the second argument are file paths
+    func saveTo(path: String, store: TagStore)
+    
     /// Should include a period. For instance for CSV files it would be ".csv"
-    var fileExtension: String { get }
+    static var fileExtension: String { get }
+    
+    /// provides a default path to a writeable file with a default
+    /// filename inside the directory `directory`
+    /// Default implementation is provided
+    static func defaultWritePath(in directory: URL) -> String
+    
+    /// provides a path to the specified file name in the given directory
+    /// Falls back to `defaultWritePath(in:)` if `filename` is nil
+    /// Default implementation is provided
+    static func writePath(in directory: URL, named filename: String?) -> String
 }
 
 extension FileWriter {
-    func defaultWritePath(in directory: URL) -> String {
-        "\(directory.absolutePath)\(FileTagBackend.filePrefix)\(fileExtension)"
+    static func defaultWritePath(in directory: URL) -> String {
+        "\(directory.absolutePath)\(FileTagBackend.filePrefix)\(Self.fileExtension)"
     }
     
-    func writePath(in directory: URL, named filename: String) -> String {
-        "\(directory.absolutePath)\(filename)\(fileExtension)"
+    static func writePath(in directory: URL, named filename: String?) -> String {
+        if let filename {
+            return "\(directory.absolutePath)\(filename)\(Self.fileExtension)"
+        } else {
+            return Self.defaultWritePath(in: directory)
+        }
     }
 }
