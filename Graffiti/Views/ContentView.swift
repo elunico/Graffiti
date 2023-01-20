@@ -40,6 +40,7 @@ struct ContentView: View {
             case .csv: return "Comma-Separated Values"
             case .xattr: return "Extended File Attributes"
             case .json: return "JSON File"
+            case .ccts: return "Custom Compressed Tag Store"
             case .none: return "<<none>>"
             }
         }
@@ -51,6 +52,7 @@ struct ContentView: View {
             case .json: return "json"
             case .xattr: return nil
             case .none: return nil
+            case .ccts: return "ccts"
             }
         }
         
@@ -72,11 +74,13 @@ struct ContentView: View {
             if self == .json {
                 b = try FileTagBackend(withFileName: filename, forFilesIn: directory, writer: JSONFileWriter())
             }
-            
+            if self == .ccts {
+                b = try FileTagBackend(withFileName: filename, forFilesIn: directory, writer: CompressedCustomTagStoreWriter())
+            }
             return b
         }
         
-        case xattr, csv, plist, json
+        case xattr, csv, plist, json, ccts
         case none
     }
     
@@ -118,6 +122,8 @@ struct ContentView: View {
                         .help("Saves all tags of all files in a directory to a single (binary) Property List file also placed in that directory")
                     Text("JSON File").tag(Format.json)
                         .help("Saves all tags of all files in a directory to a single JSON file also placed in that directory")
+                    Text("Custom Compressed Tag Store File").tag(Format.ccts)
+                        .help("Saves all tags of all files in a directory to a single custom compressed binary format meant to make efficient use of space at the cost of compatibility with external editors")
                     Text("Extended File Attributes").tag(Format.xattr)
                         .help("Saves all tags of each files as extended attributes (xattr) of that file. The file retains its tags even when moved")
                 })
