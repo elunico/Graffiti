@@ -27,7 +27,7 @@ class JSONFileWriter: FileWriter {
             throw FileWriterError.InvalidFileFormat
         }
         
-        if version.isReadCompatible(with: TagStore.default.version) {
+        if !version.isReadCompatible(with: TagStore.default.version) {
             throw FileWriterError.VersionMismatch
         }
         
