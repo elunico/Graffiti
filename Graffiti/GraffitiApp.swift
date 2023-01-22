@@ -6,6 +6,11 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
+
+extension UTType {
+    static let customCompressedTagStore = UTType(exportedAs: "com.tom.ccts")
+}
 
 
 @main
@@ -14,5 +19,13 @@ struct GraffitiApp: App {
         WindowGroup {
             ContentView()
         }
+        .commands(content: {
+            
+            CommandMenu("Tag", content: {
+                Button("Edit Tags") {
+                    
+                }
+            })
+        })
     }
 }

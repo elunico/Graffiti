@@ -38,7 +38,7 @@ struct MainView: View {
     @State var choice: ContentView.Format
     @State var backend: TagBackend
     @State var directory: URL?
-    @StateObject var files: TaggedDirectory = .empty
+    @StateObject var files: TaggedDirectory = TaggedDirectory.empty.copy() as! TaggedDirectory
     @State private var selected: Set<TaggedFile.ID> = Set()
     @State private var query: String = ""
     
@@ -290,8 +290,9 @@ struct MainView: View {
         .navigationDocument(directory!)
         .onAppear {
             guard let path = self.directory?.absolutePath else { return }
-            
-            self.files.load(directory: path, backend: backend)
+            DispatchQueue.main.async {
+                self.files.load(directory: path, backend: backend)
+            }
         }
     }
     

@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol TagBackend {
+protocol TagBackend: NSCopying {
     func addTag(_ tag: Tag, to file: TaggedFile)
     func removeTag(withID id: Tag.ID, from file: TaggedFile)
     func loadTags(at path: String) -> Set<Tag>

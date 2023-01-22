@@ -9,6 +9,10 @@ import Foundation
 
 
 class XattrTagBackend: TagBackend {
+    func copy(with zone: NSZone? = nil) -> Any {
+        return XattrTagBackend(deliminator: delimiter)
+    }
+    
     var implementationProhibitedCharacters: Set<Character> {
         Set([","])
     }

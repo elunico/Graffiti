@@ -7,6 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DC09FE30297DB00C00BD51D9 /* GraffitiQLTableViewSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09FE2F297DB00C00BD51D9 /* GraffitiQLTableViewSource.swift */; };
+		DC09FE31297DB3E400BD51D9 /* CSVFileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAB1A0296A04DE00843BE4 /* CSVFileWriter.swift */; };
+		DC09FE32297DB3E400BD51D9 /* FileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAB1A2296A056B00843BE4 /* FileWriter.swift */; };
+		DC09FE33297DB3E400BD51D9 /* PropertyListFileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2E803B296A40450015AE26 /* PropertyListFileWriter.swift */; };
+		DC09FE34297DB3E400BD51D9 /* JSONFileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFDE987296F4AEC005F00E9 /* JSONFileWriter.swift */; };
+		DC09FE35297DB3E400BD51D9 /* CompressedCustomTagStoreWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC21D4D22979ED900024E644 /* CompressedCustomTagStoreWriter.swift */; };
+		DC09FE36297DB41E00BD51D9 /* TaggedFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC72962299B00DEED22 /* TaggedFile.swift */; };
+		DC09FE37297DB41E00BD51D9 /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C22965DD1C0002690A /* Tag.swift */; };
+		DC09FE38297DB41E00BD51D9 /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5FA2F12975032800084CB2 /* Version.swift */; };
+		DC09FE39297DB41E00BD51D9 /* TagStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5FA2F32975091500084CB2 /* TagStore.swift */; };
+		DC09FE3B297DB5F600BD51D9 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09FE3A297DB5F600BD51D9 /* Utility.swift */; };
+		DC09FE3C297DB5F600BD51D9 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09FE3A297DB5F600BD51D9 /* Utility.swift */; };
+		DC09FE3D297DB60E00BD51D9 /* FileTagBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAB19D296A018A00843BE4 /* FileTagBackend.swift */; };
+		DC09FE3E297DB62E00BD51D9 /* TagBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC9296229C600DEED22 /* TagBackend.swift */; };
+		DC09FE3F297DB63600BD51D9 /* XattrTagBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C72965DD680002690A /* XattrTagBackend.swift */; };
+		DC09FE40297DB64000BD51D9 /* XattrBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC42962066200DEED22 /* XattrBridge.m */; };
+		DC09FE41297DB66700BD51D9 /* LazyBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C52965DD560002690A /* LazyBackend.swift */; };
+		DC09FE42297DB66700BD51D9 /* TaggedDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8E14622963EAE0002E1788 /* TaggedDirectory.swift */; };
 		DC1B7BC52962066200DEED22 /* XattrBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC42962066200DEED22 /* XattrBridge.m */; };
 		DC1B7BC82962299B00DEED22 /* TaggedFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC72962299B00DEED22 /* TaggedFile.swift */; };
 		DC1B7BCA296229C600DEED22 /* TagBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC9296229C600DEED22 /* TagBackend.swift */; };
@@ -28,11 +46,42 @@
 		DCFA39C62965DD560002690A /* LazyBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C52965DD560002690A /* LazyBackend.swift */; };
 		DCFA39C82965DD680002690A /* XattrTagBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C72965DD680002690A /* XattrTagBackend.swift */; };
 		DCFA39CA296604740002690A /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C9296604740002690A /* MainView.swift */; };
+		DCFAEC6E297AFD3400F8A80F /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCFAEC6D297AFD3400F8A80F /* Quartz.framework */; };
+		DCFAEC71297AFD3400F8A80F /* PreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFAEC70297AFD3400F8A80F /* PreviewViewController.swift */; };
+		DCFAEC73297AFD3400F8A80F /* PreviewProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFAEC72297AFD3400F8A80F /* PreviewProvider.swift */; };
+		DCFAEC76297AFD3400F8A80F /* PreviewViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = DCFAEC74297AFD3400F8A80F /* PreviewViewController.xib */; };
+		DCFAEC7B297AFD3400F8A80F /* CCTSQLPlugin.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DCFAEC6B297AFD3400F8A80F /* CCTSQLPlugin.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DCFDE988296F4AEC005F00E9 /* JSONFileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFDE987296F4AEC005F00E9 /* JSONFileWriter.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		DCFAEC79297AFD3400F8A80F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DC5244812960ACB200821407 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DCFAEC6A297AFD3400F8A80F;
+			remoteInfo = CCTSQLPlugin;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		DCFAEC7C297AFD3400F8A80F /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				DCFAEC7B297AFD3400F8A80F /* CCTSQLPlugin.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		DC0301EA29737CD500097EBF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		DC09FE2F297DB00C00BD51D9 /* GraffitiQLTableViewSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraffitiQLTableViewSource.swift; sourceTree = "<group>"; };
+		DC09FE3A297DB5F600BD51D9 /* Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
 		DC1B7BC32962066200DEED22 /* XattrBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XattrBridge.h; sourceTree = "<group>"; };
 		DC1B7BC42962066200DEED22 /* XattrBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XattrBridge.m; sourceTree = "<group>"; };
 		DC1B7BC6296209D200DEED22 /* Graffiti-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Graffiti-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -58,6 +107,13 @@
 		DCFA39C52965DD560002690A /* LazyBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazyBackend.swift; sourceTree = "<group>"; };
 		DCFA39C72965DD680002690A /* XattrTagBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XattrTagBackend.swift; sourceTree = "<group>"; };
 		DCFA39C9296604740002690A /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		DCFAEC6B297AFD3400F8A80F /* CCTSQLPlugin.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CCTSQLPlugin.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		DCFAEC6D297AFD3400F8A80F /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
+		DCFAEC70297AFD3400F8A80F /* PreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewViewController.swift; sourceTree = "<group>"; };
+		DCFAEC72297AFD3400F8A80F /* PreviewProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewProvider.swift; sourceTree = "<group>"; };
+		DCFAEC75297AFD3400F8A80F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PreviewViewController.xib; sourceTree = "<group>"; };
+		DCFAEC77297AFD3400F8A80F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DCFAEC78297AFD3400F8A80F /* CCTSQLPlugin.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CCTSQLPlugin.entitlements; sourceTree = "<group>"; };
 		DCFDE987296F4AEC005F00E9 /* JSONFileWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONFileWriter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -69,6 +125,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DCFAEC68297AFD3400F8A80F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DCFAEC6E297AFD3400F8A80F /* Quartz.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -76,6 +140,8 @@
 			isa = PBXGroup;
 			children = (
 				DC52448B2960ACB200821407 /* Graffiti */,
+				DCFAEC6F297AFD3400F8A80F /* CCTSQLPlugin */,
+				DCFAEC6C297AFD3400F8A80F /* Frameworks */,
 				DC52448A2960ACB200821407 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -84,6 +150,7 @@
 			isa = PBXGroup;
 			children = (
 				DC5244892960ACB200821407 /* Graffiti.app */,
+				DCFAEC6B297AFD3400F8A80F /* CCTSQLPlugin.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -102,6 +169,7 @@
 				DC5244902960ACB300821407 /* Assets.xcassets */,
 				DC5244952960ACB300821407 /* Graffiti.entitlements */,
 				DC5244922960ACB300821407 /* Preview Content */,
+				DC09FE3A297DB5F600BD51D9 /* Utility.swift */,
 			);
 			path = Graffiti;
 			sourceTree = "<group>";
@@ -161,6 +229,27 @@
 			path = Controllers;
 			sourceTree = "<group>";
 		};
+		DCFAEC6C297AFD3400F8A80F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DCFAEC6D297AFD3400F8A80F /* Quartz.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DCFAEC6F297AFD3400F8A80F /* CCTSQLPlugin */ = {
+			isa = PBXGroup;
+			children = (
+				DCFAEC70297AFD3400F8A80F /* PreviewViewController.swift */,
+				DC09FE2F297DB00C00BD51D9 /* GraffitiQLTableViewSource.swift */,
+				DCFAEC72297AFD3400F8A80F /* PreviewProvider.swift */,
+				DCFAEC74297AFD3400F8A80F /* PreviewViewController.xib */,
+				DCFAEC77297AFD3400F8A80F /* Info.plist */,
+				DCFAEC78297AFD3400F8A80F /* CCTSQLPlugin.entitlements */,
+			);
+			path = CCTSQLPlugin;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -171,15 +260,34 @@
 				DC5244852960ACB200821407 /* Sources */,
 				DC5244862960ACB200821407 /* Frameworks */,
 				DC5244872960ACB200821407 /* Resources */,
+				DCFAEC7C297AFD3400F8A80F /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				DCFAEC7A297AFD3400F8A80F /* PBXTargetDependency */,
 			);
 			name = Graffiti;
 			productName = Graffiti;
 			productReference = DC5244892960ACB200821407 /* Graffiti.app */;
 			productType = "com.apple.product-type.application";
+		};
+		DCFAEC6A297AFD3400F8A80F /* CCTSQLPlugin */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DCFAEC7F297AFD3400F8A80F /* Build configuration list for PBXNativeTarget "CCTSQLPlugin" */;
+			buildPhases = (
+				DCFAEC67297AFD3400F8A80F /* Sources */,
+				DCFAEC68297AFD3400F8A80F /* Frameworks */,
+				DCFAEC69297AFD3400F8A80F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CCTSQLPlugin;
+			productName = CCTSQLPlugin;
+			productReference = DCFAEC6B297AFD3400F8A80F /* CCTSQLPlugin.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -194,6 +302,9 @@
 					DC5244882960ACB200821407 = {
 						CreatedOnToolsVersion = 14.2;
 						LastSwiftMigration = 1420;
+					};
+					DCFAEC6A297AFD3400F8A80F = {
+						CreatedOnToolsVersion = 14.2;
 					};
 				};
 			};
@@ -211,6 +322,7 @@
 			projectRoot = "";
 			targets = (
 				DC5244882960ACB200821407 /* Graffiti */,
+				DCFAEC6A297AFD3400F8A80F /* CCTSQLPlugin */,
 			);
 		};
 /* End PBXProject section */
@@ -222,6 +334,14 @@
 			files = (
 				DC5244942960ACB300821407 /* Preview Assets.xcassets in Resources */,
 				DC5244912960ACB300821407 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DCFAEC69297AFD3400F8A80F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DCFAEC76297AFD3400F8A80F /* PreviewViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -246,6 +366,7 @@
 				DC5FA2F22975032800084CB2 /* Version.swift in Sources */,
 				DCFDE988296F4AEC005F00E9 /* JSONFileWriter.swift in Sources */,
 				DCFA39CA296604740002690A /* MainView.swift in Sources */,
+				DC09FE3B297DB5F600BD51D9 /* Utility.swift in Sources */,
 				DC21D4D32979ED910024E644 /* CompressedCustomTagStoreWriter.swift in Sources */,
 				DCFA39C02965DCC20002690A /* TagView.swift in Sources */,
 				DC1B7BC82962299B00DEED22 /* TaggedFile.swift in Sources */,
@@ -255,7 +376,52 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DCFAEC67297AFD3400F8A80F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC09FE41297DB66700BD51D9 /* LazyBackend.swift in Sources */,
+				DC09FE42297DB66700BD51D9 /* TaggedDirectory.swift in Sources */,
+				DC09FE40297DB64000BD51D9 /* XattrBridge.m in Sources */,
+				DC09FE3F297DB63600BD51D9 /* XattrTagBackend.swift in Sources */,
+				DC09FE3E297DB62E00BD51D9 /* TagBackend.swift in Sources */,
+				DC09FE3D297DB60E00BD51D9 /* FileTagBackend.swift in Sources */,
+				DC09FE36297DB41E00BD51D9 /* TaggedFile.swift in Sources */,
+				DC09FE37297DB41E00BD51D9 /* Tag.swift in Sources */,
+				DC09FE38297DB41E00BD51D9 /* Version.swift in Sources */,
+				DC09FE39297DB41E00BD51D9 /* TagStore.swift in Sources */,
+				DC09FE31297DB3E400BD51D9 /* CSVFileWriter.swift in Sources */,
+				DC09FE32297DB3E400BD51D9 /* FileWriter.swift in Sources */,
+				DC09FE33297DB3E400BD51D9 /* PropertyListFileWriter.swift in Sources */,
+				DC09FE3C297DB5F600BD51D9 /* Utility.swift in Sources */,
+				DC09FE34297DB3E400BD51D9 /* JSONFileWriter.swift in Sources */,
+				DC09FE35297DB3E400BD51D9 /* CompressedCustomTagStoreWriter.swift in Sources */,
+				DCFAEC71297AFD3400F8A80F /* PreviewViewController.swift in Sources */,
+				DCFAEC73297AFD3400F8A80F /* PreviewProvider.swift in Sources */,
+				DC09FE30297DB00C00BD51D9 /* GraffitiQLTableViewSource.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		DCFAEC7A297AFD3400F8A80F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DCFAEC6A297AFD3400F8A80F /* CCTSQLPlugin */;
+			targetProxy = DCFAEC79297AFD3400F8A80F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		DCFAEC74297AFD3400F8A80F /* PreviewViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DCFAEC75297AFD3400F8A80F /* Base */,
+			);
+			name = PreviewViewController.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		DC5244962960ACB300821407 /* Debug */ = {
@@ -315,6 +481,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OBJC_BRIDGING_HEADER = "Graffiti/Graffiti-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -369,6 +536,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OBJC_BRIDGING_HEADER = "Graffiti/Graffiti-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 			};
 			name = Release;
@@ -376,6 +544,7 @@
 		DC5244992960ACB300821407 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
@@ -409,6 +578,7 @@
 		DC52449A2960ACB300821407 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
@@ -438,6 +608,62 @@
 			};
 			name = Release;
 		};
+		DCFAEC7D297AFD3400F8A80F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = CCTSQLPlugin/CCTSQLPlugin.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9KTV75G5K9;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CCTSQLPlugin/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CCTSQLPlugin;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.CCTSQLPlugin;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		DCFAEC7E297AFD3400F8A80F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = CCTSQLPlugin/CCTSQLPlugin.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9KTV75G5K9;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CCTSQLPlugin/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CCTSQLPlugin;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.CCTSQLPlugin;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -455,6 +681,15 @@
 			buildConfigurations = (
 				DC5244992960ACB300821407 /* Debug */,
 				DC52449A2960ACB300821407 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DCFAEC7F297AFD3400F8A80F /* Build configuration list for PBXNativeTarget "CCTSQLPlugin" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DCFAEC7D297AFD3400F8A80F /* Debug */,
+				DCFAEC7E297AFD3400F8A80F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

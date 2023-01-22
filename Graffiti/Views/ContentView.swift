@@ -8,16 +8,7 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
-extension URL {
-    var absolutePath: String {
-        absoluteString.replacingOccurrences(of: "file://", with: "")
-    }
-    
-    var prettyPrinted: String {
-        let home = FileManager.default.homeDirectoryForCurrentUser
-        return absolutePath.replacingOccurrences(of: home.absolutePath, with: "~/")
-    }
-}
+
 
 extension View {
     func onClearAll(message: String, isPresented: Binding<Bool>, clearAction: @escaping () -> ()) -> some View {
@@ -191,6 +182,8 @@ struct ContentView: View {
         })
     }
     
+    
+    
     var body: some View {
         if isLoading {
             ProgressView().progressViewStyle(CircularProgressViewStyle())
@@ -213,9 +206,16 @@ struct ContentView: View {
                                 print(error.localizedDescription)
                             }
                         }
+                        .onOpenURL(perform: { path in
+                            isLoading = true
+                            loadDroppedFile(path)
+                            
+                        })
         } else {
             MainView(choice: formatChoice, backend: backend!, directory: self.directory, showOptions: { showingOptions = true; formatChoice = .none; })
+                
         }
+        
     }
     
     func setBackend(onDone completed: @escaping (Bool) -> Void) {

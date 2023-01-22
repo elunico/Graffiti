@@ -31,14 +31,14 @@ extension Data {
 }
 extension Data.Iterator {
     mutating func nextBEInt() -> Int? {
-        guard var m1 = next(), var m2 = next(), var m3 = next(), var m4 = next() else {
+        guard let m1 = next(), let m2 = next(), let m3 = next(), let m4 = next() else {
             return nil
         }
         return (Int(m1) << 24) | (Int(m2) << 16) | (Int(m3) << 8) | (Int(m4))
     }
     
     mutating func nextBEInt16() -> Int16? {
-        guard var m1 = next(), var m2 = next() else {
+        guard let m1 = next(), let m2 = next() else {
             return nil
         }
         return  (Int16(m1) << 8) | (Int16(m2))
@@ -156,6 +156,7 @@ class CompressedCustomTagStoreWriter: FileWriter {
                 data.append(tdata)
             }
         }
+                
         FileManager.default.createFile(atPath: path, contents: try! NSData(data: data).compressed(using: .lzma) as Data)
     }
 }

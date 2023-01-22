@@ -7,7 +7,18 @@
 
 import Foundation
 
-class TaggedDirectory: ObservableObject {
+class TaggedDirectory: ObservableObject, NSCopying {
+    func copy(with zone: NSZone? = nil) -> Any {
+        var d = TaggedDirectory()
+        d.directory = directory
+        d.files = files.map { $0.copy() as! TaggedFile }
+        d.backend = backend.copy() as! TagBackend
+        d.indexMap = indexMap
+        d.filterPredicate = filterPredicate
+        d.setFilter(from: self.query)
+        return d 
+    }
+    
     static let empty: TaggedDirectory = TaggedDirectory()
     private static let alwaysTrue: (TaggedFile) -> Bool = { _ in true }
     
@@ -18,6 +29,7 @@ class TaggedDirectory: ObservableObject {
     
     private var filterPredicate: (TaggedFile) -> Bool = alwaysTrue
     private var cachedFiles: [TaggedFile]? = nil
+    private var query: String = ""
 
     var allFiles: [TaggedFile] {
         files
@@ -65,6 +77,7 @@ extension TaggedDirectory {
     }
     
     func setFilter(from query: String) {
+        self.query = query
         if query.isEmpty {
             filterPredicate = TaggedDirectory.alwaysTrue
             return
@@ -83,6 +96,7 @@ extension TaggedDirectory {
     }
     
     func filter(by query: String) -> [TaggedFile] {
+        self.query = query
         if query.isEmpty {
             return files
         }

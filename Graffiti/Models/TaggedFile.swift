@@ -7,7 +7,13 @@
 
 import Foundation
 
-class TaggedFile: ObservableObject {
+class TaggedFile: ObservableObject, NSCopying {
+    func copy(with zone: NSZone? = nil) -> Any {
+        var t = TaggedFile(parent: parent, filename: filename, backend: backend)
+        t.tags = tags
+        return t
+    }
+    
     let parent: String
     let filename: String
     let isDirectory: Bool

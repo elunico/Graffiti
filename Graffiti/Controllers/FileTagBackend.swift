@@ -9,6 +9,13 @@ import Foundation
 
 class FileTagBackend: TagBackend {
     
+    func copy(with zone: NSZone? = nil) -> Any {
+        guard var f = try? FileTagBackend(withFileName: filename, forFilesIn: directory, writer: writer) else { fatalError("Failed to produce copy() of FileTagBackend") }
+        f.tags = tags
+        f.dirty = dirty
+        return f
+    }
+    
     func loadTags(at path: String) -> Set<Tag> {
         return tags[path] ?? []
     }
