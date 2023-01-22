@@ -52,10 +52,6 @@ class PreviewViewController: NSViewController, QLPreviewingController {
         // Quick Look will display a loading spinner while the completion handler is not called.
         dirLabel.stringValue = url.absolutePath
         data = try? CompressedCustomTagStoreWriter().loadFrom(path: url.absolutePath).tagData.map { (key, value) in (key, value) }
-        if data == nil {
-            handler(PreviewError.dataLoadFailure)
-            return
-        }
         table.reloadData()
         handler(nil)
     }
