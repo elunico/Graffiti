@@ -160,3 +160,4 @@ class CompressedCustomTagStoreWriter: FileWriter {
         FileManager.default.createFile(atPath: path, contents: try! NSData(data: data).compressed(using: .lzma) as Data)
     }
 }
+

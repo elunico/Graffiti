@@ -8,14 +8,16 @@
 import Cocoa
 import Quartz
 
+enum PreviewError: Error {
+    case dataLoadFailure
+}
+
 class PreviewViewController: NSViewController, QLPreviewingController {
     
     @IBOutlet var dirLabel: NSTextField!
     
     @IBOutlet weak var table: NSTableView!
-    
-    let source: GraffitiQLTableViewSource = GraffitiQLTableViewSource()
-    
+        
     override var nibName: NSNib.Name? {
         return NSNib.Name("PreviewViewController")
     }
@@ -24,8 +26,6 @@ class PreviewViewController: NSViewController, QLPreviewingController {
         super.loadView()
         table.delegate = self
         table.dataSource = self
-        
-        // Do any additional setup after loading the view.
     }
     
     /*
@@ -52,6 +52,10 @@ class PreviewViewController: NSViewController, QLPreviewingController {
         // Quick Look will display a loading spinner while the completion handler is not called.
         dirLabel.stringValue = url.absolutePath
         data = try? CompressedCustomTagStoreWriter().loadFrom(path: url.absolutePath).tagData.map { (key, value) in (key, value) }
+        if data == nil {
+            handler(PreviewError.dataLoadFailure)
+            return
+        }
         table.reloadData()
         handler(nil)
     }
@@ -69,12 +73,12 @@ extension PreviewViewController: NSTableViewDataSource {
 extension PreviewViewController: NSTableViewDelegate {
     
     enum CellIdentifiers {
-        static let fileNameCell = "Filename"
-        static let kindCell = "Kind"
-        static let tagsCell = "Tags"
-        static let countCell = "Count"
+        static let fileNameCell = NSUserInterfaceItemIdentifier(rawValue: "Filename")
+        static let kindCell = NSUserInterfaceItemIdentifier(rawValue: "Kind")
+        static let tagsCell = NSUserInterfaceItemIdentifier(rawValue: "Tags")
+        static let countCell = NSUserInterfaceItemIdentifier(rawValue: "Count")
         
-        static func forColumn(withIndex index: Int) -> String {
+        static func forColumn(withIndex index: Int) -> NSUserInterfaceItemIdentifier {
             switch index {
             case 0:
                 return fileNameCell
@@ -92,38 +96,32 @@ extension PreviewViewController: NSTableViewDelegate {
     
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         
-        var text: String = ""
-        var cellIdentifier: String = ""
-        
-        // 1
+    
         guard let item = data?[row] else {
-
             return nil
         }
         
         for (index, column) in tableView.tableColumns.enumerated() {
             if tableColumn == column {
-                cellIdentifier = CellIdentifiers.forColumn(withIndex: index)
-                switch index {
-                case 0:
-                    text = (item.0 as NSString).lastPathComponent
-                case 1:
-                    text = (item.0 as NSString).pathExtension
-                case 2:
-                    text = item.1.map{ $0.value }.joined(separator: ", ")
-                case 3:
-                    text = item.1.count.description
-                default:
-                    fatalError()
+                if let cell = tableView.makeView(withIdentifier: CellIdentifiers.forColumn(withIndex: index), owner: nil) as? NSTableCellView {
+                    cell.textField?.stringValue = ({switch index {
+                    case 0:
+                        return (item.0 as NSString).lastPathComponent
+                    case 1:
+                        return (item.0 as NSString).pathExtension
+                    case 2:
+                        return item.1.map{ $0.value }.joined(separator: ", ")
+                    case 3:
+                        return item.1.count.description
+                    default:
+                        fatalError()
+                    } })()
+                    return cell
                 }
+                break 
             }
         }
         
-        // 3
-        if let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: cellIdentifier), owner: nil) as? NSTableCellView {
-            cell.textField?.stringValue = text
-            return cell
-        }
         return nil
     }
     
