@@ -10,12 +10,21 @@ import AppKit
 
 class ThumbnailProvider: QLThumbnailProvider {
     
+    var extensionBadge: String {
+        "ccts"
+    }
+    
     override func provideThumbnail(for request: QLFileThumbnailRequest, _ handler: @escaping (QLThumbnailReply?, Error?) -> Void) {
         
         // There are three ways to provide a thumbnail through a QLThumbnailReply. Only one of them should be used.
         let contextSize = request.maximumSize
         guard let image = NSImage(systemSymbolName: "doc", accessibilityDescription: "") else { return }
         guard let tagImage = NSImage(systemSymbolName: "tag", accessibilityDescription: "") else { return }
+
+        image.size.height = 15
+        image.size.width = 15
+        tagImage.size.height = 15
+        tagImage.size.width = 15
         
         let store = try? CompressedCustomTagStoreWriter().loadFrom(path: request.fileURL.absolutePath)
         let fileCount = store?.tagData.count.description ?? "???"
@@ -28,7 +37,7 @@ class ThumbnailProvider: QLThumbnailProvider {
             
             let topY = (contextSize.height / 2 + (contextSize.height / 6)) - 10
             let botY = (contextSize.height / 2 - (contextSize.height / 6)) - 10
-            let font =  NSFont.systemFont(ofSize: max(contextSize.height / 10, 10))
+            let font =  NSFont.systemFont(ofSize: max(contextSize.height / 9, 10))
             
             image.size.height = contextSize.height / 4
             image.size.width = contextSize.height / 4
