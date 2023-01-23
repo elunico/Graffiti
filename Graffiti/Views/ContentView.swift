@@ -83,7 +83,14 @@ struct ContentView: View {
     @State var directory: URL? = nil
     @State var backend: TagBackend? = nil
     @State var isImporting: Bool = false
-    @State var isLoading: Bool = false
+    @State var isLoading: Bool = false {
+        didSet {
+            if !isLoading {
+                NSApplication.shared.requestUserAttention(.informationalRequest)
+            }
+        }
+    }
+    
     @State var targeted: Bool = false
     @State var errorString: String = ""
     

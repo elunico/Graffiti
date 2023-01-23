@@ -9,11 +9,6 @@ import Foundation
 import SwiftUI
 import QuickLook
 
-extension String {
-    var lastPathComponent: String? {
-        self.components(separatedBy: "/").last
-    }
-}
 
 class Sorter: SortComparator {
     typealias Compared = TaggedFile
@@ -107,7 +102,7 @@ struct MainView: View {
                                                                                 appropriateFor: url,
                                                                                 create: true)
                                                     
-                                                    let temporaryFileURL = temporaryDirectoryURL.appendingPathComponent(ts.lastPathComponent!)
+                                                    let temporaryFileURL = temporaryDirectoryURL.appendingPathComponent(ts.lastPathComponent)
                                                     
                                                     guard let data = try? Data(contentsOf: url) else { return  NSItemProvider()}
                                                     guard let _ = try? data.write(to: temporaryFileURL, options: .atomic) else { return  NSItemProvider()}
@@ -119,7 +114,7 @@ struct MainView: View {
                                                 if files.tagStore == nil {
                                                     Image(systemName: "nosign")
                                                 } else {
-                                                    Label("\(files.tagStore!.lastPathComponent!)", systemImage: "doc")
+                                                    Label("\(files.tagStore!.lastPathComponent)", systemImage: "doc")
                                                 }
                                             })
                                     }
@@ -214,6 +209,8 @@ struct MainView: View {
                         HStack {
                             Spacer()
                             Text("\(files.files.count) files")
+                            Divider().frame(height: 20)
+                            Text("\(files.files.map { $0.tags.count }.reduce(0, +)) tags")
                         }
                     }
                 }
@@ -291,7 +288,7 @@ struct MainView: View {
         .frame(minWidth: 500.0, minHeight: 500.0, alignment: .center)
         .environmentObject(files)
         .padding()
-        .navigationTitle("\(directory!.prettyPrinted) – \(files.files.count) files – Graffiti")
+        .navigationTitle("\(directory!.prettyPrinted) – \(files.files.count) files – \(files.files.map { $0.tags.count }.reduce(0, +)) - tags")
         .navigationDocument(directory!)
         .onAppear {
             guard let path = self.directory?.absolutePath else { return }

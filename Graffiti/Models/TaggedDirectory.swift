@@ -118,9 +118,3 @@ extension TaggedDirectory {
         setFilter(from: "")
     }
 }
-
-extension Array {
-    func anySatisfy(_ predicate: (Element) -> Bool) -> Bool {
-        !self.allSatisfy { !predicate($0) }
-    }
-}
