@@ -35,6 +35,8 @@ class Sorter: SortComparator {
 }
 
 struct MainView: View {
+    static let kUserDefaultsRichKindKey = "com.tom.graffiti-richKind"
+    
     @State var choice: ContentView.Format
     @State var backend: TagBackend
     @State var directory: URL?
@@ -83,6 +85,9 @@ struct MainView: View {
                             })
                             Spacer()
                             Toggle("Spotlight File Kinds", isOn: $richKind)
+                                .onChange(of: richKind, perform: { _ in
+                                    UserDefaults.standard.set(richKind, forKey: MainView.kUserDefaultsRichKindKey)
+                                })
                             
                         }
                         if showingMoreInfo {
@@ -293,6 +298,7 @@ struct MainView: View {
             DispatchQueue.main.async {
                 self.files.load(directory: path, backend: backend)
             }
+            richKind = UserDefaults.standard.bool(forKey: MainView.kUserDefaultsRichKindKey)
         }
     }
     
