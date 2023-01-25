@@ -68,7 +68,7 @@ enum FileError: Error {
 
 fileprivate var didRequestPermission: Set<String> = []
 
-func sandboxAccessDirectory<R>(at directory: String, _ action: (String) throws -> (R)) rethrows -> R {
+func getSandboxedAccess<R>(to directory: String, thenPerform action: (String) throws -> (R)) rethrows -> R {
     print("Accessing \(directory)")
     do {
         return try action(directory)
@@ -92,12 +92,9 @@ func sandboxAccessDirectory<R>(at directory: String, _ action: (String) throws -
 }
 
 func getContentsOfDirectory(atPath directory: String) throws -> [String] {
-    try sandboxAccessDirectory(at: directory) {
-        try FileManager.default.contentsOfDirectory(atPath: $0)
-    }
+    try getSandboxedAccess(to: directory) { try FileManager.default.contentsOfDirectory(atPath: $0) }
 }
 
 func TPData(contentsOf url: URL) throws -> Data {
-//    try attemptFileAccess(ofPath: url.absolutePath) { path in try Data(contentsOf: URL(fileURLWithPath: path)) }
     try Data(contentsOf: url)
 }

@@ -15,13 +15,6 @@ struct StoreFormatOptionsProvider: DynamicOptionsProvider {
     }
 }
 
-struct LibraryAppShorcuts: AppShortcutsProvider {
-    @AppShortcutsBuilder static var appShortcuts: [AppShortcut] {
-        AppShortcut(intent: GraffitiAddTagToFile(), phrases: ["Add a tag to the given file by adding it to the specified tag store using \(.applicationName)"])
-        AppShortcut(intent: GraffitiGetTagsOfFile(), phrases: ["Get the tags of a given file from the specified tag store using \(.applicationName) and return them as a list of strings"])
-    }
-}
-
 extension AppIntent {
     
     func setup(storageType: IntentParameter<String>, file: IntentParameter<IntentFile>) throws -> (TaggedDirectory, TaggedFile, TagBackend) {
@@ -48,26 +41,7 @@ extension AppIntent {
 }
 
 
-struct GraffitiGetTagsOfFile: AppIntent {
-    static var title: LocalizedStringResource = "Get tags of File"
-    
-    static var description: IntentDescription = IntentDescription("Retrieve the tags of a file as a list of strings")
-    
-    @Parameter(title: "File")
-    var file: IntentFile
-    
-    @Parameter(title: "Tags")
-    var tags: [String]
-    
-    @Parameter(title: "Storage Type", optionsProvider: StoreFormatOptionsProvider())
-    var storageType: String
-    
-    func perform() async throws -> some IntentResult {
-        let (_, tagFile, _) = try setup(storageType: $storageType, file: $file)
 
-        return .result(value: tagFile.tags.map { $0.value })
-    }
-}
 
 struct GraffitiAddTagToFile: AppIntent {
     static var title: LocalizedStringResource = "Add tags to a File"
