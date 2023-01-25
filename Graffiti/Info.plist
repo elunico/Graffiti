@@ -64,7 +64,9 @@
 	</array>
 	<key>INIntentsSupported</key>
 	<array>
-		<string>GraffitiAddTagToFile</string>
+		<string>GraffitiRemoveTagsFromFile</string>
+		<string>GraffitiAddTagsToFile</string>
+		<string>GraffitiGetTagsOfFile</string>
 	</array>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
