@@ -31,24 +31,20 @@ enum Format: Hashable, CustomStringConvertible, CaseIterable {
     }
     
     func implementation(in directory: URL, withFileName filename: String? = nil) throws -> TagBackend? {
-        if self == .none {
-            return nil
-        }
         var b: TagBackend? = nil
 
-        if self == .plist {
+        switch self {
+        case .none:
+            return nil
+        case .plist:
             b = try FileTagBackend(withFileName: filename, forFilesIn: directory, writer: PropertyListFileWriter())
-        }
-        if self == .csv {
+        case .csv:
             b = try FileTagBackend(withFileName: filename, forFilesIn: directory, writer: CSVFileWriter())
-        }
-        if self == .xattr{
+        case .xattr:
             b = XattrTagBackend()
-        }
-        if self == .json {
+        case .json:
             b = try FileTagBackend(withFileName: filename, forFilesIn: directory, writer: JSONFileWriter())
-        }
-        if self == .ccts {
+        case .ccts:
             b = try FileTagBackend(withFileName: filename, forFilesIn: directory, writer: CompressedCustomTagStoreWriter())
         }
         return b
