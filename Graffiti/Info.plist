@@ -62,6 +62,10 @@
 			<string>com.tom.ccts</string>
 		</dict>
 	</array>
+	<key>INIntentsSupported</key>
+	<array>
+		<string>GraffitiAddTagToFile</string>
+	</array>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
 		<dict>

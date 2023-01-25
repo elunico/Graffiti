@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AppKit
 
 extension String {
     var lastPathComponent: String {
@@ -59,4 +60,44 @@ extension Array where Element: Hashable {
         }
         return result
     }
+}
+
+enum FileError: Error {
+    case userCancelled, permissionRequested, couldNotRead
+}
+
+fileprivate var didRequestPermission: Set<String> = []
+
+func sandboxAccessDirectory<R>(at directory: String, _ action: (String) throws -> (R)) rethrows -> R {
+    print("Accessing \(directory)")
+    do {
+        return try action(directory)
+    } catch _ where !didRequestPermission.contains(directory) {
+        
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = false
+        panel.canChooseDirectories = true
+        panel.directoryURL = URL(fileURLWithPath: directory)
+        panel.message = "Select the folder you are targeting to grant Graffiti permission to access it"
+        let response = panel.runModal()
+        // TODO: save bookmark so permissions is only requested once
+        if response == NSApplication.ModalResponse.OK {
+            didRequestPermission.insert(directory)
+            return try action(panel.url!.absolutePath)
+        }
+        throw FileError.userCancelled
+    } catch let error {
+        throw error
+    }
+}
+
+func getContentsOfDirectory(atPath directory: String) throws -> [String] {
+    try sandboxAccessDirectory(at: directory) {
+        try FileManager.default.contentsOfDirectory(atPath: $0)
+    }
+}
+
+func TPData(contentsOf url: URL) throws -> Data {
+//    try attemptFileAccess(ofPath: url.absolutePath) { path in try Data(contentsOf: URL(fileURLWithPath: path)) }
+    try Data(contentsOf: url)
 }

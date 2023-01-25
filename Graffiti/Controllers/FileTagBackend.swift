@@ -30,7 +30,6 @@ class FileTagBackend: TagBackend {
         self.directory = directory
         self.writer = writer
         self.filename = filename
-        // todo: fix this
         let intermediate = try writer.loadFrom(path: type(of: writer).writePath(in: directory, named: filename))
         let data = intermediate.tagData
         for (path, tags) in data {

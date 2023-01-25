@@ -40,13 +40,13 @@ class TaggedDirectory: ObservableObject, NSCopying {
         self.backend = XattrTagBackend()
     }
     
-    func load(directory: String, backend: TagBackend = XattrTagBackend()) {
+    func load(directory: String, backend: TagBackend = XattrTagBackend()) throws {
         self.files.removeAll()
         self.indexMap.removeAll()
         self.directory = directory
         self.backend = backend
         
-        let content = try! FileManager().contentsOfDirectory(atPath: directory)
+        let content = try getContentsOfDirectory(atPath: directory)
         var idx = 0
         for file in content {
             let tf = TaggedFile(parent: directory, filename: file, backend: backend)

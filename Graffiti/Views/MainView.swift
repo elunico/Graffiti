@@ -32,7 +32,7 @@ class Sorter: SortComparator {
 struct MainView: View {
     static let kUserDefaultsRichKindKey = "com.tom.graffiti-richKind"
     
-    @State var choice: ContentView.Format
+    @State var choice: Format
     @State var backend: TagBackend
     @State var directory: URL?
     @StateObject var files: TaggedDirectory = TaggedDirectory.empty.copy() as! TaggedDirectory
@@ -104,7 +104,7 @@ struct MainView: View {
                                                     
                                                     let temporaryFileURL = temporaryDirectoryURL.appendingPathComponent(ts.lastPathComponent)
                                                     
-                                                    guard let data = try? Data(contentsOf: url) else { return  NSItemProvider()}
+                                                    guard let data = try? TPData(contentsOf: url) else { return  NSItemProvider()}
                                                     guard let _ = try? data.write(to: temporaryFileURL, options: .atomic) else { return  NSItemProvider()}
                                                     return NSItemProvider(item: temporaryFileURL as NSSecureCoding, typeIdentifier: "public.file-url")
                                                 } catch {
@@ -293,7 +293,7 @@ struct MainView: View {
         .onAppear {
             guard let path = self.directory?.absolutePath else { return }
             DispatchQueue.main.async {
-                self.files.load(directory: path, backend: backend)
+                try! self.files.load(directory: path, backend: backend)
             }
             richKind = UserDefaults.standard.bool(forKey: MainView.kUserDefaultsRichKindKey)
         }

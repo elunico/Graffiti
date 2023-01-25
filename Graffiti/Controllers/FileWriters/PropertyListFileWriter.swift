@@ -17,7 +17,7 @@ class PropertyListFileWriter: FileWriter {
         }
         
         
-        let data = try Data(contentsOf: URL(fileURLWithPath: path))
+        let data = try TPData(contentsOf: URL(fileURLWithPath: path))
         let object = try PropertyListSerialization.propertyList(from: data, format: nil)
         
         let dict = object as? [String: Any]

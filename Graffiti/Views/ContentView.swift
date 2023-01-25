@@ -24,56 +24,7 @@ extension View {
 }
 
 struct ContentView: View {
-    enum Format: Hashable, CustomStringConvertible, CaseIterable {
-        var description: String {
-            switch self {
-            case .plist: return "Property List"
-            case .csv: return "Comma-Separated Values"
-            case .xattr: return "Extended File Attributes"
-            case .json: return "JSON File"
-            case .ccts: return "Custom Compressed Tag Store"
-            case .none: return "<<none>>"
-            }
-        }
-        
-        var fileExtension: String? {
-            switch self {
-            case .plist: return "plist"
-            case .csv: return "csv"
-            case .json: return "json"
-            case .xattr: return nil
-            case .none: return nil
-            case .ccts: return "ccts"
-            }
-        }
-        
-        func implementation(in directory: URL, withFileName filename: String? = nil) throws -> TagBackend? {
-            if self == .none {
-                return nil
-            }
-            var b: TagBackend? = nil
-
-            if self == .plist {
-                b = try FileTagBackend(withFileName: filename, forFilesIn: directory, writer: PropertyListFileWriter())
-            }
-            if self == .csv {
-                b = try FileTagBackend(withFileName: filename, forFilesIn: directory, writer: CSVFileWriter())
-            }
-            if self == .xattr{
-                b = XattrTagBackend()
-            }
-            if self == .json {
-                b = try FileTagBackend(withFileName: filename, forFilesIn: directory, writer: JSONFileWriter())
-            }
-            if self == .ccts {
-                b = try FileTagBackend(withFileName: filename, forFilesIn: directory, writer: CompressedCustomTagStoreWriter())
-            }
-            return b
-        }
-        
-        case xattr, csv, plist, json, ccts
-        case none
-    }
+    
     
     @State var formatChoice: Format = .none
     @State var lazyChoice: Bool = false
@@ -177,10 +128,13 @@ struct ContentView: View {
                     if let ext = formatChoice.fileExtension, let url = directory?.appendingPathComponent("\(FileTagBackend.filePrefix).\(ext)") {
                         Button("Delete File") {
                             // TODO: oh boy
-                            try! FileManager.default.removeItem(at: url)
-                            showingError = false
-                            setBackend {
-                                showingOptions = !$0
+                            if (try? FileManager.default.removeItem(at: url)) == nil {
+                                showingError = true
+                            } else {
+                                showingError = false
+                                setBackend {
+                                    showingOptions = !$0
+                                }
                             }
                         }
                     }

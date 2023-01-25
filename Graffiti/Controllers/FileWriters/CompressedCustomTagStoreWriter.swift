@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import os
 
 extension Int {
     var bigEndianBytes: Data {
@@ -101,11 +102,15 @@ class CompressedCustomTagStoreWriter: FileWriter {
             FileManager.default.createFile(atPath: path, contents: try! Data(NSData(data: TagStore.default.version.encodedForCCTS.appending(0.bigEndianBytes)).compressed(using: .lzma)))
         }
         
-        guard let data = try? Data(contentsOf: URL(fileURLWithPath: path)), let data = try? Data(NSData(data: data).decompressed(using: .lzma)) else {
+        guard let data = try? TPData(contentsOf: URL(fileURLWithPath: path)), let data = try? Data(NSData(data: data).decompressed(using: .lzma)) else {
+            os_log("%s", log: .default, type: .error, "Error at getting data with path \(path)")
+
             throw FileWriterError.InvalidFileFormat
         }
         
         if data.count < 10 {
+            os_log("%s", log: .default, type: .error, "Data formatted incorrectly with \(data.count) bytes")
+
             throw FileWriterError.InvalidFileFormat
         }
         
@@ -113,6 +118,8 @@ class CompressedCustomTagStoreWriter: FileWriter {
         let version = Version.from(dataIterator: &iter)
         
         if !TagStore.default.version.isReadCompatible(with: version) {
+            os_log("%s", log: .default, type: .error, "Bad version \(version)")
+
             throw FileWriterError.VersionMismatch
         }
         
@@ -120,14 +127,18 @@ class CompressedCustomTagStoreWriter: FileWriter {
         
         for _ in 0..<totalFiles {
             guard let pathLength = iter.nextBEInt16(), let pathData = iter.next(Int(pathLength)), let path = String(data: pathData, encoding: .utf8) else {
+                os_log("%s", log: .default, type: .error, "Invalid path length")
+
                 throw FileWriterError.InvalidFileFormat
             }
             retValue[path] = Set()
             guard let tagCount = iter.nextBEInt() else {
+                os_log("%s", log: .default, type: .error, "Invalid tag count")
                 throw FileWriterError.InvalidFileFormat
             }
             for _ in 0..<tagCount {
                 guard let tagLen = iter.nextBEInt16(), let tagData = iter.next(Int(tagLen)), let tag = String(data: tagData, encoding: .utf8) else {
+                    os_log("%s", log: .default, type: .error, "Invalid tag length")
                     throw FileWriterError.InvalidFileFormat
                 }
                 retValue[path]!.insert(Tag(value: tag))

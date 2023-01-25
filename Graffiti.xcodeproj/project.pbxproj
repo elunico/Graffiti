@@ -55,6 +55,27 @@
 		DC52448F2960ACB200821407 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC52448E2960ACB200821407 /* ContentView.swift */; };
 		DC5244912960ACB300821407 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DC5244902960ACB300821407 /* Assets.xcassets */; };
 		DC5244942960ACB300821407 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DC5244932960ACB300821407 /* Preview Assets.xcassets */; };
+		DC5D264E297EE699009D3868 /* GraffitiTagFileExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D264D297EE699009D3868 /* GraffitiTagFileExtension.swift */; };
+		DC5D2650297EE699009D3868 /* GraffitiAddTagToFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D264F297EE699009D3868 /* GraffitiAddTagToFile.swift */; };
+		DC5D2655297EE699009D3868 /* GraffitiTagFile.appex in Embed ExtensionKit Extensions */ = {isa = PBXBuildFile; fileRef = DC5D264B297EE699009D3868 /* GraffitiTagFile.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		DC5D265B297EE79F009D3868 /* Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D265A297EE79F009D3868 /* Format.swift */; };
+		DC5D265C297EE7B5009D3868 /* Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D265A297EE79F009D3868 /* Format.swift */; };
+		DC5D265D297EE8D2009D3868 /* CompressedCustomTagStoreWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC21D4D22979ED900024E644 /* CompressedCustomTagStoreWriter.swift */; };
+		DC5D265E297EE8D2009D3868 /* LazyBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C52965DD560002690A /* LazyBackend.swift */; };
+		DC5D265F297EE8D2009D3868 /* TagBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC9296229C600DEED22 /* TagBackend.swift */; };
+		DC5D2660297EE8D2009D3868 /* CSVFileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAB1A0296A04DE00843BE4 /* CSVFileWriter.swift */; };
+		DC5D2661297EE8D2009D3868 /* JSONFileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFDE987296F4AEC005F00E9 /* JSONFileWriter.swift */; };
+		DC5D2662297EE8D2009D3868 /* PropertyListFileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2E803B296A40450015AE26 /* PropertyListFileWriter.swift */; };
+		DC5D2663297EE8D2009D3868 /* FileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAB1A2296A056B00843BE4 /* FileWriter.swift */; };
+		DC5D2664297EE8D2009D3868 /* FileTagBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAB19D296A018A00843BE4 /* FileTagBackend.swift */; };
+		DC5D2665297EE8D2009D3868 /* XattrTagBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C72965DD680002690A /* XattrTagBackend.swift */; };
+		DC5D2666297EE93D009D3868 /* TaggedDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8E14622963EAE0002E1788 /* TaggedDirectory.swift */; };
+		DC5D2667297EE93D009D3868 /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5FA2F12975032800084CB2 /* Version.swift */; };
+		DC5D2668297EE93D009D3868 /* TaggedFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC72962299B00DEED22 /* TaggedFile.swift */; };
+		DC5D2669297EE93D009D3868 /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C22965DD1C0002690A /* Tag.swift */; };
+		DC5D266A297EE93D009D3868 /* TagStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5FA2F32975091500084CB2 /* TagStore.swift */; };
+		DC5D266B297EE981009D3868 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09FE3A297DB5F600BD51D9 /* Utility.swift */; };
+		DC5D266C297EEA83009D3868 /* XattrBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC42962066200DEED22 /* XattrBridge.m */; };
 		DC5FA2F22975032800084CB2 /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5FA2F12975032800084CB2 /* Version.swift */; };
 		DC5FA2F42975091500084CB2 /* TagStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5FA2F32975091500084CB2 /* TagStore.swift */; };
 		DC8E14632963EAE0002E1788 /* TaggedDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8E14622963EAE0002E1788 /* TaggedDirectory.swift */; };
@@ -82,6 +103,13 @@
 			remoteGlobalIDString = DC14E742297DCBE7001B00AC;
 			remoteInfo = CCTSThumbnailProvider;
 		};
+		DC5D2653297EE699009D3868 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DC5244812960ACB200821407 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DC5D264A297EE699009D3868;
+			remoteInfo = GraffitiTagFile;
+		};
 		DCFAEC79297AFD3400F8A80F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = DC5244812960ACB200821407 /* Project object */;
@@ -92,6 +120,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		DC5D2656297EE699009D3868 /* Embed ExtensionKit Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(EXTENSIONS_FOLDER_PATH)";
+			dstSubfolderSpec = 16;
+			files = (
+				DC5D2655297EE699009D3868 /* GraffitiTagFile.appex in Embed ExtensionKit Extensions */,
+			);
+			name = "Embed ExtensionKit Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DCFAEC7C297AFD3400F8A80F /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -128,6 +167,12 @@
 		DC5244902960ACB300821407 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DC5244932960ACB300821407 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		DC5244952960ACB300821407 /* Graffiti.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Graffiti.entitlements; sourceTree = "<group>"; };
+		DC5D264B297EE699009D3868 /* GraffitiTagFile.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = GraffitiTagFile.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		DC5D264D297EE699009D3868 /* GraffitiTagFileExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraffitiTagFileExtension.swift; sourceTree = "<group>"; };
+		DC5D264F297EE699009D3868 /* GraffitiAddTagToFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraffitiAddTagToFile.swift; sourceTree = "<group>"; };
+		DC5D2651297EE699009D3868 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DC5D2652297EE699009D3868 /* GraffitiTagFile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GraffitiTagFile.entitlements; sourceTree = "<group>"; };
+		DC5D265A297EE79F009D3868 /* Format.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Format.swift; sourceTree = "<group>"; };
 		DC5FA2F12975032800084CB2 /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
 		DC5FA2F32975091500084CB2 /* TagStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagStore.swift; sourceTree = "<group>"; };
 		DC8E14622963EAE0002E1788 /* TaggedDirectory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaggedDirectory.swift; sourceTree = "<group>"; };
@@ -166,6 +211,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DC5D2648297EE699009D3868 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DCFAEC68297AFD3400F8A80F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -193,6 +245,7 @@
 				DC52448B2960ACB200821407 /* Graffiti */,
 				DCFAEC6F297AFD3400F8A80F /* CCTSQLPlugin */,
 				DC14E747297DCBE8001B00AC /* CCTSThumbnailProvider */,
+				DC5D264C297EE699009D3868 /* GraffitiTagFile */,
 				DCFAEC6C297AFD3400F8A80F /* Frameworks */,
 				DC52448A2960ACB200821407 /* Products */,
 			);
@@ -204,6 +257,7 @@
 				DC5244892960ACB200821407 /* Graffiti.app */,
 				DCFAEC6B297AFD3400F8A80F /* CCTSQLPlugin.appex */,
 				DC14E743297DCBE7001B00AC /* CCTSThumbnailProvider.appex */,
+				DC5D264B297EE699009D3868 /* GraffitiTagFile.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -233,6 +287,17 @@
 				DC5244932960ACB300821407 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		DC5D264C297EE699009D3868 /* GraffitiTagFile */ = {
+			isa = PBXGroup;
+			children = (
+				DC5D264D297EE699009D3868 /* GraffitiTagFileExtension.swift */,
+				DC5D264F297EE699009D3868 /* GraffitiAddTagToFile.swift */,
+				DC5D2651297EE699009D3868 /* Info.plist */,
+				DC5D2652297EE699009D3868 /* GraffitiTagFile.entitlements */,
+			);
+			path = GraffitiTagFile;
 			sourceTree = "<group>";
 		};
 		DCE8E1582967D45F002D0A05 /* Views */ = {
@@ -266,6 +331,7 @@
 				DC8E14622963EAE0002E1788 /* TaggedDirectory.swift */,
 				DC5FA2F12975032800084CB2 /* Version.swift */,
 				DC5FA2F32975091500084CB2 /* TagStore.swift */,
+				DC5D265A297EE79F009D3868 /* Format.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -331,17 +397,36 @@
 				DC5244862960ACB200821407 /* Frameworks */,
 				DC5244872960ACB200821407 /* Resources */,
 				DCFAEC7C297AFD3400F8A80F /* Embed Foundation Extensions */,
+				DC5D2656297EE699009D3868 /* Embed ExtensionKit Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				DCFAEC7A297AFD3400F8A80F /* PBXTargetDependency */,
 				DC14E74D297DCBE8001B00AC /* PBXTargetDependency */,
+				DC5D2654297EE699009D3868 /* PBXTargetDependency */,
 			);
 			name = Graffiti;
 			productName = Graffiti;
 			productReference = DC5244892960ACB200821407 /* Graffiti.app */;
 			productType = "com.apple.product-type.application";
+		};
+		DC5D264A297EE699009D3868 /* GraffitiTagFile */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DC5D2659297EE699009D3868 /* Build configuration list for PBXNativeTarget "GraffitiTagFile" */;
+			buildPhases = (
+				DC5D2647297EE699009D3868 /* Sources */,
+				DC5D2648297EE699009D3868 /* Frameworks */,
+				DC5D2649297EE699009D3868 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = GraffitiTagFile;
+			productName = GraffitiTagFile;
+			productReference = DC5D264B297EE699009D3868 /* GraffitiTagFile.appex */;
+			productType = "com.apple.product-type.extensionkit-extension";
 		};
 		DCFAEC6A297AFD3400F8A80F /* CCTSQLPlugin */ = {
 			isa = PBXNativeTarget;
@@ -377,6 +462,9 @@
 						CreatedOnToolsVersion = 14.2;
 						LastSwiftMigration = 1420;
 					};
+					DC5D264A297EE699009D3868 = {
+						CreatedOnToolsVersion = 14.2;
+					};
 					DCFAEC6A297AFD3400F8A80F = {
 						CreatedOnToolsVersion = 14.2;
 					};
@@ -398,6 +486,7 @@
 				DC5244882960ACB200821407 /* Graffiti */,
 				DCFAEC6A297AFD3400F8A80F /* CCTSQLPlugin */,
 				DC14E742297DCBE7001B00AC /* CCTSThumbnailProvider */,
+				DC5D264A297EE699009D3868 /* GraffitiTagFile */,
 			);
 		};
 /* End PBXProject section */
@@ -416,6 +505,13 @@
 			files = (
 				DC5244942960ACB300821407 /* Preview Assets.xcassets in Resources */,
 				DC5244912960ACB300821407 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DC5D2649297EE699009D3868 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -459,6 +555,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DC5D265B297EE79F009D3868 /* Format.swift in Sources */,
 				DCFA39C32965DD1C0002690A /* Tag.swift in Sources */,
 				DC1B7BC52962066200DEED22 /* XattrBridge.m in Sources */,
 				DC1B7BCA296229C600DEED22 /* TagBackend.swift in Sources */,
@@ -480,6 +577,32 @@
 				DCEAB1A3296A056B00843BE4 /* FileWriter.swift in Sources */,
 				DC8E14632963EAE0002E1788 /* TaggedDirectory.swift in Sources */,
 				DCEAB1A1296A04DE00843BE4 /* CSVFileWriter.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DC5D2647297EE699009D3868 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC5D2669297EE93D009D3868 /* Tag.swift in Sources */,
+				DC5D2650297EE699009D3868 /* GraffitiAddTagToFile.swift in Sources */,
+				DC5D266B297EE981009D3868 /* Utility.swift in Sources */,
+				DC5D265D297EE8D2009D3868 /* CompressedCustomTagStoreWriter.swift in Sources */,
+				DC5D2664297EE8D2009D3868 /* FileTagBackend.swift in Sources */,
+				DC5D2663297EE8D2009D3868 /* FileWriter.swift in Sources */,
+				DC5D2667297EE93D009D3868 /* Version.swift in Sources */,
+				DC5D266A297EE93D009D3868 /* TagStore.swift in Sources */,
+				DC5D264E297EE699009D3868 /* GraffitiTagFileExtension.swift in Sources */,
+				DC5D265F297EE8D2009D3868 /* TagBackend.swift in Sources */,
+				DC5D265E297EE8D2009D3868 /* LazyBackend.swift in Sources */,
+				DC5D2665297EE8D2009D3868 /* XattrTagBackend.swift in Sources */,
+				DC5D2662297EE8D2009D3868 /* PropertyListFileWriter.swift in Sources */,
+				DC5D2668297EE93D009D3868 /* TaggedFile.swift in Sources */,
+				DC5D265C297EE7B5009D3868 /* Format.swift in Sources */,
+				DC5D2661297EE8D2009D3868 /* JSONFileWriter.swift in Sources */,
+				DC5D266C297EEA83009D3868 /* XattrBridge.m in Sources */,
+				DC5D2660297EE8D2009D3868 /* CSVFileWriter.swift in Sources */,
+				DC5D2666297EE93D009D3868 /* TaggedDirectory.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -515,6 +638,11 @@
 			isa = PBXTargetDependency;
 			target = DC14E742297DCBE7001B00AC /* CCTSThumbnailProvider */;
 			targetProxy = DC14E74C297DCBE8001B00AC /* PBXContainerItemProxy */;
+		};
+		DC5D2654297EE699009D3868 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DC5D264A297EE699009D3868 /* GraffitiTagFile */;
+			targetProxy = DC5D2653297EE699009D3868 /* PBXContainerItemProxy */;
 		};
 		DCFAEC7A297AFD3400F8A80F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -623,8 +751,10 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SELECTED_FILES = readwrite;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -685,8 +815,10 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SELECTED_FILES = readwrite;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -716,7 +848,7 @@
 				CODE_SIGN_ENTITLEMENTS = Graffiti/Graffiti.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 23JA22A;
+				CURRENT_PROJECT_VERSION = 23JA23A;
 				DEVELOPMENT_ASSET_PATHS = "\"Graffiti/Preview Content\"";
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -730,7 +862,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 7.0.1;
+				MARKETING_VERSION = 8.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -750,7 +882,7 @@
 				CODE_SIGN_ENTITLEMENTS = Graffiti/Graffiti.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 23JA22A;
+				CURRENT_PROJECT_VERSION = 23JA23A;
 				DEVELOPMENT_ASSET_PATHS = "\"Graffiti/Preview Content\"";
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -764,11 +896,65 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 7.0.1;
+				MARKETING_VERSION = 8.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Graffiti/Graffiti-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		DC5D2657297EE699009D3868 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = GraffitiTagFile/GraffitiTagFile.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9KTV75G5K9;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = GraffitiTagFile/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = GraffitiTagFile;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.GraffitiTagFile;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		DC5D2658297EE699009D3868 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = GraffitiTagFile/GraffitiTagFile.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9KTV75G5K9;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = GraffitiTagFile/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = GraffitiTagFile;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.GraffitiTagFile;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -855,6 +1041,15 @@
 			buildConfigurations = (
 				DC5244992960ACB300821407 /* Debug */,
 				DC52449A2960ACB300821407 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DC5D2659297EE699009D3868 /* Build configuration list for PBXNativeTarget "GraffitiTagFile" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DC5D2657297EE699009D3868 /* Debug */,
+				DC5D2658297EE699009D3868 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

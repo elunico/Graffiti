@@ -15,7 +15,7 @@ class JSONFileWriter: FileWriter {
             FileManager.default.createFile(atPath: path, contents: "{\"version\": \"\(TagStore.default.version.description)\", \"data\": {}}".data(using: .utf8))
         }
         
-        let object = try JSONSerialization.jsonObject(with: Data(contentsOf: URL(filePath: path)))
+        let object = try JSONSerialization.jsonObject(with: TPData(contentsOf: URL(filePath: path)))
         
         let dict = object as? [String: Any]
         
