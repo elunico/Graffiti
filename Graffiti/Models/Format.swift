@@ -5,6 +5,7 @@
 //  Created by Thomas Povinelli on 1/23/23.
 //
 
+import UniformTypeIdentifiers
 import Foundation
 
 enum Format: Hashable, CustomStringConvertible, CaseIterable {
@@ -16,6 +17,17 @@ enum Format: Hashable, CustomStringConvertible, CaseIterable {
         case .json: return "JSON File"
         case .ccts: return "Custom Compressed Tag Store"
         case .none: return "<<none>>"
+        }
+    }
+    
+    var contentType: UTType? {
+        switch self {
+        case .plist: return .propertyList
+        case .csv: return .commaSeparatedText
+        case .json: return .json
+        case .xattr: return nil
+        case .none: return nil
+        case .ccts: return UTType("com.tom.ccts")
         }
     }
     
@@ -48,6 +60,15 @@ enum Format: Hashable, CustomStringConvertible, CaseIterable {
             b = try FileTagBackend(withFileName: filename, forFilesIn: directory, writer: CompressedCustomTagStoreWriter())
         }
         return b
+    }
+    
+    static func format(forExtension fileExtension: String) -> Format? {
+        for format in Format.allCases {
+            if format.fileExtension == fileExtension {
+                return format
+            }
+        }
+        return nil 
     }
     
     case xattr, csv, plist, json, ccts

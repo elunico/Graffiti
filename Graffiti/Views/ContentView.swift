@@ -34,6 +34,7 @@ struct ContentView: View {
     @State var directory: URL? = nil
     @State var backend: TagBackend? = nil
     @State var isImporting: Bool = false
+    @State var isConverting: Bool = false
     @State var isLoading: Bool = false {
         didSet {
             if !isLoading {
@@ -59,30 +60,12 @@ struct ContentView: View {
                 Text("Selected: \(directory?.absolutePath ?? "<none>")")
             }
             Spacer().frame(height: 25.0)
-                
-            Group {
-                Label("Choose a save format", systemImage: "2.circle")
-                    .font(.title)
-                
-                Picker("", selection: $formatChoice, content: {
-                    Text("CSV File").tag(Format.csv)
-                        .help("Saves all tags of all files in a directory to a single CSV file also placed in that directory")
-                    Text("Property List File").tag(Format.plist)
-                        .help("Saves all tags of all files in a directory to a single (binary) Property List file also placed in that directory")
-                    Text("JSON File").tag(Format.json)
-                        .help("Saves all tags of all files in a directory to a single JSON file also placed in that directory")
-                    Text("Custom Compressed Tag Store File").tag(Format.ccts)
-                        .help("Saves all tags of all files in a directory to a single custom compressed binary format meant to make efficient use of space at the cost of compatibility with external editors")
-                    Text("Extended File Attributes").tag(Format.xattr)
-                        .help("Saves all tags of each files as extended attributes (xattr) of that file. The file retains its tags even when moved")
-                })
-                .pickerStyle(RadioGroupPickerStyle())
-                .frame(minWidth: 200.0, maxWidth: 300.0)
-                .padding()
-                Toggle(isOn: $lazyChoice, label: {
-                    Text("Lazy Writing?")
-                })
-            }
+            Label("Choose a save format", systemImage: "2.circle")
+                .font(.title)
+            FormatSelector(formatChoice: $formatChoice)
+            Toggle(isOn: $lazyChoice, label: {
+                Text("Lazy Writing?")
+            })
             Spacer().frame(height: 25.0)
         }
     }
@@ -107,15 +90,20 @@ struct ContentView: View {
                 } label: {
                     Label("Go!", systemImage: "arrowshape.forward")
                 }.disabled(directory == nil || formatChoice == .none)
+                Spacer().frame(height: 50.0)
+                Divider().frame(width: geometry.size.width / 2)
+                Button("Convert an existing tag store") {
+                    isConverting = true 
+                }
             }
             .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
             .padding()
         }
-        .onDrop(of: ["public.file-url"], isTargeted: $targeted) { providers -> Bool in
-            receiveDrop(providers: providers)
-            return true
-        }
-        .frame(minWidth: 600.0, minHeight: 600.0, alignment: .center)
+         .onDrop(of: ["public.file-url"], isTargeted: $targeted) { providers -> Bool in
+             receiveDrop(providers: providers)
+             return true
+         }
+        .frame(minWidth: 600.0, minHeight: 650.0, alignment: .center)
         .sheet(isPresented: $showingError, content: {
             VStack {
                 Text("Invalid File Format").font(.title).padding()
@@ -171,6 +159,9 @@ struct ContentView: View {
                             isLoading = true
                             loadDroppedFile(path)
                             
+                        })
+                        .sheet(isPresented: $isConverting, content: {
+                            ConvertView(done: { isConverting = false })
                         })
         } else {
             MainView(choice: formatChoice, backend: backend!, directory: self.directory, showOptions: { showingOptions = true; formatChoice = .none; })

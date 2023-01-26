@@ -9,7 +9,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 extension UTType {
-    static let customCompressedTagStore = UTType(exportedAs: "com.tom.ccts")
+    var compressedCustomTagStore: UTType { UTType(exportedAs: "com.tom.ccts") }
 }
 
 

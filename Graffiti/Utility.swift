@@ -8,6 +8,28 @@
 import Foundation
 import AppKit
 
+
+protocol AnyOptional {
+    associatedtype Element
+    var asOptional: Optional<Element> { get }
+}
+
+extension Optional: AnyOptional {
+    var asOptional: Optional<Wrapped> { self }
+}
+
+extension Array where Element: AnyOptional {
+    func droppingNils() -> [Element.Element] {
+        self.map { $0.asOptional }.filter { $0 != nil }.map { $0! }
+    }
+}
+
+extension UserDefaults {
+    static var this: UserDefaults? {
+        UserDefaults(suiteName: "com.tom.graffiti")
+    }
+}
+
 extension String {
     var lastPathComponent: String {
         (self as NSString).lastPathComponent

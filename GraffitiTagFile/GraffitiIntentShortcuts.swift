@@ -13,6 +13,7 @@ struct LibraryAppShorcuts: AppShortcutsProvider {
     @AppShortcutsBuilder static var appShortcuts: [AppShortcut] {
         AppShortcut(intent: GraffitiAddTagsToFile(), phrases: ["Add a tag to the given file by adding it to the specified tag store using \(.applicationName)"])
         AppShortcut(intent: GraffitiGetTagsOfFile(), phrases: ["Get the tags of a given file from the specified tag store using \(.applicationName) and return them as a list of strings"])
+        AppShortcut(intent: GraffitiRemoveTagsFromFile(), phrases: ["Remnove the specified tags of the given file from the specified tag store using \(.applicationName). If the file does not have a tag, no action is taken."])
     }
 }
 

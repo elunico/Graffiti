@@ -55,3 +55,9 @@ extension FileWriter {
         }
     }
 }
+
+func convert(file url: URL, isUsing currentWriter: FileWriter, willUse futureWriter: FileWriter) throws {
+    let data = try currentWriter.loadFrom(path: url.absolutePath)
+    let path = url.deletingPathExtension().appendingPathExtension(String(type(of: futureWriter).fileExtension.trimmingPrefix(/\./))).absolutePath
+    getSandboxedAccess(to: path, thenPerform: {futureWriter.saveTo(path: $0, store: data)})
+}

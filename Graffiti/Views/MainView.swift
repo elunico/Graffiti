@@ -81,7 +81,7 @@ struct MainView: View {
                             Spacer()
                             Toggle("Spotlight File Kinds", isOn: $richKind)
                                 .onChange(of: richKind, perform: { _ in
-                                    UserDefaults.standard.set(richKind, forKey: MainView.kUserDefaultsRichKindKey)
+                                    UserDefaults.this?.set(richKind, forKey: MainView.kUserDefaultsRichKindKey)
                                 })
                             
                         }
@@ -295,7 +295,7 @@ struct MainView: View {
             DispatchQueue.main.async {
                 try! self.files.load(directory: path, backend: backend)
             }
-            richKind = UserDefaults.standard.bool(forKey: MainView.kUserDefaultsRichKindKey)
+            richKind = UserDefaults.this?.bool(forKey: MainView.kUserDefaultsRichKindKey) ?? false 
         }
     }
     
