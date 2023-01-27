@@ -19,7 +19,7 @@ protocol TagBackend: NSCopying {
     ///
     /// SerializedFormat is a representation of the Tags in a serialized
     /// format. This can be void
-    func commitTransactions()
+    func commit(files: [TaggedFile])
     
     /// special characters used by the Tag backend that are
     /// prohibited from being used in Tags themselves
@@ -40,8 +40,8 @@ extension TagBackend {
 
 extension TagBackend {
     // do nothing by default
-    func commitTransactions() {
-        
+    func commit(files: [TaggedFile]) {
+
     }
 }
 

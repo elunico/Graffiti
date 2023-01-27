@@ -18,7 +18,7 @@ class TaggedFile: ObservableObject, NSCopying {
     let filename: String
     let isDirectory: Bool
     private let backend: TagBackend
-    private(set) var tags: Set<Tag> = Set()
+    @Published var tags: Set<Tag> = Set()
     
     convenience init(atPath path: String, backend: TagBackend) {
         var components = path.components(separatedBy: "/")
@@ -55,10 +55,6 @@ class TaggedFile: ObservableObject, NSCopying {
     func clearTags() {
         backend.clearTags(of: self)
         tags.removeAll()
-    }
-    
-    func commit() {
-        backend.commitTransactions()
     }
 }
 

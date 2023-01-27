@@ -20,7 +20,7 @@ struct GraffitiGetTagsOfFile: AppIntent {
     var storageType: String
     
     func perform() async throws -> some IntentResult {
-        let (_, tagFile, _) = try setup(storageType: $storageType, file: $file)
+        let (_, tagFile) = try setup(storageType: $storageType, file: $file)
 
         return .result(value: tagFile.tags.map { $0.value })
     }

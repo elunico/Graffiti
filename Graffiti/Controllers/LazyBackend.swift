@@ -60,11 +60,11 @@ class LazyBackend: TagBackend {
         }
     }
     
-    func commitTransactions() {
+    func commit(files: [TaggedFile]) {
         for transaction in transactions {
             perform(transaction: transaction)
         }
         transactions.removeAll()
-        backing.commitTransactions()
+        backing.commit(files: files)
     }
 }

@@ -26,13 +26,14 @@ extension View {
 struct ContentView: View {
     
     
+    @EnvironmentObject var taggedDirectory: TaggedDirectory
+//    @StateObject var taggedDirectory: TaggedDirectory = TaggedDirectory.empty.copy() as! TaggedDirectory
     @State var formatChoice: Format = .none
     @State var lazyChoice: Bool = false
     @State var showingOptions: Bool = true
     @State var showingError: Bool = false
     @State var loadedFile: URL? = nil
     @State var directory: URL? = nil
-    @State var backend: TagBackend? = nil
     @State var isImporting: Bool = false
     @State var isConverting: Bool = false
     @State var isLoading: Bool = false {
@@ -71,7 +72,7 @@ struct ContentView: View {
     }
     
     var selectionView: some View {
-         GeometryReader { geometry in
+        GeometryReader { geometry in
             VStack {
                 Group {
                     Text("Graffiti").font(.largeTitle)
@@ -83,7 +84,7 @@ struct ContentView: View {
                     .font(.title)
                 Button {
                     if directory != nil && formatChoice != .none {
-                        self.setBackend {
+                        self.loadUserSelection {
                             showingOptions = !$0
                         }
                     }
@@ -93,21 +94,21 @@ struct ContentView: View {
                 Spacer().frame(height: 50.0)
                 Divider().frame(width: geometry.size.width / 2)
                 Button("Convert an existing tag store") {
-                    isConverting = true 
+                    isConverting = true
                 }
             }
             .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
             .padding()
         }
-         .onDrop(of: ["public.file-url"], isTargeted: $targeted) { providers -> Bool in
-             receiveDrop(providers: providers)
-             return true
-         }
+        .onDrop(of: ["public.file-url"], isTargeted: $targeted) { providers -> Bool in
+            receiveDrop(providers: providers)
+            return true
+        }
         .frame(minWidth: 600.0, minHeight: 650.0, alignment: .center)
         .sheet(isPresented: $showingError, content: {
             VStack {
-                Text("Invalid File Format").font(.title).padding()
-                Text("The directory could not be opened. If make sure you have permission to access this directory")
+                Text("Error").font(.title).padding()
+                //                Text("The directory could not be opened. If make sure you have permission to access this directory")
                 Text(errorString)
                 HStack {
                     Button("Close") {
@@ -120,7 +121,7 @@ struct ContentView: View {
                                 showingError = true
                             } else {
                                 showingError = false
-                                setBackend {
+                                loadUserSelection {
                                     showingOptions = !$0
                                 }
                             }
@@ -139,38 +140,39 @@ struct ContentView: View {
         } else if showingOptions {
             selectionView
                 .fileImporter(
-                            isPresented: $isImporting,
-                            allowedContentTypes: [.plainText],
-                            allowsMultipleSelection: false
-                        ) { result in
-                            do {
-                                guard let selectedFile: URL = try result.get().first else { return }
-                                if FileManager.default.fileExists(atPath: selectedFile.absolutePath) {
-                                    loadDroppedFile(selectedFile)
-                                }
-                                
-                            } catch {
-                                // Handle failure.
-                                print("Unable to read file contents")
-                                print(error.localizedDescription)
-                            }
+                    isPresented: $isImporting,
+                    allowedContentTypes: [.plainText],
+                    allowsMultipleSelection: false
+                ) { result in
+                    do {
+                        guard let selectedFile: URL = try result.get().first else { return }
+                        if FileManager.default.fileExists(atPath: selectedFile.absolutePath) {
+                            loadDroppedFile(selectedFile)
                         }
-                        .onOpenURL(perform: { path in
-                            isLoading = true
-                            loadDroppedFile(path)
-                            
-                        })
-                        .sheet(isPresented: $isConverting, content: {
-                            ConvertView(done: { isConverting = false })
-                        })
+                        
+                    } catch {
+                        // Handle failure.
+                        print("Unable to read file contents")
+                        print(error.localizedDescription)
+                    }
+                }
+                .onOpenURL(perform: { path in
+                    isLoading = true
+                    print("loading \(path)")
+                    loadDroppedFile(path)
+                    
+                })
+                .sheet(isPresented: $isConverting, content: {
+                    ConvertView(done: { isConverting = false })
+                })
         } else {
-            MainView(choice: formatChoice, backend: backend!, directory: self.directory, showOptions: { showingOptions = true; formatChoice = .none; })
-                
+            MainView(choice: formatChoice, directory: self.directory, showOptions: { showingOptions = true; formatChoice = .none; })
+            
         }
         
     }
     
-    func setBackend(onDone completed: @escaping (Bool) -> Void) {
+    func loadUserSelection(onDone completed: @escaping (Bool) -> Void) {
         isLoading = true
         
         DispatchQueue.main.async {
@@ -178,12 +180,23 @@ struct ContentView: View {
             let filename = loadedFile == nil ? nil : NSString(string: loadedFile!.lastPathComponent).deletingPathExtension
             
             do {
-                backend = try formatChoice.implementation(in: dir, withFileName: filename)
+                try taggedDirectory.load(directory: dir.absolutePath, format: formatChoice)
+                //                backend = try formatChoice.implementation(in: dir, withFileName: filename)
                 isLoading = false
                 showingError = false
                 completed(true)
+            } catch FileWriterError.IsADirectory {
+                isLoading = false
+                errorString = "The path \(dir.absolutePath) is a directory not a file"
+                showingError = true
+                completed(false)
+            } catch FileWriterError.DeniedFileAccess {
+                isLoading = false
+                errorString = "Graffiti does not have permission to open the chosen file or directory"
+                showingError = true
+                completed(false)
             } catch FileWriterError.InvalidFileFormat {
-                backend = nil
+                //                backend = nil
                 isLoading = false
                 errorString = "The file chosen has an invalid format."
                 showingError = true
@@ -191,13 +204,13 @@ struct ContentView: View {
             } catch FileWriterError.VersionMismatch {
                 errorString = "The file chosen is from an old version of Graffiti and cannot be opened"
                 showingError = true
-                backend = nil
+                //                backend = nil
                 isLoading = false
                 completed(false)
             } catch {
                 errorString = "An unknown error occurred"
                 showingError = true
-                backend = nil
+                //                backend = nil
                 isLoading = false
                 completed(false)
             }
@@ -211,15 +224,15 @@ struct ContentView: View {
                 directory = url
                 loadedFile = nil
                 formatChoice = .xattr
-                backend = XattrTagBackend()
+//                backend = XattrTagBackend()
             } else {
                 loadedFile = url
                 for format in Format.allCases {
                     if let f = format.fileExtension, url.pathExtension == f {
                         directory = url.deletingLastPathComponent()
                         formatChoice = format
-                        self.setBackend { _ in
-                            if backend != nil {
+                        self.loadUserSelection { success in
+                            if success {
                                 showingOptions = false
                                 showingError = false
                             } else {
@@ -240,7 +253,7 @@ struct ContentView: View {
                 loadDroppedFile(url)
             }
         })
-    }   
+    }
 }
 
 func selectFolder(callback: @escaping ([URL]) -> ()) {

@@ -97,12 +97,22 @@ class CompressedCustomTagStoreWriter: FileWriter {
     
     func loadFrom(path: String) throws -> TagStore {
         var retValue: [String: Set<Tag>] = [:]
+        var isDir: ObjCBool = false
         
-        if !FileManager.default.fileExists(atPath: path) {
+        if !FileManager.default.fileExists(atPath: path, isDirectory: &isDir) && !isDir.boolValue {
             FileManager.default.createFile(atPath: path, contents: try! Data(NSData(data: TagStore.default.version.encodedForCCTS.appending(0.bigEndianBytes)).compressed(using: .lzma)))
         }
         
-        guard let data = try? TPData(contentsOf: URL(fileURLWithPath: path)), let data = try? Data(NSData(data: data).decompressed(using: .lzma)) else {
+        if isDir.boolValue {
+            throw FileWriterError.IsADirectory
+        }
+        
+        print("loading from \(path)")
+        guard let contents = try? TPData(contentsOf: URL(fileURLWithPath: path)) else {
+            throw FileWriterError.DeniedFileAccess
+        }
+        
+        guard let data = try? Data(NSData(data: contents).decompressed(using: .lzma)) else {
             os_log("%s", log: .default, type: .error, "Error at getting data with path \(path)")
 
             throw FileWriterError.InvalidFileFormat

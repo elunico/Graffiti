@@ -14,10 +14,13 @@ extension UTType {
 
 
 @main
-struct GraffitiApp: App {    
+struct GraffitiApp: App {
+    
+    @StateObject var taggedDirectory: TaggedDirectory = TaggedDirectory.empty.copy() as! TaggedDirectory
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView().environmentObject(taggedDirectory)
         }
         .commands(content: {
             

@@ -23,10 +23,10 @@ struct GraffitiRemoveTagsFromFile: AppIntent {
     var storageType: String
     
     func perform() async throws -> some IntentResult {
-        let (_, tagFile, w) = try setup(storageType: $storageType, file: $file)
+        let (directory, tagFile) = try setup(storageType: $storageType, file: $file)
         
         for tag in tags {
-            w.removeTag(withID: tag, from: tagFile)
+            directory.removeTag(withID: tag, from: tagFile)
         }
         return .result()
 

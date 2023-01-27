@@ -8,7 +8,6 @@
 import Foundation
 import AppKit
 
-
 protocol AnyOptional {
     associatedtype Element
     var asOptional: Optional<Element> { get }

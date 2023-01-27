@@ -8,7 +8,7 @@
 import Foundation
 
 
-class XattrTagBackend: TagBackend {
+class XattrTagBackend: TagBackend {    
     func copy(with zone: NSZone? = nil) -> Any {
         return XattrTagBackend(deliminator: delimiter)
     }

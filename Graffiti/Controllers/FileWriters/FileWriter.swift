@@ -10,6 +10,8 @@ import Foundation
 enum FileWriterError: Error {
     case InvalidFileFormat
     case VersionMismatch
+    case DeniedFileAccess
+    case IsADirectory
 }
 
 protocol FileWriter {

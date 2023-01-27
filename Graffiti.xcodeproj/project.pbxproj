@@ -84,6 +84,8 @@
 		DC9CCB432980ECC000A2D622 /* GraffitiGetTagsOfFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9CCB422980ECC000A2D622 /* GraffitiGetTagsOfFile.swift */; };
 		DC9CCB452980ECE600A2D622 /* GraffitiIntentShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9CCB442980ECE600A2D622 /* GraffitiIntentShortcuts.swift */; };
 		DC9CCB472980ED4700A2D622 /* GraffitiRemoveTagsFromFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9CCB462980ED4700A2D622 /* GraffitiRemoveTagsFromFile.swift */; };
+		DCDFF2342984413F00A2B6CF /* Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D265A297EE79F009D3868 /* Format.swift */; };
+		DCDFF2352984414000A2B6CF /* Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D265A297EE79F009D3868 /* Format.swift */; };
 		DCEAB19E296A018A00843BE4 /* FileTagBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAB19D296A018A00843BE4 /* FileTagBackend.swift */; };
 		DCEAB1A1296A04DE00843BE4 /* CSVFileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAB1A0296A04DE00843BE4 /* CSVFileWriter.swift */; };
 		DCEAB1A3296A056B00843BE4 /* FileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAB1A2296A056B00843BE4 /* FileWriter.swift */; };
@@ -547,6 +549,7 @@
 			files = (
 				DC4E79AD297DF3AC003AEE68 /* XattrBridge.m in Sources */,
 				DC4E79AB297DF2E3003AEE68 /* CSVFileWriter.swift in Sources */,
+				DCDFF2352984414000A2B6CF /* Format.swift in Sources */,
 				DC4E79A8297DF2E3003AEE68 /* FileWriter.swift in Sources */,
 				DC4E799E297DF2E3003AEE68 /* Tag.swift in Sources */,
 				DC4E79A1297DF2E3003AEE68 /* JSONFileWriter.swift in Sources */,
@@ -632,6 +635,7 @@
 			files = (
 				DC09FE41297DB66700BD51D9 /* LazyBackend.swift in Sources */,
 				DC09FE42297DB66700BD51D9 /* TaggedDirectory.swift in Sources */,
+				DCDFF2342984413F00A2B6CF /* Format.swift in Sources */,
 				DC09FE40297DB64000BD51D9 /* XattrBridge.m in Sources */,
 				DC09FE3F297DB63600BD51D9 /* XattrTagBackend.swift in Sources */,
 				DC09FE3E297DB62E00BD51D9 /* TagBackend.swift in Sources */,

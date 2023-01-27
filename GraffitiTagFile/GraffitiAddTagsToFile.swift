@@ -23,10 +23,10 @@ struct GraffitiAddTagsToFile: AppIntent {
     var storageType: String
     
     func perform() async throws -> some IntentResult {
-        let (_, tagFile, w) = try setup(storageType: $storageType, file: $file)
+        let (directory, tagFile) = try setup(storageType: $storageType, file: $file)
         
         for tag in tags {
-            w.addTag(Tag(value: tag), to: tagFile)
+            directory.addTag(Tag(value: tag), to: tagFile)
         }
         return .result()
 

@@ -13,12 +13,14 @@ struct TagView: View {
     @State var selected: Tag.ID?
     @State var currentTag: String = ""
     @State var showingHelp = false
+    @EnvironmentObject var directory: TaggedDirectory
     var prohibitedCharacters: Set<Character>
     var done: (Set<TaggedFile>) -> ()
     
     func performDelete() {
         guard let index = selected else { return }
-        files.forEach{ $0.removeTag(withID: index) }
+//        files.forEach{ $0.removeTag(withID: index) }
+        files.forEach { directory.removeTag(withID: index, from: $0) }
     }
     
     var body: some View {
@@ -72,7 +74,8 @@ struct TagView: View {
             return
         }
         
-        files.forEach { $0.addTag(Tag(value: currentTag)) }
+//        files.forEach { $0.addTag(Tag(value: currentTag)) }
+        files.forEach { directory.addTag(Tag(value: currentTag), to: $0) }
         currentTag = ""
     }
 }

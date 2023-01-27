@@ -33,6 +33,8 @@ struct ConvertView: View {
             return
         }
         
+        let d = TaggedDirectory.empty.copy() as! TaggedDirectory
+        
         let currentWriter = try! getSandboxedAccess(to: sourceFile.deletingLastPathComponent().absolutePath, thenPerform: {try (beginFormat.implementation(in: URL(fileURLWithPath: $0)) as! FileTagBackend).writer})
         let nextWriter = try! getSandboxedAccess(to: sourceFile.deletingLastPathComponent().absolutePath, thenPerform: {try (endFormat.implementation(in: URL(fileURLWithPath: $0)) as! FileTagBackend).writer})
         

@@ -26,18 +26,19 @@ struct StoreFormatOptionsProvider: DynamicOptionsProvider {
 
 extension AppIntent {
     
-    func setup(storageType: IntentParameter<String>, file: IntentParameter<IntentFile>) throws -> (TaggedDirectory, TaggedFile, TagBackend) {
+    func setup(storageType: IntentParameter<String>, file: IntentParameter<IntentFile>) throws -> (TaggedDirectory, TaggedFile) {
         guard let format = Format.allCases.first(where: { $0.description == storageType.wrappedValue })
         else { throw storageType.needsValueError("Choose a tag storage type") }
         
         // TODO: shortcut intent is denied access due to sandbox but sandboxing is disabled
         os_log("%s", log: .default, type: .error, file.wrappedValue.fileURL!.deletingLastPathComponent().absolutePath)
-        guard let w = try format.implementation(in: file.wrappedValue.fileURL!.deletingLastPathComponent()) else {
-            throw file.needsValueError()
-        }
-        
         let d = TaggedDirectory.empty.copy() as! TaggedDirectory
-        guard (try? d.load(directory: file.wrappedValue.fileURL!.deletingLastPathComponent().absolutePath, backend: w)) != nil else {
+
+//        guard let w = try format.implementation(in: file.wrappedValue.fileURL!.deletingLastPathComponent()) else {
+//            throw file.needsValueError()
+//        }
+//
+        guard (try? d.load(directory: file.wrappedValue.fileURL!.deletingLastPathComponent().absolutePath, format: format)) != nil else {
             throw FileError.couldNotRead
         }
         
@@ -45,6 +46,6 @@ extension AppIntent {
             throw file.needsValueError()
         }
         
-        return (d, tagFile, w)
+        return (d, tagFile)
     }
 }
