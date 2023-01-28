@@ -19,7 +19,9 @@ struct TagView: View {
     
     func performDelete() {
         guard let index = selected else { return }
-        files.forEach { directory.removeTag(withID: index, from: $0) }
+        let tag = Tag(value: index)
+        directory.removeTag(withID: index, fromAll: files.filter { $0.tags.contains(tag) })
+//        files.forEach { directory.removeTag(withID: index, from: $0) }
     }
     
     var body: some View {
@@ -75,7 +77,9 @@ struct TagView: View {
         if currentTag.isEmpty || currentTag.allSatisfy({$0.isWhitespace}) {
             return
         }
-        files.forEach { directory.addTag(Tag(value: currentTag), to: $0) }
+        let tag = Tag(value: currentTag)
+        directory.addTags(tag, toAll: files.map { $0 })
+
         currentTag = ""
     }
 }

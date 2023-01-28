@@ -133,12 +133,7 @@ struct MainView: View {
                         currentFileList.sort(using: sorter)
                     }
                 })
-                HStack {
-                    Spacer()
-                    Text("\(files.files.count) files")
-                    Divider().frame(height: 20)
-                    Text("\(files.files.map { $0.tags.count }.reduce(0, +)) tags")
-                }
+                
             }
         }
         
@@ -189,6 +184,26 @@ struct MainView: View {
         Group {
             HStack {
                 Group {
+                    HStack {
+                        Button(action: {
+                            files.undo()
+                        }, label: {
+                            Label("Undo", systemImage: "arrow.uturn.backward")
+                        }).disabled(files.transactions.isEmpty)
+                            .keyboardShortcut("z", modifiers: [.command])
+                            .help("Undo")
+                        
+                        Button(action: {
+                            files.redo()
+                        }, label: {
+                            Label("Redo", systemImage: "arrow.uturn.forward")
+                        }).disabled(files.redoStack.isEmpty)
+                            .keyboardShortcut("z", modifiers: [.command, .shift])
+                            .help("Redo")
+                    }
+                    
+                    divider(forLayoutOrientation: .horizontally, measure: 25.0)
+                    
                     Button(action: {
                         editing = true
                     }, label: {
@@ -196,6 +211,7 @@ struct MainView: View {
                     }).disabled(selected.count == 0)
                         .buttonStyle(DefaultButtonStyle())
                         .keyboardShortcut(.return, modifiers: [])
+                        .help("Edit Tags of \(name)")
                     
                     Button(action:  {
                         guard let path = directory?.absolutePath else { return }
@@ -206,6 +222,7 @@ struct MainView: View {
                     }, label: { Label("Reveal \(name) in Finder", systemImage: "folder.badge.questionmark") })
                     .keyboardShortcut(.return, modifiers: [.command])
                     .disabled(selected.count != 1)
+                    .help("Reveal \(name) in Finder")
                     
                     Button(action:  {
                         for item in files.getFiles(withIDs: selected) {
@@ -214,6 +231,7 @@ struct MainView: View {
                     }, label: { Label("Open \(name)" , systemImage: "doc.viewfinder") })
                     .keyboardShortcut(KeyEquivalent.downArrow, modifiers: [.command])
                     .disabled(selected.count == 0)
+                    .help("Open \(name)")
                     
                     divider(forLayoutOrientation: .horizontally, measure: 25.0)
                     
@@ -221,6 +239,7 @@ struct MainView: View {
                         isPresentingConfirm = true
                     }, label: { Label("Clear All Tags for \(name)", systemImage: "clear") })
                     .disabled(selected.count == 0)
+                    .help("Clear All Tags for \(name)")
                     
                     divider(forLayoutOrientation: .horizontally, measure: 25.0)
                     
@@ -234,6 +253,7 @@ struct MainView: View {
                         Label("QuickLook", systemImage: "eye")
                     }.disabled(selected.count == 0)
                         .keyboardShortcut(.space, modifiers: [])
+                        .help("QuickLook")
                 }
             }
             TextField("Search", text: $query)
@@ -278,6 +298,13 @@ struct MainView: View {
                     Spacer()
                 }
                 tagFileTable
+                HStack {
+                    Spacer()
+                    Text("\(files.files.count) files")
+                    Divider().frame(height: 20)
+                    Text("\(files.files.map { $0.tags.count }.reduce(0, +)) tags")
+                }
+                
             }
             .onClearAll(message: (selected.count == 0 ? "This will remove EVERY tag from EVERY file currently in view in the table" : "This will remove EVERY tag from every SELECTED file in the table") + "\nYou cannot undo this action", isPresented: $isPresentingConfirm, clearAction: {
                 if selected.count == 0 {

@@ -81,6 +81,10 @@
 		DC5FA2F22975032800084CB2 /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5FA2F12975032800084CB2 /* Version.swift */; };
 		DC5FA2F42975091500084CB2 /* TagStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5FA2F32975091500084CB2 /* TagStore.swift */; };
 		DC8E14632963EAE0002E1788 /* TaggedDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8E14622963EAE0002E1788 /* TaggedDirectory.swift */; };
+		DC9BBD1B2985C0720035543D /* TagTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9BBD1A2985C0720035543D /* TagTransaction.swift */; };
+		DC9BBD1C2985C54D0035543D /* TagTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9BBD1A2985C0720035543D /* TagTransaction.swift */; };
+		DC9BBD1D2985C54D0035543D /* TagTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9BBD1A2985C0720035543D /* TagTransaction.swift */; };
+		DC9BBD1E2985C54E0035543D /* TagTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9BBD1A2985C0720035543D /* TagTransaction.swift */; };
 		DC9CCB432980ECC000A2D622 /* GraffitiGetTagsOfFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9CCB422980ECC000A2D622 /* GraffitiGetTagsOfFile.swift */; };
 		DC9CCB452980ECE600A2D622 /* GraffitiIntentShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9CCB442980ECE600A2D622 /* GraffitiIntentShortcuts.swift */; };
 		DC9CCB472980ED4700A2D622 /* GraffitiRemoveTagsFromFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9CCB462980ED4700A2D622 /* GraffitiRemoveTagsFromFile.swift */; };
@@ -189,6 +193,7 @@
 		DC5FA2F12975032800084CB2 /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
 		DC5FA2F32975091500084CB2 /* TagStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagStore.swift; sourceTree = "<group>"; };
 		DC8E14622963EAE0002E1788 /* TaggedDirectory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaggedDirectory.swift; sourceTree = "<group>"; };
+		DC9BBD1A2985C0720035543D /* TagTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagTransaction.swift; sourceTree = "<group>"; };
 		DC9CCB422980ECC000A2D622 /* GraffitiGetTagsOfFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraffitiGetTagsOfFile.swift; sourceTree = "<group>"; };
 		DC9CCB442980ECE600A2D622 /* GraffitiIntentShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraffitiIntentShortcuts.swift; sourceTree = "<group>"; };
 		DC9CCB462980ED4700A2D622 /* GraffitiRemoveTagsFromFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraffitiRemoveTagsFromFile.swift; sourceTree = "<group>"; };
@@ -355,6 +360,7 @@
 				DC5FA2F12975032800084CB2 /* Version.swift */,
 				DC5FA2F32975091500084CB2 /* TagStore.swift */,
 				DC5D265A297EE79F009D3868 /* Format.swift */,
+				DC9BBD1A2985C0720035543D /* TagTransaction.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -571,6 +577,7 @@
 				DC4E79AC297DF372003AEE68 /* Utility.swift in Sources */,
 				DC4E79A2297DF2E3003AEE68 /* TaggedDirectory.swift in Sources */,
 				DC4E79A3297DF2E3003AEE68 /* TagStore.swift in Sources */,
+				DC9BBD1D2985C54D0035543D /* TagTransaction.swift in Sources */,
 				DC4E79A4297DF2E3003AEE68 /* XattrTagBackend.swift in Sources */,
 				DC4E79AE297E071C003AEE68 /* PreviewViewController.swift in Sources */,
 			);
@@ -587,6 +594,7 @@
 				DC1B7BCA296229C600DEED22 /* TagBackend.swift in Sources */,
 				DC52448F2960ACB200821407 /* ContentView.swift in Sources */,
 				DC52448D2960ACB200821407 /* GraffitiApp.swift in Sources */,
+				DC9BBD1B2985C0720035543D /* TagTransaction.swift in Sources */,
 				DCCB4F302985B8F000C55E15 /* FileWriterError.swift in Sources */,
 				DCFA39C62965DD560002690A /* LazyBackend.swift in Sources */,
 				DC2E803C296A40450015AE26 /* PropertyListFileWriter.swift in Sources */,
@@ -621,6 +629,7 @@
 				DC5D2667297EE93D009D3868 /* Version.swift in Sources */,
 				DC5D266A297EE93D009D3868 /* TagStore.swift in Sources */,
 				DC5D264E297EE699009D3868 /* GraffitiTagFileExtension.swift in Sources */,
+				DC9BBD1E2985C54E0035543D /* TagTransaction.swift in Sources */,
 				DC9CCB452980ECE600A2D622 /* GraffitiIntentShortcuts.swift in Sources */,
 				DCCB4F332985BC6A00C55E15 /* FileWriterError.swift in Sources */,
 				DC5D265F297EE8D2009D3868 /* TagBackend.swift in Sources */,
@@ -660,6 +669,7 @@
 				DC09FE3C297DB5F600BD51D9 /* Utility.swift in Sources */,
 				DC09FE34297DB3E400BD51D9 /* JSONFileWriter.swift in Sources */,
 				DC09FE35297DB3E400BD51D9 /* CompressedCustomTagStoreWriter.swift in Sources */,
+				DC9BBD1C2985C54D0035543D /* TagTransaction.swift in Sources */,
 				DCFAEC71297AFD3400F8A80F /* PreviewViewController.swift in Sources */,
 				DCFAEC73297AFD3400F8A80F /* PreviewProvider.swift in Sources */,
 			);

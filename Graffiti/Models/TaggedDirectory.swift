@@ -57,6 +57,9 @@ class TaggedDirectory: ObservableObject, NSCopying {
     private var filterPredicate: (TaggedFile) -> Bool = alwaysTrue
     private var query: String = ""
     
+    @Published private(set) var transactions: [TagTransaction] = []
+    @Published private(set) var redoStack: [TagTransaction] = []
+    
     private init() {
         self.directory = ""
         self.backend = XattrTagBackend()
@@ -97,27 +100,72 @@ class TaggedDirectory: ObservableObject, NSCopying {
         (backend as? FileTagBackend)?.saveFile
     }
     
-    func commit() {
-        backend.commit(files: files)
-     
+    func addTags(_ tag: Tag, toAll files: [TaggedFile]) {
+        transactions.append(AddTagToManyFilesTransaction(backend: backend, tag: tag, files: files))
+        transactions.last?.perform()
+        invalidateRedo()
     }
     
     func addTag(_ tag: Tag, to file: TaggedFile) {
-        backend.addTag(tag, to: file)
+//        backend.addTag(tag, to: file)
+        transactions.append(AddTagTransaction(backend: backend, tag: tag, file: file))
+        transactions.last?.perform()
+        invalidateRedo()
     }
+    
     func removeTag(withID id: Tag.ID, from file: TaggedFile) {
-        backend.removeTag(withID: id, from: file)
+//        backend.removeTag(withID: id, from: file)
+        transactions.append(RemoveTagTransaction(backend: backend, tag: Tag(value: id), file: file))
+        transactions.last?.perform()
+        invalidateRedo()
     }
+    
+    func removeTag(withID id: Tag.ID, fromAll files: [TaggedFile]) {
+//        backend.removeTag(withID: id, from: file)
+        transactions.append(RemoveTagFromManyFilesTransaction(backend: backend, tag: Tag(value: id), files: files))
+        transactions.last?.perform()
+        invalidateRedo()
+    }
+    
+    func invalidateRedo() {
+        redoStack.removeAll()
+    }
+    
+    func invalidateUndo() {
+        transactions.removeAll()
+    }
+    
+    func undo() {
+        guard let t = transactions.popLast() else { print("Nothing to undo"); return }
+        t.undo()
+        redoStack.append(t)
+    }
+    
+    func redo() {
+        guard let t = redoStack.popLast() else { print("Nothing to redo"); return }
+        t.redo()
+        transactions.append(t)
+    }
+    
     func loadTags(at path: String) -> Set<Tag> {
         let t = backend.loadTags(at: path)
+        invalidateUndo()
         return t
     }
+    
     func clearTags(of file: TaggedFile) {
         backend.clearTags(of: file)
+        invalidateUndo()
+    }
+    
+    func commit() {
+        backend.commit(files: files)
+        invalidateUndo()
     }
     
     func commit(files: [TaggedFile]) {
         backend.commit(files: files)
+        invalidateUndo()
     }
     
     /// special characters used by the Tag backend that are
