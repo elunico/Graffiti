@@ -30,7 +30,7 @@ struct FormatSelector: View {
         ]
     
     func removing(formatOption option: Format) -> FormatSelector {
-        var this = self
+        let this = self
         this.options.removeValue(forKey: option)
         return this
     }

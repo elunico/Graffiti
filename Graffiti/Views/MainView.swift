@@ -103,7 +103,8 @@ struct MainView: View {
                                     }, label: { Label("Reveal \(item.filename) in Finder", systemImage: "folder.badge.questionmark") })
                                     
                                     Button(action:  {
-                                        NSWorkspace.shared.openFile(item.id)
+//                                        NSWorkspace.shared.openFile(item.id)
+                                        NSWorkspace.shared.open(item.absoluteURL)
                                         
                                     }, label: { Label("Open \((selected.contains(item.id) && selected.count > 1) ? "\(selected.count) items" : item.filename)" , systemImage: "doc.viewfinder") })
                                     
@@ -226,7 +227,7 @@ struct MainView: View {
                     
                     Button(action:  {
                         for item in files.getFiles(withIDs: selected) {
-                            NSWorkspace.shared.openFile(item.id)
+                            NSWorkspace.shared.open(item.absoluteURL)
                         }
                     }, label: { Label("Open \(name)" , systemImage: "doc.viewfinder") })
                     .keyboardShortcut(KeyEquivalent.downArrow, modifiers: [.command])
@@ -247,8 +248,6 @@ struct MainView: View {
                         guard selected.count > 0 else { return }
                         self.selectedFileURLs = files.getFiles(withIDs: selected).map { URL(fileURLWithPath: $0.id) }
                         self.selectedFileURL = URL(fileURLWithPath: files.getFile(withID: selected.first!)!.id)
-                        print(self.selectedFileURL)
-                        print(self.selectedFileURLs)
                     } label: {
                         Label("QuickLook", systemImage: "eye")
                     }.disabled(selected.count == 0)

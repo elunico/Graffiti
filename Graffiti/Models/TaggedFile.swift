@@ -64,6 +64,12 @@ extension TaggedFile: Identifiable {
     }
 }
 
+extension TaggedFile {
+    var absoluteURL: URL {
+        URL(fileURLWithPath: (parent as NSString).appendingPathComponent(filename))
+    }
+}
+
 extension TaggedFile: Equatable, Hashable {
     static func == (lhs: TaggedFile, rhs: TaggedFile) -> Bool {
         lhs.parent == rhs.parent && lhs.filename == rhs.filename
