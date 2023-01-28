@@ -65,7 +65,11 @@ struct TagView: View {
         }.padding()
             .frame(minWidth: 500.0, minHeight: 500.0,  alignment: Alignment.center)
             .sheet(isPresented: $showingHelp, content: {
-                FilesEditingInspectorView(done: { showingHelp = false }, removeFileWithID: { id in files.remove(at: files.firstIndex(where: {$0.id == id})!) }, files: files)
+                FilesEditingInspectorView(done: { showingHelp = false }, removeFileWithID: { id in
+                    guard let idx = files.firstIndex(where: {$0.id == id}) else { return }
+                    files.remove(at: idx)
+                    
+                }, files: files)
             })
     }
     

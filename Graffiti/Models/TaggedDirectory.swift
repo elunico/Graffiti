@@ -7,6 +7,33 @@
 
 import Foundation
 
+class Sorter: SortComparator {
+    typealias Compared = TaggedFile
+    
+    static func == (lhs: Sorter, rhs: Sorter) -> Bool {
+        lhs.order == rhs.order
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(order)
+    }
+    
+    var order: SortOrder = .forward
+    var keypath: KeyPath<TaggedFile, String>
+    
+    init(keypath: KeyPath<TaggedFile, String>) {
+        self.keypath = keypath
+    }
+    
+    func compare(_ lhs: TaggedFile, _ rhs: TaggedFile) -> ComparisonResult {
+        if order == .forward {
+            return lhs[keyPath: self.keypath].localizedCaseInsensitiveCompare(rhs[keyPath: self.keypath])
+        } else {
+            return rhs[keyPath: self.keypath].localizedCaseInsensitiveCompare(lhs[keyPath: self.keypath])
+
+        }
+    }
+}
 
 class TaggedDirectory: ObservableObject, NSCopying {
     func copy(with zone: NSZone? = nil) -> Any {
@@ -29,12 +56,19 @@ class TaggedDirectory: ObservableObject, NSCopying {
     private var indexMap: [TaggedFile.ID: Int] = [:]
     
     private var filterPredicate: (TaggedFile) -> Bool = alwaysTrue
-    var cachedFiles: [TaggedFile]? = nil
+//    var cachedFiles: [TaggedFile]? = nil
     private var query: String = ""
     
     private init() {
         self.directory = ""
         self.backend = XattrTagBackend()
+    }
+    
+    func sort(with sorter: Sorter?) {
+        print(sorter)
+        guard let sorter else { return }
+        self.files.sort(using: sorter)
+        objectWillChange.send()
     }
     
     func load(directory: String, format: Format) throws {
@@ -103,54 +137,23 @@ class TaggedDirectory: ObservableObject, NSCopying {
 
 // Functions for filtering
 extension TaggedDirectory {
-    var filteredFiles: [TaggedFile] {
-        if cachedFiles == nil {
-            cachedFiles = files
-        }
-        return cachedFiles!
-    }
-    
-//    func setFilter(from query: String) {
-//        self.query = query
-//        if query.isEmpty {
-//            filterPredicate = TaggedDirectory.alwaysTrue
-//            cachedFiles = files
-//            return
-//        }
-//        let results = query.split(separator: "|").map{ $0.trimmingCharacters(in: .whitespacesAndNewlines) }.map{ $0.split(separator: "&").map{ s in s.trimmingCharacters(in: .whitespacesAndNewlines)} }
-//        filterPredicate = {
-//            file in results.anySatisfy {
-//                conjunction in conjunction.allSatisfy {
-//                    text in
-//                    let substr = text[text.index(after: text.startIndex)...]
-//                    return (text.hasPrefix("!") && !file.tagString.contains(substr) && !file.filename.contains(substr)) || (!text.hasPrefix("!") && ((file.tagString.contains(text) || file.filename.contains(text))))
-//                }
-//            }
-//        }
-//        cachedFiles = files.filter(filterPredicate)
-//    }
-//
+
     func filter(by query: String) -> [TaggedFile] {
         self.query = query
         if query.isEmpty {
             filterPredicate = TaggedDirectory.alwaysTrue
-            cachedFiles = files
-            return files
-        }
-        let results = query.split(separator: "|").map{ $0.trimmingCharacters(in: .whitespacesAndNewlines) }.map{ $0.split(separator: "&").map{ s in s.trimmingCharacters(in: .whitespacesAndNewlines)} }
-        filterPredicate = {
-            file in results.anySatisfy {
-                conjunction in conjunction.allSatisfy {
-                    text in
-                    let substr = text[text.index(after: text.startIndex)...]
-                    return (text.hasPrefix("!") && !file.tagString.contains(substr) && !file.filename.contains(substr)) || (!text.hasPrefix("!") && ((file.tagString.contains(text) || file.filename.contains(text))))
+        } else {
+            let results = query.split(separator: "|").map{ $0.trimmingCharacters(in: .whitespacesAndNewlines) }.map{ $0.split(separator: "&").map{ s in s.trimmingCharacters(in: .whitespacesAndNewlines)} }
+            filterPredicate = {
+                file in results.anySatisfy {
+                    conjunction in conjunction.allSatisfy {
+                        text in
+                        let substr = text[text.index(after: text.startIndex)...]
+                        return (text.hasPrefix("!") && !file.tagString.localizedCaseInsensitiveContains(substr) && !file.filename.localizedCaseInsensitiveContains(substr)) || (!text.hasPrefix("!") && ((file.tagString.localizedCaseInsensitiveContains(text) || file.filename.localizedCaseInsensitiveContains(text))))
+                    }
                 }
             }
         }
         return files.filter(filterPredicate)
     }
-    
-//    func clearFilter() {
-//        setFilter(from: "")
-//    }
 }

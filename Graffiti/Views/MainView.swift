@@ -10,24 +10,6 @@ import SwiftUI
 import QuickLook
 
 
-class Sorter: SortComparator {
-    typealias Compared = TaggedFile
-    
-    static func == (lhs: Sorter, rhs: Sorter) -> Bool {
-        lhs.order == rhs.order
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(order)
-    }
-    
-    var order: SortOrder = .forward
-    
-    func compare(_ lhs: TaggedFile, _ rhs: TaggedFile) -> ComparisonResult {
-        lhs.filename.compare(rhs.filename)
-    }
-    
-}
 
 struct MainView: View {
     static let kUserDefaultsRichKindKey = "com.tom.graffiti-richKind"
@@ -46,6 +28,8 @@ struct MainView: View {
     @State private var selectedFileURL: URL? = nil
     @State private var richKind: Bool = false
     @State private var sorter: [Sorter] = []
+    
+    @State private var currentFileList: [TaggedFile] = []
     
     var showOptions: () -> ()
     
@@ -71,7 +55,7 @@ struct MainView: View {
         GeometryReader { tableGeometry in
             VStack {
                 Table(of: TaggedFile.self, selection: $selected, sortOrder: $sorter, columns: {
-                    TableColumn("File", sortUsing: Sorter()) { item in
+                    TableColumn("File", sortUsing: Sorter(keypath: \TaggedFile.filename)) { item in
                         Text(item.filename)
                     }.width(ideal: tableGeometry.size.width * 5 / 15)
                     
@@ -90,14 +74,15 @@ struct MainView: View {
                         }
                         //                            Text((try? URL(fileURLWithPath: item.id).resourceValues(forKeys: [.typeIdentifierKey]).typeIdentifier) ?? "<unknown>")
                     }.width(ideal: tableGeometry.size.width * 2 / 15)
-                    TableColumn("Tags") { item in
+                    TableColumn("Tags", sortUsing: Sorter(keypath: \TaggedFile.tagString)) { item in
                         Text(item.tagString)
                     }.width(ideal: tableGeometry.size.width * 5 / 15)
-                    TableColumn("Count") { item in
+                    TableColumn("Count", sortUsing: Sorter(keypath: \TaggedFile.tagCount)) { item in
                         Text(item.tagCount)
                     }.width(ideal: tableGeometry.size.width / 15)
                 }, rows: {
-                    ForEach(files.filter(by: query)) { item in
+                    ForEach(currentFileList) { item in
+                        
                         TableRow(item)
                             .contextMenu {
                                 Group {
@@ -144,6 +129,10 @@ struct MainView: View {
                                     }
                                 }
                             }
+                    }
+                }).onChange(of: sorter, perform: { _ in
+                    if let sorter = sorter.first {
+                        currentFileList.sort(using: sorter)
                     }
                 })
                 HStack {
@@ -241,6 +230,8 @@ struct MainView: View {
                         guard selected.count > 0 else { return }
                         self.selectedFileURLs = files.getFiles(withIDs: selected).map { URL(fileURLWithPath: $0.id) }
                         self.selectedFileURL = URL(fileURLWithPath: files.getFile(withID: selected.first!)!.id)
+                        print(self.selectedFileURL)
+                        print(self.selectedFileURLs)
                     } label: {
                         Label("QuickLook", systemImage: "eye")
                     }.disabled(selected.count == 0)
@@ -248,8 +239,20 @@ struct MainView: View {
                 }
             }
             TextField("Search", text: $query)
+                .onChange(of: query, perform: { _ in
+                    
+                    currentFileList = files.filter(by: query)
+                    var noLongerSeen = selected
+                    currentFileList.forEach { noLongerSeen.remove($0.id) }
+                    selected = selected.subtracting(noLongerSeen)
+                    if let sorter = sorter.first {
+                        currentFileList.sort(using: sorter)
+                    }
+                    
+                })
                 .frame(minWidth: 200.0, maxWidth: 500.0, alignment: .topTrailing)
                 .help("Enter your search term. Use & and | for boolean operations. Use !word to avoid 'word' in results ")
+            
         }
     }
     
@@ -280,7 +283,7 @@ struct MainView: View {
             }
             .onClearAll(message: (selected.count == 0 ? "This will remove EVERY tag from EVERY file currently in view in the table" : "This will remove EVERY tag from every SELECTED file in the table") + "\nYou cannot undo this action", isPresented: $isPresentingConfirm, clearAction: {
                 if selected.count == 0 {
-                    for file in files.filteredFiles {
+                    for file in files.filter(by: query) {
                         file.clearTags()
                     }
                 } else {
@@ -308,6 +311,7 @@ struct MainView: View {
             guard let path = self.directory?.absolutePath else { return }
             DispatchQueue.main.async {
                 try! self.files.load(directory: path, format: choice)
+                currentFileList = files.filter(by: query)
             }
             richKind = UserDefaults.this?.bool(forKey: MainView.kUserDefaultsRichKindKey) ?? false
         }
