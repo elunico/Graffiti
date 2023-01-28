@@ -28,28 +28,9 @@ class PreviewViewController: NSViewController, QLPreviewingController {
         table.dataSource = self
     }
     
-    /*
-     * Implement this method and set QLSupportsSearchableItems to YES in the Info.plist of the extension if you support CoreSpotlight.
-     *
-     func preparePreviewOfSearchableItem(identifier: String, queryString: String?, completionHandler handler: @escaping (Error?) -> Void) {
-     // Perform any setup necessary in order to prepare the view.
-     
-     // Call the completion handler so Quick Look knows that the preview is fully loaded.
-     // Quick Look will display a loading spinner while the completion handler is not called.
-     handler(nil)
-     }
-     */
-    
     var data: [(String, Set<Tag>)]? = nil
     
     func preparePreviewOfFile(at url: URL, completionHandler handler: @escaping (Error?) -> Void) {
-        
-        // Add the supported content types to the QLSupportedContentTypes array in the Info.plist of the extension.
-        
-        // Perform any setup necessary in order to prepare the view.
-        
-        // Call the completion handler so Quick Look knows that the preview is fully loaded.
-        // Quick Look will display a loading spinner while the completion handler is not called.
         dirLabel.stringValue = url.absolutePath
         data = try? CompressedCustomTagStoreWriter().loadFrom(path: url.absolutePath).tagData.map { (key, value) in (key, value) }
         table.reloadData()

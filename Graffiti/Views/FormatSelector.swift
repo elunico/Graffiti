@@ -52,9 +52,3 @@ struct FormatSelector: View {
         }
     }
 }
-
-//struct FormatSelector_Previews: PreviewProvider {
-//    static var previews: some View {
-//        FormatSelector()
-//    }
-//}

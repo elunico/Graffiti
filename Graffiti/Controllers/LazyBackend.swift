@@ -11,7 +11,7 @@ import Foundation
 class LazyBackend: TagBackend {
     
     func copy(with zone: NSZone? = nil) -> Any {
-        var l = LazyBackend(wrapping: backing)
+        let l = LazyBackend(wrapping: backing)
         l.transactions = transactions
         return l 
     }

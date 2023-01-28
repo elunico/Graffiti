@@ -72,17 +72,15 @@ struct MainView: View {
                         } else {
                             Text("\(URL(fileURLWithPath: item.id).pathExtension)")
                         }
-                        //                            Text((try? URL(fileURLWithPath: item.id).resourceValues(forKeys: [.typeIdentifierKey]).typeIdentifier) ?? "<unknown>")
                     }.width(ideal: tableGeometry.size.width * 2 / 15)
-                    TableColumn("Tags", sortUsing: Sorter(keypath: \TaggedFile.tagString)) { item in
+                    TableColumn("Tags") { item in
                         Text(item.tagString)
                     }.width(ideal: tableGeometry.size.width * 5 / 15)
-                    TableColumn("Count", sortUsing: Sorter(keypath: \TaggedFile.tagCount)) { item in
+                    TableColumn("Count") { item in
                         Text(item.tagCount)
                     }.width(ideal: tableGeometry.size.width / 15)
                 }, rows: {
                     ForEach(currentFileList) { item in
-                        
                         TableRow(item)
                             .contextMenu {
                                 Group {
@@ -244,7 +242,7 @@ struct MainView: View {
                     currentFileList = files.filter(by: query)
                     var noLongerSeen = selected
                     currentFileList.forEach { noLongerSeen.remove($0.id) }
-                    selected = selected.subtracting(noLongerSeen)
+                    selected.subtract(noLongerSeen)
                     if let sorter = sorter.first {
                         currentFileList.sort(using: sorter)
                     }
@@ -303,7 +301,6 @@ struct MainView: View {
         .onDisappear(perform: self.teardown)
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification), perform: {output in self.teardown()})
         .frame(minWidth: 500.0, minHeight: 500.0, alignment: .center)
-//        .environmentObject(files)
         .padding()
         .navigationTitle("\(directory!.prettyPrinted) – \(files.files.count) files – \(files.files.map { $0.tags.count }.reduce(0, +)) - tags")
         .navigationDocument(directory!)
@@ -320,7 +317,5 @@ struct MainView: View {
     func teardown() {
         self.files.commit()
         self.files.files.removeAll(keepingCapacity: true)
-//        self.files.clearFilter()
-
     }
 }

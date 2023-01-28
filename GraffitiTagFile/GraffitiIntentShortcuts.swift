@@ -34,10 +34,6 @@ extension AppIntent {
         os_log("%s", log: .default, type: .error, file.wrappedValue.fileURL!.deletingLastPathComponent().absolutePath)
         let d = TaggedDirectory.empty.copy() as! TaggedDirectory
 
-//        guard let w = try format.implementation(in: file.wrappedValue.fileURL!.deletingLastPathComponent()) else {
-//            throw file.needsValueError()
-//        }
-//
         guard (try? d.load(directory: file.wrappedValue.fileURL!.deletingLastPathComponent().absolutePath, format: format)) != nil else {
             throw FileError.couldNotRead
         }

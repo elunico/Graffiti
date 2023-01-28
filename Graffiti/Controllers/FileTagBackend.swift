@@ -10,11 +10,11 @@ import Foundation
 class FileTagBackend: TagBackend {
     
     func copy(with zone: NSZone? = nil) -> Any {
-        guard var f = try? FileTagBackend( withFileName: filename, forFilesIn: directory, writer: writer) else { fatalError("Failed to produce copy() of FileTagBackend") }
-//        f.tags = tags
+        guard let f = try? FileTagBackend( withFileName: filename, forFilesIn: directory, writer: writer) else { fatalError("Failed to produce copy() of FileTagBackend") }
         f.dirty = dirty
         return f
     }
+    
     private var lastAccessTime: Date? = nil
     private var cachedData: [String: Set<Tag>] = [:]
     
@@ -38,7 +38,6 @@ class FileTagBackend: TagBackend {
         return cachedData[path] ?? []
     }
     
-//    var tags: [TaggedFile.ID: Set<Tag>] = [:]
     var writer: FileWriter
     var directory: URL
     var dirty: Bool = false
@@ -51,22 +50,11 @@ class FileTagBackend: TagBackend {
         print("in init")
         try self.reloadData()
         print("after init")
-//        let intermediate = try writer.loadFrom(path: type(of: writer).writePath(in: directory, named: filename))
-//        let data = intermediate.tagData
-//        for (path, tags) in data {
-//            self.tags[path] = tags
-//        }
     }
     
     func addTag(_ tag: Tag, to file: TaggedFile) {
         dirty = true
-//        owner?.getFile(withID: file.)
         file.tags.insert(tag)
-//        if tags[file.id] == nil {
-//            tags[file.id] = [tag]
-//        } else {
-//            tags[file.id]!.insert(tag)
-//        }
     }
     
     func removeTag(withID id: Tag.ID, from file: TaggedFile) {

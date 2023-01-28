@@ -54,18 +54,6 @@ class ThumbnailProvider: QLThumbnailProvider {
             return true
         }), nil)
 
-        
-        
-        // Second way: Draw the thumbnail into a context passed to your block, set up with Core Graphics's coordinate system.
-//        handler(QLThumbnailReply(contextSize: request.maximumSize, drawing: { (context) -> Bool in
-//
-//            return true
-//        }), nil)
-//
-        /*
-        // Third way: Set an image file URL.
-        handler(QLThumbnailReply(imageFileURL: Bundle.main.url(forResource: "fileThumbnail", withExtension: "jpg")!), nil)
-        
-        */
+
     }
 }

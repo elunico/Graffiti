@@ -21,9 +21,14 @@ struct ConvertView: View {
     @State var showingConfirmOverwrite: Bool = false
     
     @State var targeted: Bool = false
+    @State var errorReason: String = ""
     
     var done: () -> ()
     
+    func fail(reason: String) {
+        errorReason = reason
+        showingError = true
+    }
     
     func performConversion(overwriting: Bool) {
         guard let sourceFile else { return }
@@ -32,16 +37,27 @@ struct ConvertView: View {
             showingConfirmOverwrite = true
             return
         }
+                
+        let currentWriter = try? getSandboxedAccess(to: sourceFile.deletingLastPathComponent().absolutePath, thenPerform: {
+            try (beginFormat.implementation(in: URL(fileURLWithPath: $0)) as! FileTagBackend).writer
+        })
         
-        let d = TaggedDirectory.empty.copy() as! TaggedDirectory
+        let nextWriter = try? getSandboxedAccess(to: sourceFile.deletingLastPathComponent().absolutePath, thenPerform: {
+            try (endFormat.implementation(in: URL(fileURLWithPath: $0)) as! FileTagBackend).writer
+        })
         
-        let currentWriter = try! getSandboxedAccess(to: sourceFile.deletingLastPathComponent().absolutePath, thenPerform: {try (beginFormat.implementation(in: URL(fileURLWithPath: $0)) as! FileTagBackend).writer})
-        let nextWriter = try! getSandboxedAccess(to: sourceFile.deletingLastPathComponent().absolutePath, thenPerform: {try (endFormat.implementation(in: URL(fileURLWithPath: $0)) as! FileTagBackend).writer})
+        if currentWriter == nil {
+            return fail(reason: "Could not create interface to source file \(sourceFile.deletingLastPathComponent().absolutePath)")
+        }
         
-        if (try? convert(file: sourceFile, isUsing: currentWriter, willUse: nextWriter)) != nil {
+        if nextWriter == nil {
+            return fail(reason: "Could not create interface to destination file")
+        }
+        
+        if (try? convert(file: sourceFile, isUsing: currentWriter!, willUse: nextWriter!)) != nil {
             showingSuccess = true
         } else {
-            showingError = true
+            fail(reason: "Could not perform conversion between \(sourceFile) and \(type(of: nextWriter!).writePath(in: sourceFile.deletingLastPathComponent(), named: nil))")
         }
     }
     
@@ -90,8 +106,8 @@ struct ConvertView: View {
         }.padding()
             .sheet(isPresented: $showingError, content: {
                 VStack {
-                    Text("Error").font(.title)
-                    Text("An error occurred during conversion")
+                    Text("An Error occurred").font(.title)
+                    Text(errorReason)
                     Button("Done") {
                         showingError = false
                     }
@@ -138,9 +154,3 @@ struct ConvertView: View {
         sourceFile?.deletingPathExtension().appendingPathExtension(String(endFormat.fileExtension ?? "")).absolutePath
     }
 }
-
-//struct ConvertView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        ConvertView()
-//    }
-//}

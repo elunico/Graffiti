@@ -43,7 +43,6 @@ class TaggedDirectory: ObservableObject, NSCopying {
         d.backend = backend.copy() as! TagBackend
         d.indexMap = indexMap
         d.filterPredicate = filterPredicate
-//        d.setFilter(from: self.query)
         return d 
     }
     
@@ -56,7 +55,6 @@ class TaggedDirectory: ObservableObject, NSCopying {
     private var indexMap: [TaggedFile.ID: Int] = [:]
     
     private var filterPredicate: (TaggedFile) -> Bool = alwaysTrue
-//    var cachedFiles: [TaggedFile]? = nil
     private var query: String = ""
     
     private init() {
@@ -65,19 +63,17 @@ class TaggedDirectory: ObservableObject, NSCopying {
     }
     
     func sort(with sorter: Sorter?) {
-        print(sorter)
         guard let sorter else { return }
         self.files.sort(using: sorter)
         objectWillChange.send()
     }
     
-    func load(directory: String, format: Format) throws {
+    func load(directory: String, filename: String? = nil, format: Format) throws {
         self.files.removeAll()
         self.indexMap.removeAll()
         self.directory = directory
-        guard let backend = try format.implementation(in: URL(fileURLWithPath: directory)) else { print("Invalid"); return }
-        self.backend = backend 
-        print("after implementation")
+        guard let backend = try format.implementation(in: URL(fileURLWithPath: directory), withFileName: filename) else { print("Invalid"); return }
+        self.backend = backend
         let content = try getContentsOfDirectory(atPath: directory)
         var idx = 0
         for file in content {

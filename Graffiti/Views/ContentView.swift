@@ -27,7 +27,6 @@ struct ContentView: View {
     
     
     @EnvironmentObject var taggedDirectory: TaggedDirectory
-//    @StateObject var taggedDirectory: TaggedDirectory = TaggedDirectory.empty.copy() as! TaggedDirectory
     @State var formatChoice: Format = .none
     @State var lazyChoice: Bool = false
     @State var showingOptions: Bool = true
@@ -108,7 +107,6 @@ struct ContentView: View {
         .sheet(isPresented: $showingError, content: {
             VStack {
                 Text("Error").font(.title).padding()
-                //                Text("The directory could not be opened. If make sure you have permission to access this directory")
                 Text(errorString)
                 HStack {
                     Button("Close") {
@@ -172,7 +170,7 @@ struct ContentView: View {
         
     }
     
-    func loadUserSelection(onDone completed: @escaping (Bool) -> Void) {
+    func loadUserSelection(onDone completed: @escaping (_ success: Bool) -> Void) {
         isLoading = true
         
         DispatchQueue.main.async {
@@ -180,8 +178,7 @@ struct ContentView: View {
             let filename = loadedFile == nil ? nil : NSString(string: loadedFile!.lastPathComponent).deletingPathExtension
             
             do {
-                try taggedDirectory.load(directory: dir.absolutePath, format: formatChoice)
-                //                backend = try formatChoice.implementation(in: dir, withFileName: filename)
+                try taggedDirectory.load(directory: dir.absolutePath, filename: filename, format: formatChoice)
                 isLoading = false
                 showingError = false
                 completed(true)
@@ -196,7 +193,6 @@ struct ContentView: View {
                 showingError = true
                 completed(false)
             } catch FileWriterError.InvalidFileFormat {
-                //                backend = nil
                 isLoading = false
                 errorString = "The file chosen has an invalid format."
                 showingError = true
@@ -204,13 +200,11 @@ struct ContentView: View {
             } catch FileWriterError.VersionMismatch {
                 errorString = "The file chosen is from an old version of Graffiti and cannot be opened"
                 showingError = true
-                //                backend = nil
                 isLoading = false
                 completed(false)
             } catch {
                 errorString = "An unknown error occurred"
                 showingError = true
-                //                backend = nil
                 isLoading = false
                 completed(false)
             }
@@ -224,7 +218,6 @@ struct ContentView: View {
                 directory = url
                 loadedFile = nil
                 formatChoice = .xattr
-//                backend = XattrTagBackend()
             } else {
                 loadedFile = url
                 for format in Format.allCases {

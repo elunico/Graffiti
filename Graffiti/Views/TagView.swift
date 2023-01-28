@@ -19,7 +19,6 @@ struct TagView: View {
     
     func performDelete() {
         guard let index = selected else { return }
-//        files.forEach{ $0.removeTag(withID: index) }
         files.forEach { directory.removeTag(withID: index, from: $0) }
     }
     
@@ -68,7 +67,6 @@ struct TagView: View {
                 FilesEditingInspectorView(done: { showingHelp = false }, removeFileWithID: { id in
                     guard let idx = files.firstIndex(where: {$0.id == id}) else { return }
                     files.remove(at: idx)
-                    
                 }, files: files)
             })
     }
@@ -77,8 +75,6 @@ struct TagView: View {
         if currentTag.isEmpty || currentTag.allSatisfy({$0.isWhitespace}) {
             return
         }
-        
-//        files.forEach { $0.addTag(Tag(value: currentTag)) }
         files.forEach { directory.addTag(Tag(value: currentTag), to: $0) }
         currentTag = ""
     }
