@@ -22,7 +22,6 @@
 		DC09FE3E297DB62E00BD51D9 /* TagBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC9296229C600DEED22 /* TagBackend.swift */; };
 		DC09FE3F297DB63600BD51D9 /* XattrTagBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C72965DD680002690A /* XattrTagBackend.swift */; };
 		DC09FE40297DB64000BD51D9 /* XattrBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC42962066200DEED22 /* XattrBridge.m */; };
-		DC09FE41297DB66700BD51D9 /* LazyBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C52965DD560002690A /* LazyBackend.swift */; };
 		DC09FE42297DB66700BD51D9 /* TaggedDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8E14622963EAE0002E1788 /* TaggedDirectory.swift */; };
 		DC14E745297DCBE8001B00AC /* QuickLookThumbnailing.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC14E744297DCBE7001B00AC /* QuickLookThumbnailing.framework */; };
 		DC14E746297DCBE8001B00AC /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCFAEC6D297AFD3400F8A80F /* Quartz.framework */; };
@@ -37,7 +36,6 @@
 		DC341E2429814D3F003B5153 /* ConvertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC341E2329814D3F003B5153 /* ConvertView.swift */; };
 		DC341E2629814D8F003B5153 /* FormatSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC341E2529814D8F003B5153 /* FormatSelector.swift */; };
 		DC4E799E297DF2E3003AEE68 /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C22965DD1C0002690A /* Tag.swift */; };
-		DC4E799F297DF2E3003AEE68 /* LazyBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C52965DD560002690A /* LazyBackend.swift */; };
 		DC4E79A0297DF2E3003AEE68 /* TaggedFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC72962299B00DEED22 /* TaggedFile.swift */; };
 		DC4E79A1297DF2E3003AEE68 /* JSONFileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFDE987296F4AEC005F00E9 /* JSONFileWriter.swift */; };
 		DC4E79A2297DF2E3003AEE68 /* TaggedDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8E14622963EAE0002E1788 /* TaggedDirectory.swift */; };
@@ -63,7 +61,6 @@
 		DC5D265B297EE79F009D3868 /* Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D265A297EE79F009D3868 /* Format.swift */; };
 		DC5D265C297EE7B5009D3868 /* Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D265A297EE79F009D3868 /* Format.swift */; };
 		DC5D265D297EE8D2009D3868 /* CompressedCustomTagStoreWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC21D4D22979ED900024E644 /* CompressedCustomTagStoreWriter.swift */; };
-		DC5D265E297EE8D2009D3868 /* LazyBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C52965DD560002690A /* LazyBackend.swift */; };
 		DC5D265F297EE8D2009D3868 /* TagBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC9296229C600DEED22 /* TagBackend.swift */; };
 		DC5D2660297EE8D2009D3868 /* CSVFileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAB1A0296A04DE00843BE4 /* CSVFileWriter.swift */; };
 		DC5D2661297EE8D2009D3868 /* JSONFileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFDE987296F4AEC005F00E9 /* JSONFileWriter.swift */; };
@@ -99,7 +96,6 @@
 		DCEAB1A3296A056B00843BE4 /* FileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAB1A2296A056B00843BE4 /* FileWriter.swift */; };
 		DCFA39C02965DCC20002690A /* TagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39BF2965DCC20002690A /* TagView.swift */; };
 		DCFA39C32965DD1C0002690A /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C22965DD1C0002690A /* Tag.swift */; };
-		DCFA39C62965DD560002690A /* LazyBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C52965DD560002690A /* LazyBackend.swift */; };
 		DCFA39C82965DD680002690A /* XattrTagBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C72965DD680002690A /* XattrTagBackend.swift */; };
 		DCFA39CA296604740002690A /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C9296604740002690A /* MainView.swift */; };
 		DCFAEC6E297AFD3400F8A80F /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCFAEC6D297AFD3400F8A80F /* Quartz.framework */; };
@@ -203,7 +199,6 @@
 		DCEAB1A2296A056B00843BE4 /* FileWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileWriter.swift; sourceTree = "<group>"; };
 		DCFA39BF2965DCC20002690A /* TagView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagView.swift; sourceTree = "<group>"; };
 		DCFA39C22965DD1C0002690A /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
-		DCFA39C52965DD560002690A /* LazyBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazyBackend.swift; sourceTree = "<group>"; };
 		DCFA39C72965DD680002690A /* XattrTagBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XattrTagBackend.swift; sourceTree = "<group>"; };
 		DCFA39C9296604740002690A /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		DCFAEC6B297AFD3400F8A80F /* CCTSQLPlugin.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CCTSQLPlugin.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -371,7 +366,6 @@
 				DCEAB19F296A04D100843BE4 /* FileWriters */,
 				DC1B7BC9296229C600DEED22 /* TagBackend.swift */,
 				DCEAB19D296A018A00843BE4 /* FileTagBackend.swift */,
-				DCFA39C52965DD560002690A /* LazyBackend.swift */,
 				DCFA39C72965DD680002690A /* XattrTagBackend.swift */,
 			);
 			path = Controllers;
@@ -568,7 +562,6 @@
 				DC14E749297DCBE8001B00AC /* ThumbnailProvider.swift in Sources */,
 				DCCB4F322985BC6A00C55E15 /* FileWriterError.swift in Sources */,
 				DC4E79A7297DF2E3003AEE68 /* CompressedCustomTagStoreWriter.swift in Sources */,
-				DC4E799F297DF2E3003AEE68 /* LazyBackend.swift in Sources */,
 				DC4E79A9297DF2E3003AEE68 /* TagBackend.swift in Sources */,
 				DC4E79A5297DF2E3003AEE68 /* FileTagBackend.swift in Sources */,
 				DC4E79A0297DF2E3003AEE68 /* TaggedFile.swift in Sources */,
@@ -596,7 +589,6 @@
 				DC52448D2960ACB200821407 /* GraffitiApp.swift in Sources */,
 				DC9BBD1B2985C0720035543D /* TagTransaction.swift in Sources */,
 				DCCB4F302985B8F000C55E15 /* FileWriterError.swift in Sources */,
-				DCFA39C62965DD560002690A /* LazyBackend.swift in Sources */,
 				DC2E803C296A40450015AE26 /* PropertyListFileWriter.swift in Sources */,
 				DCEAB19E296A018A00843BE4 /* FileTagBackend.swift in Sources */,
 				DCFA39C82965DD680002690A /* XattrTagBackend.swift in Sources */,
@@ -633,7 +625,6 @@
 				DC9CCB452980ECE600A2D622 /* GraffitiIntentShortcuts.swift in Sources */,
 				DCCB4F332985BC6A00C55E15 /* FileWriterError.swift in Sources */,
 				DC5D265F297EE8D2009D3868 /* TagBackend.swift in Sources */,
-				DC5D265E297EE8D2009D3868 /* LazyBackend.swift in Sources */,
 				DC5D2665297EE8D2009D3868 /* XattrTagBackend.swift in Sources */,
 				DC5D2662297EE8D2009D3868 /* PropertyListFileWriter.swift in Sources */,
 				DC5D2668297EE93D009D3868 /* TaggedFile.swift in Sources */,
@@ -651,7 +642,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DC09FE41297DB66700BD51D9 /* LazyBackend.swift in Sources */,
 				DC09FE42297DB66700BD51D9 /* TaggedDirectory.swift in Sources */,
 				DCDFF2342984413F00A2B6CF /* Format.swift in Sources */,
 				DC09FE40297DB64000BD51D9 /* XattrBridge.m in Sources */,

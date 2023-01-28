@@ -21,7 +21,6 @@ struct TagView: View {
         guard let index = selected else { return }
         let tag = Tag(value: index)
         directory.removeTag(withID: index, fromAll: files.filter { $0.tags.contains(tag) })
-//        files.forEach { directory.removeTag(withID: index, from: $0) }
     }
     
     var body: some View {
@@ -44,6 +43,7 @@ struct TagView: View {
                     TableColumn("Tag", value: \Tag.value)
                 }).onDeleteCommand(perform: self.performDelete)
                 
+                
                 TextField("Add Tag", text: $currentTag, prompt: Text("Tag"))
                     .onChange(of: currentTag) { _ in
                         currentTag.removeAll(where: { prohibitedCharacters.contains($0) })
@@ -51,14 +51,26 @@ struct TagView: View {
                         self.addCurrentTag()
                     }
                 HStack {
-                    Button("Add Tag") {
-                        self.addCurrentTag()
-                    }.disabled(currentTag == "")
+                    HStack {
+                        Button("Undo") {
+                            directory.undo()
+                        }.disabled(directory.transactions.isEmpty)
+                            .keyboardShortcut("z", modifiers: [.command])
+                        Button("Redo") {
+                            directory.redo()
+                        }.disabled(directory.redoStack.isEmpty)
+                            .keyboardShortcut("z", modifiers: [.shift, .command])
+                    }
                     Spacer()
-                    Button("Delete Tag") {
-                        self.performDelete()
-                    }.disabled(selected == nil)
-                }.padding()
+                    HStack {
+                        Button("Delete Tag") {
+                            self.performDelete()
+                        }.disabled(selected == nil)
+                        Button("Add Tag") {
+                            self.addCurrentTag()
+                        }.disabled(currentTag == "")
+                    }
+                }
                 Button("Close") {
                     done(files)
                 }.keyboardShortcut(.return, modifiers: [])
@@ -69,6 +81,8 @@ struct TagView: View {
                 FilesEditingInspectorView(done: { showingHelp = false }, removeFileWithID: { id in
                     guard let idx = files.firstIndex(where: {$0.id == id}) else { return }
                     files.remove(at: idx)
+                }, addFileWithID: {
+                    files.insert($0)
                 }, files: files)
             })
     }
@@ -79,7 +93,7 @@ struct TagView: View {
         }
         let tag = Tag(value: currentTag)
         directory.addTags(tag, toAll: files.map { $0 })
-
+        
         currentTag = ""
     }
 }

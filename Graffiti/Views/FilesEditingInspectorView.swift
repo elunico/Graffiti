@@ -12,7 +12,10 @@ struct FilesEditingInspectorView: View {
     @State var selectedFile: TaggedFile.ID? = nil
     @State var done: () -> ()
     var removeFileWithID: (TaggedFile.ID) -> ()
-    var files: Set<TaggedFile>
+    var addFileWithID: (TaggedFile) -> ()
+    @State var files: Set<TaggedFile>
+    
+    @State var removedFiles: [TaggedFile] = []
     
     var body: some View {
         VStack {
@@ -24,8 +27,19 @@ struct FilesEditingInspectorView: View {
             Button("Exclude File") {
                 guard let id = selectedFile else { return  }
                 removeFileWithID(id)
+                if let f = files.first(where: {selectedFile == $0.id}) {
+                    files.remove(f)
+                    removedFiles.append(f)
+                }
             }.disabled(selectedFile == nil)
-            Text("Note that you can view this list of files by hovering over the 'Tags of n files' text")
+            Button("Undo") {
+                if let last = removedFiles.popLast() {
+                    addFileWithID(last)
+                    files.insert(last)
+                }
+            }.disabled(removedFiles.isEmpty)
+                .keyboardShortcut("z", modifiers: [.command])
+            Text("Warning: exclusions cannot be undone if the sheet is closed")
                 .font(.caption2)
             Button("Close") {
                 done()
