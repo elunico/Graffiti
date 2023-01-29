@@ -118,10 +118,10 @@ struct GraffitiApp: App {
     
     var canEditTags: Bool {
         switch appState.currentState {
-        case .MainView(true):
-            return true
+        case .MainView(let t):
+            return !t
         default:
-            return false
+            return true
         }
     }
     

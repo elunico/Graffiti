@@ -27,7 +27,11 @@ class AnySelectionModel: ObservableObject {
 
 class ApplicationState: ObservableObject {
     
-    var currentState: AppState = .StartScreen
+    @Published var currentState: AppState = .StartScreen {
+        didSet {
+            print(currentState)
+        }
+    }
     
     @Published var isImporting: Bool = false 
     @Published var isConverting: Bool = false
