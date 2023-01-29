@@ -156,6 +156,7 @@ class TaggedDirectory: ObservableObject, NSCopying {
     func clearTags(of file: TaggedFile) {
         backend.clearTags(of: file)
         invalidateUndo()
+        invalidateRedo()
     }
     
     func commit() {

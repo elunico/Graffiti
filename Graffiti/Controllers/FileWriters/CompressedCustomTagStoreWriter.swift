@@ -107,7 +107,6 @@ class CompressedCustomTagStoreWriter: FileWriter {
             throw FileWriterError.IsADirectory
         }
         
-        print("loading from \(path)")
         guard let contents = try? TPData(contentsOf: URL(fileURLWithPath: path)) else {
             throw FileWriterError.DeniedFileAccess
         }
@@ -164,7 +163,6 @@ class CompressedCustomTagStoreWriter: FileWriter {
         var data = Data()
         data.append(store.version.encodedForCCTS)
         data.append(store.tagData.count.bigEndianBytes)
-        print(data)
         
         for (path, tags) in store.tagData {
             let pdata = path.data(using: .utf8)!

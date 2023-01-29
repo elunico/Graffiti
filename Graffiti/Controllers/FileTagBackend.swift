@@ -47,9 +47,7 @@ class FileTagBackend: TagBackend {
         self.directory = directory
         self.writer = writer
         self.filename = filename
-        print("in init")
         try self.reloadData()
-        print("after init")
     }
     
     func addTag(_ tag: Tag, to file: TaggedFile) {

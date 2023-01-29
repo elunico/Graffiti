@@ -160,7 +160,6 @@ struct ContentView: View {
                 .onOpenURL(perform: { path in
                     appState.isLoading = true
                     appState.currentState = .Loading
-                    print("loading \(path)")
                     loadDroppedFile(path)
                     
                 })

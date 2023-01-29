@@ -90,7 +90,6 @@ enum FileError: Error {
 fileprivate var didRequestPermission: Set<String> = []
 
 func getSandboxedAccess<R>(to directory: String, thenPerform action: (String) throws -> (R)) rethrows -> R {
-    print("Accessing \(directory)")
     do {
         return try action(directory)
     } catch _ where !didRequestPermission.contains(directory) {
