@@ -14,6 +14,9 @@ struct FilesEditingInspectorView: View {
     var removeFileWithID: (TaggedFile.ID) -> ()
     var addFileWithID: (TaggedFile) -> ()
     @State var files: Set<TaggedFile>
+    @EnvironmentObject var appState: ApplicationState
+    var externalSelectionModel = AnySelectionModel()
+
     
     @State var removedFiles: [TaggedFile] = []
     
@@ -47,5 +50,16 @@ struct FilesEditingInspectorView: View {
             
         }.padding()
             .frame(minHeight: 400.0)
+            .onAppear {
+                appState.createSelectionModel()
+            }
+            .onDisappear {
+                appState.releaseSelectionModel()
+            }
+            .onChange(of: selectedFile, perform: { _ in
+                if let id = selectedFile {
+                    appState.select(only: id)
+                }
+            })
     }
 }

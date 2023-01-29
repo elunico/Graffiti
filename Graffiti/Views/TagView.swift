@@ -14,6 +14,9 @@ struct TagView: View {
     @State var currentTag: String = ""
     @State var showingHelp = false
     @EnvironmentObject var directory: TaggedDirectory
+    @EnvironmentObject var appState: ApplicationState
+    
+    var externalSelectionModel = AnySelectionModel()
     var prohibitedCharacters: Set<Character>
     var done: (Set<TaggedFile>) -> ()
     
@@ -76,6 +79,17 @@ struct TagView: View {
                 }.keyboardShortcut(.return, modifiers: [])
             }
         }.padding()
+            .onAppear {
+                appState.createSelectionModel()
+            }
+            .onDisappear {
+                appState.releaseSelectionModel()
+            }
+            .onChange(of: selected, perform: { _ in
+                if let id = selected {
+                    appState.select(only: id)
+                }
+            })
             .frame(minWidth: 500.0, minHeight: 500.0,  alignment: Alignment.center)
             .sheet(isPresented: $showingHelp, content: {
                 FilesEditingInspectorView(done: { showingHelp = false }, removeFileWithID: { id in

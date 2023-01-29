@@ -22,9 +22,7 @@ struct ConvertView: View {
     
     @State var targeted: Bool = false
     @State var errorReason: String = ""
-    
-    var done: () -> ()
-    
+        
     func fail(reason: String) {
         errorReason = reason
         showingError = true
@@ -94,16 +92,13 @@ struct ConvertView: View {
                 FormatSelector(formatChoice: $endFormat).removing(formatOption: .xattr).removing(formatOption: .none).onChange(of: endFormat, perform: { print($0) })
             }.padding()
             HStack {
-                Button("Close") {
-                    done()
-                }
-                
                 Button("Convert") {
                     performConversion(overwriting: false)
                     
                 }
             }
         }.padding()
+            .frame(minWidth: 600, idealWidth: 600, minHeight: 400, idealHeight: 400)
             .sheet(isPresented: $showingError, content: {
                 VStack {
                     Text("An Error occurred").font(.title)

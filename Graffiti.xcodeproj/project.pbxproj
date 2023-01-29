@@ -51,6 +51,7 @@
 		DC4E79AC297DF372003AEE68 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09FE3A297DB5F600BD51D9 /* Utility.swift */; };
 		DC4E79AD297DF3AC003AEE68 /* XattrBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC42962066200DEED22 /* XattrBridge.m */; };
 		DC4E79AE297E071C003AEE68 /* PreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFAEC70297AFD3400F8A80F /* PreviewViewController.swift */; };
+		DC4F4CD12985EB060001CCD9 /* ApplicationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4F4CD02985EB060001CCD9 /* ApplicationState.swift */; };
 		DC52448D2960ACB200821407 /* GraffitiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC52448C2960ACB200821407 /* GraffitiApp.swift */; };
 		DC52448F2960ACB200821407 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC52448E2960ACB200821407 /* ContentView.swift */; };
 		DC5244912960ACB300821407 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DC5244902960ACB300821407 /* Assets.xcassets */; };
@@ -174,6 +175,7 @@
 		DC2E803B296A40450015AE26 /* PropertyListFileWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PropertyListFileWriter.swift; sourceTree = "<group>"; };
 		DC341E2329814D3F003B5153 /* ConvertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertView.swift; sourceTree = "<group>"; };
 		DC341E2529814D8F003B5153 /* FormatSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormatSelector.swift; sourceTree = "<group>"; };
+		DC4F4CD02985EB060001CCD9 /* ApplicationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationState.swift; sourceTree = "<group>"; };
 		DC5244892960ACB200821407 /* Graffiti.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Graffiti.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC52448C2960ACB200821407 /* GraffitiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraffitiApp.swift; sourceTree = "<group>"; };
 		DC52448E2960ACB200821407 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -366,6 +368,7 @@
 				DC5FA2F32975091500084CB2 /* TagStore.swift */,
 				DC5D265A297EE79F009D3868 /* Format.swift */,
 				DC9BBD1A2985C0720035543D /* TagTransaction.swift */,
+				DC4F4CD02985EB060001CCD9 /* ApplicationState.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -596,6 +599,7 @@
 				DC1B7BC52962066200DEED22 /* XattrBridge.m in Sources */,
 				DC1B7BCA296229C600DEED22 /* TagBackend.swift in Sources */,
 				DC52448F2960ACB200821407 /* ContentView.swift in Sources */,
+				DC4F4CD12985EB060001CCD9 /* ApplicationState.swift in Sources */,
 				DC52448D2960ACB200821407 /* GraffitiApp.swift in Sources */,
 				DC9BBD1B2985C0720035543D /* TagTransaction.swift in Sources */,
 				DCCB4F302985B8F000C55E15 /* FileWriterError.swift in Sources */,

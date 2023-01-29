@@ -27,24 +27,27 @@ struct ContentView: View {
     
     
     @EnvironmentObject var taggedDirectory: TaggedDirectory
+    @EnvironmentObject var appState: ApplicationState
     @State var formatChoice: Format = .none
     @State var lazyChoice: Bool = false
     @State var showingOptions: Bool = true
     @State var showingError: Bool = false
     @State var loadedFile: URL? = nil
     @State var directory: URL? = nil
-    @State var isImporting: Bool = false
-    @State var isConverting: Bool = false
-    @State var isLoading: Bool = false {
-        didSet {
-            if !isLoading {
-                NSApplication.shared.requestUserAttention(.informationalRequest)
-            }
-        }
-    }
+//    @State var isImporting: Bool = false
+//    @State var isConverting: Bool = false
+//    @State var isLoading: Bool = false {
+//        didSet {
+//            if !isLoading {
+//                NSApplication.shared.requestUserAttention(.informationalRequest)
+//            }
+//        }
+//    }
     
     @State var targeted: Bool = false
     @State var errorString: String = ""
+    
+    @Environment(\.openWindow) private var openWindow
     
     var optionArea: some View {
         Group {
@@ -93,7 +96,7 @@ struct ContentView: View {
                 Spacer().frame(height: 50.0)
                 Divider().frame(width: geometry.size.width / 2)
                 Button("Convert an existing tag store") {
-                    isConverting = true
+                    openWindow(id: "convertwindow")
                 }
             }
             .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
@@ -133,12 +136,12 @@ struct ContentView: View {
     
     
     var body: some View {
-        if isLoading {
+        if appState.isLoading {
             ProgressView().progressViewStyle(CircularProgressViewStyle())
         } else if showingOptions {
             selectionView
                 .fileImporter(
-                    isPresented: $isImporting,
+                    isPresented: $appState.isImporting,
                     allowedContentTypes: [.plainText],
                     allowsMultipleSelection: false
                 ) { result in
@@ -155,13 +158,11 @@ struct ContentView: View {
                     }
                 }
                 .onOpenURL(perform: { path in
-                    isLoading = true
+                    appState.isLoading = true
+                    appState.currentState = .Loading
                     print("loading \(path)")
                     loadDroppedFile(path)
                     
-                })
-                .sheet(isPresented: $isConverting, content: {
-                    ConvertView(done: { isConverting = false })
                 })
         } else {
             MainView(choice: formatChoice, directory: self.directory, showOptions: { showingOptions = true; formatChoice = .none; })
@@ -171,7 +172,7 @@ struct ContentView: View {
     }
     
     func loadUserSelection(onDone completed: @escaping (_ success: Bool) -> Void) {
-        isLoading = true
+        appState.isLoading = true
         
         DispatchQueue.main.async {
             guard let dir = self.directory else { return completed(false) }
@@ -179,33 +180,39 @@ struct ContentView: View {
             
             do {
                 try taggedDirectory.load(directory: dir.absolutePath, filename: filename, format: formatChoice)
-                isLoading = false
+                appState.isLoading = false
                 showingError = false
+                appState.currentState = .MainView(hasSelection: false)
                 completed(true)
             } catch FileWriterError.IsADirectory {
-                isLoading = false
+                appState.isLoading = false
                 errorString = "The path \(dir.absolutePath) is a directory not a file"
                 showingError = true
+                appState.currentState = .ShowingFileError
                 completed(false)
             } catch FileWriterError.DeniedFileAccess {
-                isLoading = false
+                appState.isLoading = false
                 errorString = "Graffiti does not have permission to open the chosen file or directory"
                 showingError = true
+                appState.currentState = .ShowingFileError
                 completed(false)
             } catch FileWriterError.InvalidFileFormat {
-                isLoading = false
+                appState.isLoading = false
                 errorString = "The file chosen has an invalid format."
                 showingError = true
+                appState.currentState = .ShowingFileError
                 completed(false)
             } catch FileWriterError.VersionMismatch {
                 errorString = "The file chosen is from an old version of Graffiti and cannot be opened"
                 showingError = true
-                isLoading = false
+                appState.isLoading = false
+                appState.currentState = .ShowingFileError
                 completed(false)
             } catch {
                 errorString = "An unknown error occurred"
                 showingError = true
-                isLoading = false
+                appState.isLoading = false
+                appState.currentState = .ShowingFileError
                 completed(false)
             }
         }

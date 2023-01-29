@@ -1,0 +1,85 @@
+//
+//  ApplicationState.swift
+//  Graffiti
+//
+//  Created by Thomas Povinelli on 1/28/23.
+//
+
+import Foundation
+
+enum AppState : Equatable {
+    case StartScreen
+    case Converting
+    case Loading
+    case MainView(hasSelection: Bool)
+    case EditingTags
+    case ShowingFileError
+    case EditingFileView
+    case ShowingConfirm
+    
+}
+
+class AnySelectionModel: ObservableObject {
+    @Published var selectedItems: [Any] = []
+    var isSingleSelected: Bool = false
+}
+
+
+class ApplicationState: ObservableObject {
+    
+    var currentState: AppState = .StartScreen
+    
+    @Published var isImporting: Bool = false 
+    @Published var isConverting: Bool = false
+    @Published var isLoading: Bool = false
+    
+    @Published var editing: Bool = false
+    @Published var isPresentingConfirm: Bool = false
+    @Published var showingMoreInfo: Bool = false
+    
+    @Published var showingHelp = false
+    
+    @Published var selectionModels: [AnySelectionModel] = []
+    
+    
+    func select(only object: Any) {
+        clearSelection()
+        select(additionalItem: object)
+        objectWillChange.send()
+    }
+    
+    func select(additionalItem item: Any) {
+        selectionModels.last?.selectedItems.append(item)
+        objectWillChange.send()
+    }
+    
+    func select(only objects: any Sequence) {
+        clearSelection()
+        for item in objects {
+            select(additionalItem: item)
+        }
+        objectWillChange.send()
+    }
+    
+    func clearSelection() {
+        selectionModels.last?.selectedItems.removeAll()
+        objectWillChange.send()
+    }
+    
+    @discardableResult
+    func createSelectionModel() -> AnySelectionModel {
+        let model = AnySelectionModel()
+        selectionModels.append(model)
+        return model
+    }
+    
+    @discardableResult
+    func releaseSelectionModel() -> AnySelectionModel? {
+        selectionModels.popLast()
+    }
+    
+//    @Published var showingError: Bool = false
+//    @Published var showingSuccess: Bool = false
+//    @Published var showingConfirmOverwrite: Bool = false
+
+}

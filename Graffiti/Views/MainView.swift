@@ -17,12 +17,13 @@ struct MainView: View {
     @State var choice: Format
     @State var directory: URL?
     @EnvironmentObject var files: TaggedDirectory
+    @EnvironmentObject var appState: ApplicationState
     @State private var selected: Set<TaggedFile.ID> = Set()
     @State private var query: String = ""
     
-    @State private var editing: Bool = false
-    @State private var isPresentingConfirm: Bool = false
-    @State private var showingMoreInfo: Bool = false
+//    @State private var editing: Bool = false
+//    @State private var isPresentingConfirm: Bool = false
+//    @State private var showingMoreInfo: Bool = false
     
     @State private var selectedFileURLs: [URL] = []
     @State private var selectedFileURL: URL? = nil
@@ -32,7 +33,7 @@ struct MainView: View {
     @State private var currentFileList: [TaggedFile] = []
     
     var showOptions: () -> ()
-    
+        
     enum Orientation {
         case horizontally, vertically
     }
@@ -88,7 +89,8 @@ struct MainView: View {
                                         if !selected.contains(item.id) {
                                             selected = Set([item.id])
                                         }
-                                        editing = true
+                                        appState.editing = true
+                                        appState.currentState = .EditingTags
                                     }, label: {
                                         Label("Edit Tags of \((selected.contains(item.id) && selected.count > 1) ? "\(selected.count) items" : item.filename)", systemImage: "pencil")
                                     })
@@ -114,7 +116,8 @@ struct MainView: View {
                                         if !selected.contains(item.id) {
                                             selected = Set([item.id])
                                         }
-                                        isPresentingConfirm = true
+                                        appState.isPresentingConfirm = true
+                                        appState.currentState = .ShowingConfirm
                                     }, label: { Label("Clear All Tags for \((selected.contains(item.id) && selected.count > 1) ? "\(selected.count) items" : item.filename)", systemImage: "clear") })
                                     
                                     divider(forLayoutOrientation: .horizontally, measure: 25.0)
@@ -133,6 +136,11 @@ struct MainView: View {
                     if let sorter = sorter.first {
                         currentFileList.sort(using: sorter)
                     }
+                }).onChange(of: selected, perform: { _ in
+                    if selected.count > 0 {
+                        appState.currentState = .MainView(hasSelection: true)
+                    }
+                    appState.select(only: selected)
                 })
                 
             }
@@ -206,7 +214,8 @@ struct MainView: View {
                     divider(forLayoutOrientation: .horizontally, measure: 25.0)
                     
                     Button(action: {
-                        editing = true
+                        appState.editing = true
+                        appState.currentState = .EditingTags
                     }, label: {
                         Label("Edit Tags of \(name)", systemImage: "pencil")
                     }).disabled(selected.count == 0)
@@ -237,7 +246,8 @@ struct MainView: View {
                     divider(forLayoutOrientation: .horizontally, measure: 25.0)
                     
                     Button(action:  {
-                        isPresentingConfirm = true
+                        appState.isPresentingConfirm = true
+                        appState.currentState = .ShowingConfirm
                     }, label: { Label("Clear All Tags for \(name)", systemImage: "clear") })
                     .disabled(selected.count == 0)
                     .help("Clear All Tags for \(name)")
@@ -280,8 +290,8 @@ struct MainView: View {
                     VStack {
                         HStack {
                             Text("Tagging: \(directory?.absolutePath ?? "<none>")")
-                            Button(action: {showingMoreInfo.toggle()}, label: {
-                                Text(showingMoreInfo ? "Less" : "More")
+                            Button(action: {appState.showingMoreInfo.toggle()}, label: {
+                                Text(appState.showingMoreInfo ? "Less" : "More")
                             })
                             Spacer()
                             Toggle("Spotlight File Kinds", isOn: $richKind)
@@ -290,7 +300,7 @@ struct MainView: View {
                                 })
                             
                         }
-                        if showingMoreInfo {
+                        if appState.showingMoreInfo {
                             MoreInfo()
                         }
                     }
@@ -305,7 +315,7 @@ struct MainView: View {
                 }
                 
             }
-            .onClearAll(message: (selected.count == 0 ? "This will remove EVERY tag from EVERY file currently in view in the table" : "This will remove EVERY tag from every SELECTED file in the table") + "\nYou cannot undo this action", isPresented: $isPresentingConfirm, clearAction: {
+            .onClearAll(message: (selected.count == 0 ? "This will remove EVERY tag from EVERY file currently in view in the table" : "This will remove EVERY tag from every SELECTED file in the table") + "\nYou cannot undo this action", isPresented: $appState.isPresentingConfirm, clearAction: {
                 if selected.count == 0 {
                     for file in files.filter(by: query) {
                         file.clearTags()
@@ -316,8 +326,8 @@ struct MainView: View {
                     }
                 }
             })
-            .sheet(isPresented: $editing,  content: {
-                TagView(files: files.getFiles(withIDs: selected), prohibitedCharacters: files.prohibitedCharacters, done: { _ in editing = false })
+            .sheet(isPresented: $appState.editing,  content: {
+                TagView(files: files.getFiles(withIDs: selected), prohibitedCharacters: files.prohibitedCharacters, done: { _ in appState.editing = false; appState.currentState = .MainView(hasSelection: selected.count > 0) })
             })
         }
         .toolbar(content: {
@@ -337,11 +347,13 @@ struct MainView: View {
                 currentFileList = files.filter(by: query)
             }
             richKind = UserDefaults.this?.bool(forKey: MainView.kUserDefaultsRichKindKey) ?? false
+            appState.createSelectionModel()
         }
     }
     
     func teardown() {
         self.files.commit()
         self.files.files.removeAll(keepingCapacity: true)
+        self.appState.releaseSelectionModel()
     }
 }
