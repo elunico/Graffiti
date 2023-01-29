@@ -62,6 +62,8 @@ struct ConvertView: View {
     var body: some View {
         VStack {
             Text("Convert between tag store formats").font(.title)
+            Divider().frame(width: 100.0)
+                .padding()
             
             Button("Choose a file") {
                 let folderPicker = NSOpenPanel()
@@ -82,21 +84,28 @@ struct ConvertView: View {
                     }
                 }
             }
-            Text(sourceFile?.absolutePath ?? "<none>") 
+            Text("Converting: \(sourceFile?.absolutePath ?? "<none>")")
             
-            HStack {
                 Text("Starting format: \(beginFormat.fileExtension ?? "<unknown>")")
-            }
-            HStack {
-                Text("To format")
-                FormatSelector(formatChoice: $endFormat).removing(formatOption: .xattr).removing(formatOption: .none).onChange(of: endFormat, perform: { print($0) })
+            
+            VStack {
+                Text("Convert To:").font(.title2)
+                if sourceFile != nil {
+                    FormatSelector(formatChoice: $endFormat)
+                        .removing(formatOption: .xattr)
+                        .removing(formatOption: Format.none)
+                        .removing(formatOption: beginFormat)
+                        .onChange(of: endFormat, perform: { print($0) })
+                } else {
+                    Text("Choose a file to begin")
+                        .frame(height: 100.0)
+                }
             }.padding()
-            HStack {
                 Button("Convert") {
                     performConversion(overwriting: false)
                     
                 }
-            }
+            
         }.padding()
             .frame(minWidth: 600, idealWidth: 600, minHeight: 400, idealHeight: 400)
             .sheet(isPresented: $showingError, content: {

@@ -42,6 +42,7 @@ struct GraffitiApp: App {
                 .onAppear {
                     NSWindow.allowsAutomaticWindowTabbing = false
                 }
+                
             //            let d = windowStateManager.windowStates.tryGet(keyWindow)?.1 ?? TaggedDirectory.empty.copy() as! TaggedDirectory
             //            let a = windowStateManager.windowStates.tryGet(keyWindow)?.0 ?? ApplicationState()
             //            ContentView().environmentObject(d).environmentObject(a)

@@ -145,6 +145,7 @@ struct ContentView: View {
                     allowedContentTypes: [.plainText],
                     allowsMultipleSelection: false
                 ) { result in
+                    print(result)
                     do {
                         guard let selectedFile: URL = try result.get().first else { return }
                         if FileManager.default.fileExists(atPath: selectedFile.absolutePath) {
@@ -158,6 +159,7 @@ struct ContentView: View {
                     }
                 }
                 .onOpenURL(perform: { path in
+                    print(path)
                     appState.isLoading = true
                     appState.currentState = .Loading
                     loadDroppedFile(path)
