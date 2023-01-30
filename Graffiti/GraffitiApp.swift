@@ -12,28 +12,54 @@ extension UTType {
     var compressedCustomTagStore: UTType { UTType(exportedAs: "com.tom.ccts") }
 }
 
-extension Dictionary {
-    func tryGet(_ key: Key?) -> Value? {
-        if let key {
-            return self[key]
-        } else {
-            return nil
-        }
-    }
-}
-
-class WindowStateManager: ObservableObject {
-    @Published var windowStates: [NSUserInterfaceItemIdentifier: (ApplicationState, TaggedDirectory)] = [:]
-}
-
 @main
 struct GraffitiApp: App {
     
     @StateObject var taggedDirectory: TaggedDirectory = TaggedDirectory.empty.copy() as! TaggedDirectory
     @StateObject var appState: ApplicationState = ApplicationState()
-    //    @StateObject var windowStateManager = WindowStateManager()
     
-    //    @State var keyWindow: NSUserInterfaceItemIdentifier? = nil
+    func editTags() {
+        appState.currentState = .EditingTags
+        appState.editing = true
+    }
+    
+    func clearAllTags() {
+        appState.currentState = .ShowingConfirm
+        appState.isPresentingConfirm = true
+    }
+    
+    func openFiles() {
+        
+        if let files = appState.selectionModels.last?.selectedItems.map({ $0 as? TaggedFile.ID }).droppingNils() {
+            for file in files {
+                NSWorkspace.shared.open(URL(fileURLWithPath: file))
+            }
+        }
+    }
+    
+    func revealFiles() {
+        if let file = appState.selectionModels.last?.selectedItems.map({ $0 as? TaggedFile.ID }).droppingNils().first {
+            if !NSWorkspace.shared.selectFile(file, inFileViewerRootedAtPath: (file as NSString).deletingLastPathComponent) {
+                NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: (file as NSString).deletingLastPathComponent)
+            }
+        }
+    }
+    
+    func revealCurrentFolder() {
+        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: taggedDirectory.directory)
+    }
+    
+    func revealCurrentTagStore() {
+        if let file = taggedDirectory.tagStore {
+            if !NSWorkspace.shared.selectFile(file, inFileViewerRootedAtPath: taggedDirectory.directory) {
+                NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: taggedDirectory.directory)
+            }
+        }
+    }
+    
+    var keyWindow: NSWindow? {
+        NSApp.keyWindow ?? NSApplication.shared.windows.filter {$0.isKeyWindow}.first
+    }
     
     var body: some Scene {
         Window("Graffiti", id: "mainwindow") {
@@ -42,71 +68,40 @@ struct GraffitiApp: App {
                 .onAppear {
                     NSWindow.allowsAutomaticWindowTabbing = false
                 }
-                
-            //            let d = windowStateManager.windowStates.tryGet(keyWindow)?.1 ?? TaggedDirectory.empty.copy() as! TaggedDirectory
-            //            let a = windowStateManager.windowStates.tryGet(keyWindow)?.0 ?? ApplicationState()
-            //            ContentView().environmentObject(d).environmentObject(a)
-            //                .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { notification in
-            //                    print(notification.object as? NSWindow)
-            //                    if let window = notification.object as? NSWindow, let keyIdentifier = window.identifier {
-            //                        keyWindow = keyIdentifier
-            //                        print(keyWindow)
-            //                        print(windowStateManager.windowStates[keyIdentifier])
-            //                        windowStateManager.windowStates[keyIdentifier] = (ApplicationState(), TaggedDirectory.empty.copy() as! TaggedDirectory)
-            //                    }
-            //                }
-            
         }
         
         .commands(content: {
             CommandMenu("Tags", content: {
                 Button("Edit Tags") {
-                    appState.currentState = .EditingTags
-                    appState.editing = true
-                }.disabled(canEditTags)
+                    editTags()
+                }
+                .disabled(canEditTags)
                     .keyboardShortcut("e")
                 Button("Clear All Tags") {
-                    appState.currentState = .ShowingConfirm
-                    appState.isPresentingConfirm = true
+                    clearAllTags()
                 }.disabled(canEditTags)
                     .keyboardShortcut(.delete, modifiers: [.control, .command])
             })
             CommandGroup(after: .newItem, addition: {
                 Button("Open File(s)", action: {
-                    
-                    if let files = appState.selectionModels.last?.selectedItems.map({ $0 as? TaggedFile.ID }).droppingNils() {
-                        for file in files {
-                            NSWorkspace.shared.open(URL(fileURLWithPath: file))
-                        }
-                    }
-                    
+                    openFiles()
                 }).keyboardShortcut(.downArrow, modifiers: [.command])
                     .disabled((appState.selectionModels.last?.selectedItems.first as? TaggedFile.ID) == nil)
                 
                 Button("Reveal File") {
-                    if let file = appState.selectionModels.last?.selectedItems.map({ $0 as? TaggedFile.ID }).droppingNils().first {
-                        if !NSWorkspace.shared.selectFile(file, inFileViewerRootedAtPath: (file as NSString).deletingLastPathComponent) {
-                            NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: (file as NSString).deletingLastPathComponent)
-                        }
-                    }
+                    revealFiles()
                 }.keyboardShortcut(.return, modifiers: [.command])
                     .disabled(appState.selectionModels.last?.selectedItems.count != 1 || (appState.selectionModels.last?.selectedItems.first as? TaggedFile.ID) == nil)
                 
                 Divider()
                 
                 Button("Reveal Current Folder in Finder") {
-                    NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: taggedDirectory.directory)
+                    revealCurrentFolder()
                 }.disabled(taggedDirectory.directory.isEmpty)
                 
                 Button("Reveal Current Tag Store File in Finder") {
-                    if let file = taggedDirectory.tagStore {
-                        if !NSWorkspace.shared.selectFile(file, inFileViewerRootedAtPath: taggedDirectory.directory) {
-                            NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: taggedDirectory.directory)
-                        }
-                    }
+                    revealCurrentTagStore()
                 }.disabled(taggedDirectory.tagStore == nil)
-                
-                
             })
             
             

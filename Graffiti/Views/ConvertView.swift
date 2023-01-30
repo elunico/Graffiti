@@ -10,7 +10,7 @@ import UniformTypeIdentifiers
 
 
 struct ConvertView: View {
-    @State var sourceFile: URL? = nil 
+    @State var sourceFile: URL? = nil
     @State var beginFormat: Format = .none
     @State var endFormat: Format = .none
     
@@ -22,7 +22,7 @@ struct ConvertView: View {
     
     @State var targeted: Bool = false
     @State var errorReason: String = ""
-        
+    
     func fail(reason: String) {
         errorReason = reason
         showingError = true
@@ -35,7 +35,7 @@ struct ConvertView: View {
             showingConfirmOverwrite = true
             return
         }
-                
+        
         let currentWriter = try? getSandboxedAccess(to: sourceFile.deletingLastPathComponent().absolutePath, thenPerform: {
             try (beginFormat.implementation(in: URL(fileURLWithPath: $0)) as! FileTagBackend).writer
         })
@@ -86,7 +86,7 @@ struct ConvertView: View {
             }
             Text("Converting: \(sourceFile?.absolutePath ?? "<none>")")
             
-                Text("Starting format: \(beginFormat.fileExtension ?? "<unknown>")")
+            Text("Starting format: \(beginFormat.fileExtension ?? "<unknown>")")
             
             VStack {
                 Text("Convert To:").font(.title2)
@@ -101,10 +101,10 @@ struct ConvertView: View {
                         .frame(height: 100.0)
                 }
             }.padding()
-                Button("Convert") {
-                    performConversion(overwriting: false)
-                    
-                }
+            Button("Convert") {
+                performConversion(overwriting: false)
+                
+            }
             
         }.padding()
             .frame(minWidth: 600, idealWidth: 600, minHeight: 400, idealHeight: 400)
@@ -151,7 +151,7 @@ struct ConvertView: View {
                 })
                 return true
             }
-            
+        
     }
     
     var resultFile: String? {
