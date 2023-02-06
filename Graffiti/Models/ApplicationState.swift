@@ -42,10 +42,24 @@ class ApplicationState: ObservableObject {
     @Published var editing: Bool = false
     @Published var isPresentingConfirm: Bool = false
     @Published var showingMoreInfo: Bool = false
+    @Published var showingOptions = true 
     
     @Published var showingHelp = false
     
     @Published var selectionModels: [AnySelectionModel] = []
+    
+    func reset() {
+        currentState = .StartScreen
+        isImporting = false
+        isConverting = false
+        isLoading = false
+        editing = false
+        isPresentingConfirm = false
+        showingMoreInfo = false
+        showingOptions = true
+        showingHelp = false
+        selectionModels = []
+    }
     
     
     func select(only object: Any) {

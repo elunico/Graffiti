@@ -30,7 +30,7 @@ struct ContentView: View {
     @EnvironmentObject var appState: ApplicationState
     @State var formatChoice: Format = .none
     @State var lazyChoice: Bool = false
-    @State var showingOptions: Bool = true
+//    @State var showingOptions: Bool = true
     @State var showingError: Bool = false
     @State var loadedFile: URL? = nil
     @State var directory: URL? = nil
@@ -86,8 +86,8 @@ struct ContentView: View {
                     .font(.title)
                 Button {
                     if directory != nil && formatChoice != .none {
-                        self.loadUserSelection {
-                            showingOptions = !$0
+                        self.loadUserSelection { [unowned appState] in
+                            appState.showingOptions = !$0
                         }
                     }
                 } label: {
@@ -122,8 +122,8 @@ struct ContentView: View {
                                 showingError = true
                             } else {
                                 showingError = false
-                                loadUserSelection {
-                                    showingOptions = !$0
+                                loadUserSelection { [unowned appState] in
+                                    appState.showingOptions = !$0
                                 }
                             }
                         }
@@ -138,7 +138,7 @@ struct ContentView: View {
     var body: some View {
         if appState.isLoading {
             ProgressView().progressViewStyle(CircularProgressViewStyle())
-        } else if showingOptions {
+        } else if appState.showingOptions {
             selectionView
                 .fileImporter(
                     isPresented: $appState.isImporting,
@@ -158,14 +158,18 @@ struct ContentView: View {
                         print(error.localizedDescription)
                     }
                 }
-                .onOpenURL(perform: { path in
+                .onOpenURL(perform: { [unowned appState] path in
                     appState.isLoading = true
                     appState.currentState = .Loading
                     loadDroppedFile(path)
                     
                 })
         } else {
-            MainView(choice: formatChoice, directory: self.directory, showOptions: { showingOptions = true; formatChoice = .none; })
+            MainView(choice: formatChoice, directory: self.directory, showOptions: { [unowned appState, unowned taggedDirectory] in
+                formatChoice = .none
+//                appState.reset()
+//                taggedDirectory.reset()
+            })
             
         }
         
@@ -232,12 +236,12 @@ struct ContentView: View {
                     if let f = format.fileExtension, url.pathExtension == f {
                         directory = url.deletingLastPathComponent()
                         formatChoice = format
-                        self.loadUserSelection { success in
+                        self.loadUserSelection { [unowned appState] success in
                             if success {
-                                showingOptions = false
+                                appState.showingOptions = false
                                 showingError = false
                             } else {
-                                showingOptions = true
+                                appState.showingOptions = true
                                 showingError = true
                             }
                         }

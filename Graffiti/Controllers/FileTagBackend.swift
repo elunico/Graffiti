@@ -40,7 +40,7 @@ class FileTagBackend: TagBackend {
     
     var writer: FileWriter
     var directory: URL
-    var dirty: Bool = false
+    var dirty: Bool = false 
     var filename: String?
     
     init(withFileName filename: String?, forFilesIn directory: URL, writer: FileWriter) throws {

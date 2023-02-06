@@ -308,6 +308,12 @@ struct MainView: View {
                 }
                 tagFileTable
                 HStack {
+                    Button("Choose Different Format") { [unowned appState] in
+                        self.teardown()
+                        appState.currentState = .StartScreen
+                        appState.showingOptions = true 
+                        showOptions()
+                    }
                     Spacer()
                     Text("\(files.files.count) files")
                     Divider().frame(height: 20)
@@ -353,7 +359,6 @@ struct MainView: View {
     
     func teardown() {
         self.files.commit()
-        self.files.files.removeAll(keepingCapacity: true)
         self.appState.releaseSelectionModel()
     }
 }

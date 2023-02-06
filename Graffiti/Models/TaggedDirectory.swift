@@ -60,6 +60,18 @@ class TaggedDirectory: ObservableObject, NSCopying {
     @Published private(set) var transactions: [TagTransaction] = []
     @Published private(set) var redoStack: [TagTransaction] = []
     
+    func reset() {
+        directory = ""
+        files = []
+        indexMap = [:]
+        
+        filterPredicate = TaggedDirectory.alwaysTrue
+        query = ""
+        
+        transactions = []
+        redoStack = []
+    }
+    
     private init() {
         self.directory = ""
         self.backend = XattrTagBackend()
@@ -72,8 +84,8 @@ class TaggedDirectory: ObservableObject, NSCopying {
     }
     
     func load(directory: String, filename: String? = nil, format: Format) throws {
-        self.files.removeAll()
         self.indexMap.removeAll()
+        self.files.removeAll()
         self.directory = directory
         guard let backend = try format.implementation(in: URL(fileURLWithPath: directory), withFileName: filename) else { return }
         self.backend = backend
@@ -93,7 +105,7 @@ class TaggedDirectory: ObservableObject, NSCopying {
     }
     
     func getFiles(withIDs ids: Set<String>) -> Set<TaggedFile> {
-        Set(ids.map { indexMap[$0] }.filter { $0 != nil }.map { files[$0!] })
+        return Set(ids.map { indexMap[$0] }.filter { $0 != nil }.map { files[$0!] })
     }
     
     var tagStore: String? {
@@ -161,11 +173,12 @@ class TaggedDirectory: ObservableObject, NSCopying {
     
     func commit() {
         backend.commit(files: files)
-        invalidateUndo()
     }
     
     func commit(files: [TaggedFile]) {
         backend.commit(files: files)
+        self.indexMap.removeAll()
+        self.files.removeAll(keepingCapacity: true)
         invalidateUndo()
     }
     
