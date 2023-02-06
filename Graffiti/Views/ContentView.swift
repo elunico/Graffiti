@@ -159,7 +159,6 @@ struct ContentView: View {
                     }
                 }
                 .onOpenURL(perform: { path in
-                    print(path)
                     appState.isLoading = true
                     appState.currentState = .Loading
                     loadDroppedFile(path)
@@ -228,6 +227,7 @@ struct ContentView: View {
                 formatChoice = .xattr
             } else {
                 loadedFile = url
+                var matchedImport = false
                 for format in Format.allCases {
                     if let f = format.fileExtension, url.pathExtension == f {
                         directory = url.deletingLastPathComponent()
@@ -241,8 +241,15 @@ struct ContentView: View {
                                 showingError = true
                             }
                         }
+                        matchedImport = true
                         break
                     }
+                }
+                if !matchedImport {
+                    errorString = "The selected file format is not a Tag Store File format"
+                    showingError = true
+                    appState.isLoading = false
+                    appState.currentState = .ShowingFileError
                 }
             }
         }
@@ -282,3 +289,4 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
+

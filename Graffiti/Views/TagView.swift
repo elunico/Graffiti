@@ -16,7 +16,6 @@ struct TagView: View {
     @EnvironmentObject var directory: TaggedDirectory
     @EnvironmentObject var appState: ApplicationState
     
-    var externalSelectionModel = AnySelectionModel()
     var prohibitedCharacters: Set<Character>
     var done: (Set<TaggedFile>) -> ()
     

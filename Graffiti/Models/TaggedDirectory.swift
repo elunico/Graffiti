@@ -75,7 +75,7 @@ class TaggedDirectory: ObservableObject, NSCopying {
         self.files.removeAll()
         self.indexMap.removeAll()
         self.directory = directory
-        guard let backend = try format.implementation(in: URL(fileURLWithPath: directory), withFileName: filename) else { print("Invalid"); return }
+        guard let backend = try format.implementation(in: URL(fileURLWithPath: directory), withFileName: filename) else { return }
         self.backend = backend
         let content = try getContentsOfDirectory(atPath: directory)
         var idx = 0

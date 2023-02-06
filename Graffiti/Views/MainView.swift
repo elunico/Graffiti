@@ -85,7 +85,7 @@ struct MainView: View {
                         TableRow(item)
                             .contextMenu {
                                 Group {
-                                    Button(action: {
+                                    Button(action: { [unowned appState] in
                                         if !selected.contains(item.id) {
                                             selected = Set([item.id])
                                         }
@@ -112,7 +112,7 @@ struct MainView: View {
                                     
                                     divider(forLayoutOrientation: .horizontally, measure: 25.0)
                                     
-                                    Button(action:  {
+                                    Button(action:  { [unowned appState] in
                                         if !selected.contains(item.id) {
                                             selected = Set([item.id])
                                         }
@@ -194,7 +194,7 @@ struct MainView: View {
             HStack {
                 Group {
                     HStack {
-                        Button(action: {
+                        Button(action: { [unowned files] in
                             files.undo()
                         }, label: {
                             Label("Undo", systemImage: "arrow.uturn.backward")
@@ -202,7 +202,7 @@ struct MainView: View {
                             .keyboardShortcut("z", modifiers: [.command])
                             .help("Undo")
                         
-                        Button(action: {
+                        Button(action: { [unowned files] in
                             files.redo()
                         }, label: {
                             Label("Redo", systemImage: "arrow.uturn.forward")
@@ -213,7 +213,7 @@ struct MainView: View {
                     
                     divider(forLayoutOrientation: .horizontally, measure: 25.0)
                     
-                    Button(action: {
+                    Button(action: { [unowned appState] in
                         appState.editing = true
                         appState.currentState = .EditingTags
                     }, label: {
@@ -223,7 +223,7 @@ struct MainView: View {
                         .keyboardShortcut(.return, modifiers: [])
                         .help("Edit Tags of \(name)")
                     
-                    Button(action:  {
+                    Button(action:  { [unowned files] in
                         guard let path = directory?.absolutePath else { return }
                         
                         if !NSWorkspace.shared.selectFile(files.getFile(withID: selected.first!)!.id, inFileViewerRootedAtPath: path) {
@@ -234,7 +234,7 @@ struct MainView: View {
                     .disabled(selected.count != 1)
                     .help("Reveal \(name) in Finder")
                     
-                    Button(action:  {
+                    Button(action:  { [unowned files] in
                         for item in files.getFiles(withIDs: selected) {
                             NSWorkspace.shared.open(item.absoluteURL)
                         }
@@ -245,7 +245,7 @@ struct MainView: View {
                     
                     divider(forLayoutOrientation: .horizontally, measure: 25.0)
                     
-                    Button(action:  {
+                    Button(action:  { [unowned appState] in
                         appState.isPresentingConfirm = true
                         appState.currentState = .ShowingConfirm
                     }, label: { Label("Clear All Tags for \(name)", systemImage: "clear") })
@@ -254,7 +254,7 @@ struct MainView: View {
                     
                     divider(forLayoutOrientation: .horizontally, measure: 25.0)
                     
-                    Button {
+                    Button { [unowned files] in
                         guard selected.count > 0 else { return }
                         self.selectedFileURLs = files.getFiles(withIDs: selected).map { URL(fileURLWithPath: $0.id) }
                         self.selectedFileURL = URL(fileURLWithPath: files.getFile(withID: selected.first!)!.id)
@@ -266,7 +266,7 @@ struct MainView: View {
                 }
             }
             TextField("Search", text: $query)
-                .onChange(of: query, perform: { _ in
+                .onChange(of: query, perform: { [unowned files] _ in
                     
                     currentFileList = files.filter(by: query)
                     var noLongerSeen = selected
@@ -296,7 +296,7 @@ struct MainView: View {
                             Spacer()
                             Toggle("Spotlight File Kinds", isOn: $richKind)
                                 .onChange(of: richKind, perform: { _ in
-                                    UserDefaults.this?.set(richKind, forKey: MainView.kUserDefaultsRichKindKey)
+                                    UserDefaults.thisAppDomain?.set(richKind, forKey: MainView.kUserDefaultsRichKindKey)
                                 })
                             
                         }
@@ -315,7 +315,7 @@ struct MainView: View {
                 }
                 
             }
-            .onClearAll(message: (selected.count == 0 ? "This will remove EVERY tag from EVERY file currently in view in the table" : "This will remove EVERY tag from every SELECTED file in the table") + "\nYou cannot undo this action", isPresented: $appState.isPresentingConfirm, clearAction: {
+            .onClearAll(message: (selected.count == 0 ? "This will remove EVERY tag from EVERY file currently in view in the table" : "This will remove EVERY tag from every SELECTED file in the table") + "\nYou cannot undo this action", isPresented: $appState.isPresentingConfirm, clearAction: { [unowned files] in
                 if selected.count == 0 {
                     for file in files.filter(by: query) {
                         file.clearTags()
@@ -340,13 +340,13 @@ struct MainView: View {
         .padding()
         .navigationTitle("\(directory!.prettyPrinted) – \(files.files.count) files – \(files.files.map { $0.tags.count }.reduce(0, +)) - tags")
         .navigationDocument(directory!)
-        .onAppear {
+        .onAppear { [unowned files] in
             guard let path = self.directory?.absolutePath else { return }
             DispatchQueue.main.async {
                 try! self.files.load(directory: path, format: choice)
                 currentFileList = files.filter(by: query)
             }
-            richKind = UserDefaults.this?.bool(forKey: MainView.kUserDefaultsRichKindKey) ?? false
+            richKind = UserDefaults.thisAppDomain?.bool(forKey: MainView.kUserDefaultsRichKindKey) ?? false
             appState.createSelectionModel()
         }
     }

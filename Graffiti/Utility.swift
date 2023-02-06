@@ -17,14 +17,8 @@ extension Optional: AnyOptional {
     var asOptional: Optional<Wrapped> { self }
 }
 
-extension Array where Element: AnyOptional {
-    func droppingNils() -> [Element.Element] {
-        self.map { $0.asOptional }.filter { $0 != nil }.map { $0! }
-    }
-}
-
 extension UserDefaults {
-    static var this: UserDefaults? {
+    static var thisAppDomain: UserDefaults? {
         UserDefaults(suiteName: "com.tom.graffiti")
     }
 }
@@ -88,9 +82,29 @@ enum FileError: Error {
 }
 
 fileprivate var didRequestPermission: Set<String> = []
+fileprivate var bookmarks: [URL: Data] = [:]
+var bookmarksPath = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.applicationSupportDirectory, .userDomainMask, true).first!
 
-func getSandboxedAccess<R>(to directory: String, thenPerform action: (String) throws -> (R)) rethrows -> R {
+@discardableResult
+func saveBookmark(of url: URL) throws -> Bool {
+    let data = try url.bookmarkData(options: .withSecurityScope, includingResourceValuesForKeys: nil, relativeTo: nil)
+    bookmarks[url] = data
+    return NSKeyedArchiver.archiveRootObject(bookmarks, toFile: bookmarksPath)
+}
+
+func accessBookmark(of url: URL) throws -> URL? {
+    guard let bookmarks = NSKeyedUnarchiver.unarchiveObject(withFile: bookmarksPath) as? [URL: Data] else { return nil }
+    guard let data = bookmarks[url] else { return nil }
+    var isStale = false
+    let newURL = try URL(resolvingBookmarkData: data, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &isStale)
+    return newURL
+}
+
+func getSandboxedAccess<R>(to directory: String, thenPerform action: (String) throws -> (R)) throws -> R {
     do {
+        let bookmarkedURL = try accessBookmark(of: URL(fileURLWithPath: directory))
+        defer { bookmarkedURL?.stopAccessingSecurityScopedResource() }
+        bookmarkedURL?.startAccessingSecurityScopedResource()
         return try action(directory)
     } catch _ where !didRequestPermission.contains(directory) {
         
@@ -102,6 +116,7 @@ func getSandboxedAccess<R>(to directory: String, thenPerform action: (String) th
         let response = panel.runModal()
         // TODO: save bookmark so permissions is only requested once
         if response == NSApplication.ModalResponse.OK {
+            try saveBookmark(of: panel.url!)
             didRequestPermission.insert(directory)
             return try action(panel.url!.absolutePath)
         }

@@ -17,17 +17,17 @@ class TaggedFile: ObservableObject, NSCopying {
     let parent: String
     let filename: String
     let isDirectory: Bool
-    private let backend: TagBackend
+    private weak var backend: TagBackend?
     @Published var tags: Set<Tag> = Set()
     
-    convenience init(atPath path: String, backend: TagBackend) {
+    convenience init(atPath path: String, backend: TagBackend?) {
         var components = path.components(separatedBy: "/")
         let filename = components.removeLast()
         let parent = components.joined(separator: "/")
         self.init(parent: parent, filename: filename, backend: backend)
     }
     
-    init(parent: String, filename: String, backend: TagBackend = XattrTagBackend()) {
+    init(parent: String, filename: String, backend: TagBackend? = XattrTagBackend()) {
         self.parent = parent
         self.filename = filename
         var b: ObjCBool = false
@@ -37,23 +37,23 @@ class TaggedFile: ObservableObject, NSCopying {
             self.isDirectory = false 
         }
         self.backend = backend
-        let attrs = backend.loadTags(at: "\(parent)\(filename)")
-        self.tags = attrs 
+        let attrs = backend?.loadTags(at: "\(parent)\(filename)")
+        self.tags = attrs ?? []
     }
     
     func addTag(_ tag: Tag) {
         tags.insert(tag)
-        backend.addTag(tag, to: self)
+        backend?.addTag(tag, to: self)
     }
 
     func removeTag(withID id: Tag.ID) {
         guard let idx = tags.firstIndex(where: { $0.id == id }) else { return }
         tags.remove(at: idx)
-        backend.removeTag(withID: id, from: self)
+        backend?.removeTag(withID: id, from: self)
     }
     
     func clearTags() {
-        backend.clearTags(of: self)
+        backend?.clearTags(of: self)
         tags.removeAll()
     }
 }

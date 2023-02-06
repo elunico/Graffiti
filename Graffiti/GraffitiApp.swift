@@ -30,7 +30,7 @@ struct GraffitiApp: App {
     
     func openFiles() {
         
-        if let files = appState.selectionModels.last?.selectedItems.map({ $0 as? TaggedFile.ID }).droppingNils() {
+        if let files = appState.selectionModels.last?.selectedItems.compactMap({ $0 as? TaggedFile.ID }) {
             for file in files {
                 NSWorkspace.shared.open(URL(fileURLWithPath: file))
             }
@@ -38,7 +38,7 @@ struct GraffitiApp: App {
     }
     
     func revealFiles() {
-        if let file = appState.selectionModels.last?.selectedItems.map({ $0 as? TaggedFile.ID }).droppingNils().first {
+        if let file = appState.selectionModels.last?.selectedItems.compactMap({ $0 as? TaggedFile.ID }).first {
             if !NSWorkspace.shared.selectFile(file, inFileViewerRootedAtPath: (file as NSString).deletingLastPathComponent) {
                 NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: (file as NSString).deletingLastPathComponent)
             }

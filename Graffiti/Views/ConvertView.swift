@@ -67,7 +67,7 @@ struct ConvertView: View {
             
             Button("Choose a file") {
                 let folderPicker = NSOpenPanel()
-                let cases = Format.allCases.map { $0.contentType }.droppingNils()
+                let cases = Format.allCases.compactMap { $0.contentType }
                 folderPicker.canChooseDirectories = false
                 folderPicker.canChooseFiles = true
                 folderPicker.allowedContentTypes = cases
@@ -95,7 +95,6 @@ struct ConvertView: View {
                         .removing(formatOption: .xattr)
                         .removing(formatOption: Format.none)
                         .removing(formatOption: beginFormat)
-                        .onChange(of: endFormat, perform: { print($0) })
                 } else {
                     Text("Choose a file to begin")
                         .frame(height: 100.0)
@@ -120,7 +119,7 @@ struct ConvertView: View {
             .sheet(isPresented: $showingSuccess, content: {
                 VStack {
                     Text("Done!").font(.title)
-                    ({() -> Text in print(endFormat); return Text("")})()
+                    ({() -> Text in return Text("")})()
                     
                     Text("Successfully converted \n\(sourceFile?.absolutePath ?? "???") \nto \n\(resultFile ?? "???")")
                     Button("Done") {

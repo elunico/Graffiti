@@ -5,7 +5,7 @@
 //  Created by Thomas Povinelli on 1/28/23.
 //
 
-import Foundation
+import Cocoa
 
 enum AppState : Equatable {
     case StartScreen
@@ -27,15 +27,17 @@ class AnySelectionModel: ObservableObject {
 
 class ApplicationState: ObservableObject {
     
-    @Published var currentState: AppState = .StartScreen {
+    @Published var currentState: AppState = .StartScreen
+    
+    @Published var isImporting: Bool = false
+    @Published var isConverting: Bool = false
+    @Published var isLoading: Bool = false {
         didSet {
-            print(currentState)
+            if !isLoading {
+                NSApplication.shared.requestUserAttention(.informationalRequest)
+            }
         }
     }
-    
-    @Published var isImporting: Bool = false 
-    @Published var isConverting: Bool = false
-    @Published var isLoading: Bool = false
     
     @Published var editing: Bool = false
     @Published var isPresentingConfirm: Bool = false
@@ -82,8 +84,8 @@ class ApplicationState: ObservableObject {
         selectionModels.popLast()
     }
     
-//    @Published var showingError: Bool = false
-//    @Published var showingSuccess: Bool = false
-//    @Published var showingConfirmOverwrite: Bool = false
-
+    //    @Published var showingError: Bool = false
+    //    @Published var showingSuccess: Bool = false
+    //    @Published var showingConfirmOverwrite: Bool = false
+    
 }
