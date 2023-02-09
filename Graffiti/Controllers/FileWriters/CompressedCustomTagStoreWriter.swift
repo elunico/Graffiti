@@ -49,7 +49,7 @@ extension Data.Iterator {
         var d = Data()
         for _ in 0..<n {
             guard let v = next() else { return nil }
-            d.append(contentsOf: [v])
+            d.append(v)
         }
         return d
     }
@@ -82,11 +82,11 @@ extension Version {
 /// 2 bytes for patch version
 /// 4 bytes number of files in store
 /// ---
-///   2 bytes path length
+///   4 bytes path length
 ///   variable path to file
-///   2 bytes number of tags
+///   4 bytes number of tags
 ///   ----
-///     2 bytes tag length
+///     4 bytes tag length
 ///     variable tag bytes
 ///   ---- repeats indefinitely
 /// --- Repeats until EOF
@@ -95,7 +95,7 @@ class CompressedCustomTagStoreWriter: FileWriter {
     static let fileExtension: String = ".ccts"
 
     
-    func loadFrom(path: String) throws -> TagStore {
+    func loadFrom(path: String)  throws -> TagStore {
         var retValue: [String: Set<Tag>] = [:]
         var isDir: ObjCBool = false
         
@@ -135,7 +135,7 @@ class CompressedCustomTagStoreWriter: FileWriter {
         guard let totalFiles = iter.nextBEInt() else { throw FileWriterError.InvalidFileFormat }
         
         for _ in 0..<totalFiles {
-            guard let pathLength = iter.nextBEInt16(), let pathData = iter.next(Int(pathLength)), let path = String(data: pathData, encoding: .utf8) else {
+            guard let pathLength = iter.nextBEInt(), let pathData = iter.next(Int(pathLength)), let path = String(data: pathData, encoding: .utf8) else {
                 os_log("%s", log: .default, type: .error, "Invalid path length")
 
                 throw FileWriterError.InvalidFileFormat
@@ -146,11 +146,13 @@ class CompressedCustomTagStoreWriter: FileWriter {
                 throw FileWriterError.InvalidFileFormat
             }
             for _ in 0..<tagCount {
-                guard let tagLen = iter.nextBEInt16(), let tagData = iter.next(Int(tagLen)), let tag = String(data: tagData, encoding: .utf8) else {
+                // TODO: store the recognized text and flag
+                guard let tagLen = iter.nextBEInt(), let tagData = iter.next(Int(tagLen)) else {
                     os_log("%s", log: .default, type: .error, "Invalid tag length")
                     throw FileWriterError.InvalidFileFormat
                 }
-                retValue[path]!.insert(Tag(value: tag))
+                let tag = try  Tag.deserialize(from: tagData, imageFormat: .url)
+                retValue[path]!.insert(tag)
             }
         }
         
@@ -166,12 +168,13 @@ class CompressedCustomTagStoreWriter: FileWriter {
         
         for (path, tags) in store.tagData {
             let pdata = path.data(using: .utf8)!
-            data.append(pdata.count.bigEndianBytes.last(2))
+            data.append(pdata.count.bigEndianBytes)
             data.append(pdata)
             data.append(tags.count.bigEndianBytes)
             for tag in tags {
-                let tdata = tag.value.data(using: .utf8)!
-                data.append(tdata.count.bigEndianBytes.last(2))
+//                let tdata = tag.value.data(using: .utf8)!
+                let tdata = try! tag.serializeToData(imageFormat: .url)
+                data.append(tdata.count.bigEndianBytes)
                 data.append(tdata)
             }
         }

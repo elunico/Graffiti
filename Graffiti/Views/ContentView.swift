@@ -183,7 +183,7 @@ struct ContentView: View {
             let filename = loadedFile == nil ? nil : NSString(string: loadedFile!.lastPathComponent).deletingPathExtension
             
             do {
-                try taggedDirectory.load(directory: dir.absolutePath, filename: filename, format: formatChoice)
+                try  taggedDirectory.load(directory: dir.absolutePath, filename: filename, format: formatChoice)
                 appState.isLoading = false
                 showingError = false
                 appState.currentState = .MainView(hasSelection: false)
@@ -212,7 +212,8 @@ struct ContentView: View {
                 appState.isLoading = false
                 appState.currentState = .ShowingFileError
                 completed(false)
-            } catch {
+            } catch let error {
+                print(error)
                 errorString = "An unknown error occurred"
                 showingError = true
                 appState.isLoading = false
@@ -284,6 +285,27 @@ func selectFolder(callback: @escaping ([URL]) -> ()) {
     folderPicker.begin { response in
         if response == .OK {
             callback(folderPicker.urls)
+        }
+    }
+}
+
+func selectFile(ofTypes types: [UTType], callback: @escaping ([URL]) -> ()) {
+    
+    let folderChooserPoint = CGPoint(x: 0, y: 0)
+    let folderChooserSize = CGSize(width: 500, height: 600)
+    let folderChooserRectangle = CGRect(origin: folderChooserPoint, size: folderChooserSize)
+    let filePicker = NSOpenPanel(contentRect: folderChooserRectangle, styleMask: .utilityWindow, backing: .buffered, defer: true)
+    
+    filePicker.canChooseDirectories = false
+    filePicker.canChooseFiles = true
+    filePicker.allowsMultipleSelection = false
+    filePicker.canDownloadUbiquitousContents = true
+    filePicker.canResolveUbiquitousConflicts = true
+    filePicker.allowedContentTypes = types
+    
+    filePicker.begin { response in
+        if response == .OK {
+            callback(filePicker.urls)
         }
     }
 }

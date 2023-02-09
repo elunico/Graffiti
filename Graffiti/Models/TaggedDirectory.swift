@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import Vision
+import AppKit
 
 class Sorter: SortComparator {
     typealias Compared = TaggedFile
@@ -60,6 +62,16 @@ class TaggedDirectory: ObservableObject, NSCopying {
     @Published private(set) var transactions: [TagTransaction] = []
     @Published private(set) var redoStack: [TagTransaction] = []
     
+    @Published var doTextRecognition: Bool = true {
+        didSet {
+            if doTextRecognition {
+                recognizeText()
+            } else {
+                files.forEach { file in backend.removeTagText(from: file) }
+            }
+        }
+    }
+    
     func reset() {
         directory = ""
         files = []
@@ -83,13 +95,15 @@ class TaggedDirectory: ObservableObject, NSCopying {
         objectWillChange.send()
     }
     
-    func load(directory: String, filename: String? = nil, format: Format) throws {
+    
+    func load(directory: String, filename: String? = nil, format: Format, doTextRecognition: Bool = true)  throws {
         self.indexMap.removeAll()
         self.files.removeAll()
         self.directory = directory
+        self.doTextRecognition = doTextRecognition
         guard let backend = try format.implementation(in: URL(fileURLWithPath: directory), withFileName: filename) else { return }
         self.backend = backend
-        let content = try getContentsOfDirectory(atPath: directory)
+        let content = try  getContentsOfDirectory(atPath: directory)
         var idx = 0
         for file in content {
             let tf = TaggedFile(parent: directory, filename: file, backend: backend)
@@ -97,7 +111,54 @@ class TaggedDirectory: ObservableObject, NSCopying {
             indexMap[tf.id] = idx
             idx += 1
         }
+        if doTextRecognition {
+            recognizeText()
+        }
     }
+    
+    func recognizeText() {
+        if !doTextRecognition { return }
+        DispatchQueue.global(qos: .background).async {
+            for file in self.files {
+                for tag in file.tags where tag.recoginitionState == .uninitialized {
+                    guard let imageURL = tag.image else { return }
+                    tag.recoginitionState = .started
+                    
+                    guard let cgImage = NSImage(byReferencing: imageURL).cgImage(forProposedRect: nil, context: nil , hints: nil) else { return }
+
+                    // Create a new image-request handler.
+                    let requestHandler = VNImageRequestHandler(cgImage: cgImage)
+
+                    // Create a new request to recognize text.
+                    let request = VNRecognizeTextRequest(completionHandler: {(request: VNRequest, error: Error?) in
+                        guard let observations =
+                                request.results as? [VNRecognizedTextObservation] else {
+                            return
+                        }
+                        let recognizedStrings = observations.compactMap { observation in
+                            // Return the string of the top VNRecognizedText instance.
+                            return observation.topCandidates(1).first?.string
+                        }
+                        
+                        // Process the recognized strings.
+                        tag.imageTextContent.content.append(contentsOf: recognizedStrings)
+                        print(recognizedStrings)
+                        tag.recoginitionState = .recognized
+                    })
+
+                    do {
+                        // Perform the text-recognition request.
+                        try requestHandler.perform([request])
+                    } catch {
+                        print("Unable to perform the requests: \(error).")
+                    }
+                }
+            }
+            
+        }
+    }
+    
+    
     
     func getFile(withID id: String) -> TaggedFile? {
         guard let index = indexMap[id] else { return nil }
@@ -116,6 +177,7 @@ class TaggedDirectory: ObservableObject, NSCopying {
         transactions.append(AddTagToManyFilesTransaction(backend: backend, tag: tag, files: files))
         transactions.last?.perform()
         invalidateRedo()
+        recognizeText()
     }
     
     func addTag(_ tag: Tag, to file: TaggedFile) {
@@ -123,18 +185,21 @@ class TaggedDirectory: ObservableObject, NSCopying {
         transactions.append(AddTagTransaction(backend: backend, tag: tag, file: file))
         transactions.last?.perform()
         invalidateRedo()
+        recognizeText()
     }
+    
     
     func removeTag(withID id: Tag.ID, from file: TaggedFile) {
 //        backend.removeTag(withID: id, from: file)
-        transactions.append(RemoveTagTransaction(backend: backend, tag: Tag(value: id), file: file))
+        transactions.append(RemoveTagTransaction(backend: backend, tag: Tag.tag(fromID: id)!, file: file))
         transactions.last?.perform()
         invalidateRedo()
     }
     
+    
     func removeTag(withID id: Tag.ID, fromAll files: [TaggedFile]) {
 //        backend.removeTag(withID: id, from: file)
-        transactions.append(RemoveTagFromManyFilesTransaction(backend: backend, tag: Tag(value: id), files: files))
+        transactions.append(RemoveTagFromManyFilesTransaction(backend: backend, tag: Tag.tag(fromID: id)!, files: files)) 
         transactions.last?.perform()
         invalidateRedo()
     }
@@ -207,7 +272,7 @@ extension TaggedDirectory {
                     conjunction in conjunction.allSatisfy {
                         text in
                         let substr = text[text.index(after: text.startIndex)...]
-                        return (text.hasPrefix("!") && !file.tagString.localizedCaseInsensitiveContains(substr) && !file.filename.localizedCaseInsensitiveContains(substr)) || (!text.hasPrefix("!") && ((file.tagString.localizedCaseInsensitiveContains(text) || file.filename.localizedCaseInsensitiveContains(text))))
+                        return (text.hasPrefix("!") && !file.searchableMetadataString.localizedCaseInsensitiveContains(substr) && !file.filename.localizedCaseInsensitiveContains(substr)) || (!text.hasPrefix("!") && ((file.searchableMetadataString.localizedCaseInsensitiveContains(text) || file.filename.localizedCaseInsensitiveContains(text))))
                     }
                 }
             }

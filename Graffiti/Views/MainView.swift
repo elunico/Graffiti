@@ -21,9 +21,9 @@ struct MainView: View {
     @State private var selected: Set<TaggedFile.ID> = Set()
     @State private var query: String = ""
     
-//    @State private var editing: Bool = false
-//    @State private var isPresentingConfirm: Bool = false
-//    @State private var showingMoreInfo: Bool = false
+    //    @State private var editing: Bool = false
+    //    @State private var isPresentingConfirm: Bool = false
+    //    @State private var showingMoreInfo: Bool = false
     
     @State private var selectedFileURLs: [URL] = []
     @State private var selectedFileURL: URL? = nil
@@ -33,7 +33,7 @@ struct MainView: View {
     @State private var currentFileList: [TaggedFile] = []
     
     var showOptions: () -> ()
-        
+    
     enum Orientation {
         case horizontally, vertically
     }
@@ -80,6 +80,7 @@ struct MainView: View {
                     TableColumn("Count") { item in
                         Text(item.tagCount)
                     }.width(ideal: tableGeometry.size.width / 15)
+                    
                 }, rows: {
                     ForEach(currentFileList) { item in
                         TableRow(item)
@@ -105,7 +106,7 @@ struct MainView: View {
                                     }, label: { Label("Reveal \(item.filename) in Finder", systemImage: "folder.badge.questionmark") })
                                     
                                     Button(action:  {
-//                                        NSWorkspace.shared.openFile(item.id)
+                                        //                                        NSWorkspace.shared.openFile(item.id)
                                         NSWorkspace.shared.open(item.absoluteURL)
                                         
                                     }, label: { Label("Open \((selected.contains(item.id) && selected.count > 1) ? "\(selected.count) items" : item.filename)" , systemImage: "doc.viewfinder") })
@@ -311,7 +312,7 @@ struct MainView: View {
                     Button("Choose Different Format") { [unowned appState] in
                         self.teardown()
                         appState.currentState = .StartScreen
-                        appState.showingOptions = true 
+                        appState.showingOptions = true
                         showOptions()
                     }
                     Spacer()
@@ -339,6 +340,9 @@ struct MainView: View {
         .toolbar(content: {
             MainToolbar()
         })
+        .onChange(of: appState.doTextRecognition, perform: { recognize in
+            files.doTextRecognition = recognize
+        })
         .quickLookPreview($selectedFileURL, in: selectedFileURLs)
         .onDisappear(perform: self.teardown)
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification), perform: {output in self.teardown()})
@@ -348,10 +352,10 @@ struct MainView: View {
         .navigationDocument(directory!)
         .onAppear { [unowned files] in
             guard let path = self.directory?.absolutePath else { return }
-            DispatchQueue.main.async {
-                try! self.files.load(directory: path, format: choice)
-                currentFileList = files.filter(by: query)
-            }
+            
+            try! self.files.load(directory: path, format: choice)
+            currentFileList = files.filter(by: query)
+            
             richKind = UserDefaults.thisAppDomain?.bool(forKey: MainView.kUserDefaultsRichKindKey) ?? false
             appState.createSelectionModel()
         }

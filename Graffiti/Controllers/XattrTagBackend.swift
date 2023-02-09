@@ -8,7 +8,11 @@
 import Foundation
 
 
-class XattrTagBackend: TagBackend {    
+class XattrTagBackend: TagBackend {
+    func removeTagText(from: TaggedFile) {
+        fatalError("Not implemented")
+    }
+    
     func copy(with zone: NSZone? = nil) -> Any {
         return XattrTagBackend(deliminator: delimiter)
     }
@@ -29,7 +33,7 @@ class XattrTagBackend: TagBackend {
     }
     
     func addTag(_ tag: Tag, to file: TaggedFile) {
-        XattrBridge.appendXAttrAttribute(forFile: "\(file.parent)\(file.filename)", valueOf: tag.value , withKey: XattrTagBackend.kXattrDomain, delimitedBy: delimiter, andError: nil)
+        XattrBridge.appendXAttrAttribute(forFile: "\(file.parent)\(file.filename)", valueOf: (NSData(data: try! tag.serializeToData(imageFormat: .url)).base64EncodedString()) , withKey: XattrTagBackend.kXattrDomain, delimitedBy: delimiter, andError: nil)
     }
     
     func removeTag(withID id: Tag.ID, from file: TaggedFile) {
@@ -38,7 +42,9 @@ class XattrTagBackend: TagBackend {
     }
     
     func loadTags(at path: String) -> Set<Tag> {
-        Set(XattrBridge.getXAttrAttributes(forFile: path, withKey: XattrTagBackend.kXattrDomain, delimitedBy: delimiter, andError: nil).map { $0 as? String }.filter { $0 != nil && $0?.isEmpty != true }.map { Tag(value: $0!) })
+
+        Set(XattrBridge.getXAttrAttributes(forFile: path, withKey: XattrTagBackend.kXattrDomain, delimitedBy: delimiter, andError: nil).map { $0 as? String }.filter { $0 != nil && $0?.isEmpty != true }.map {  try! Tag.deserialize(from: NSData(base64Encoded: $0!)! as Data, imageFormat: .url) })
+        return []
     }
     
     func clearTags(of file: TaggedFile) {

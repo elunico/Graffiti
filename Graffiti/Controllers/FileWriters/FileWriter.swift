@@ -19,7 +19,7 @@ protocol FileWriter {
     var fileProhibitedCharacters: Set<Character> { get }
     
     /// The String keys of the return value are file paths
-    func loadFrom(path: String) throws -> TagStore
+    func loadFrom(path: String)  throws -> TagStore
     
     /// The String keys of the second argument are file paths
     func saveTo(path: String, store: TagStore)
@@ -52,8 +52,9 @@ extension FileWriter {
     }
 }
 
-func convert(file url: URL, isUsing currentWriter: FileWriter, willUse futureWriter: FileWriter) throws {
-    let data = try currentWriter.loadFrom(path: url.absolutePath)
+// TODO: fix plist, csv, and json to have image attributes and recognized text
+func convert(file url: URL, isUsing currentWriter: FileWriter, willUse futureWriter: FileWriter)  throws {
+    let data = try  currentWriter.loadFrom(path: url.absolutePath)
     let path = url.deletingPathExtension().appendingPathExtension(String(type(of: futureWriter).fileExtension.trimmingPrefix(/\./))).absolutePath
-    try getSandboxedAccess(to: path, thenPerform: {futureWriter.saveTo(path: $0, store: data)})
+     try  getSandboxedAccess(to: path, thenPerform: {futureWriter.saveTo(path: $0, store: data)})
 }

@@ -18,14 +18,16 @@ class FileTagBackend: TagBackend {
     private var lastAccessTime: Date? = nil
     private var cachedData: [String: Set<Tag>] = [:]
     
-    func reloadData() throws {
-        try getSandboxedAccess(to: directory.absolutePath, thenPerform: { path in
-            let intermediate = try writer.loadFrom(path: saveFile)
+    func reloadData()  throws {
+        
+        try  getSandboxedAccess(to: directory.absolutePath, thenPerform: { path in
+            let intermediate = try  writer.loadFrom(path: saveFile)
             let data = intermediate.tagData
             for (p, tags) in data {
                 cachedData[p] = tags
             }
         })
+        
         
     }
     
@@ -40,7 +42,7 @@ class FileTagBackend: TagBackend {
     
     var writer: FileWriter
     var directory: URL
-    var dirty: Bool = false 
+    var dirty: Bool = false
     var filename: String?
     
     init(withFileName filename: String?, forFilesIn directory: URL, writer: FileWriter) throws {
@@ -48,6 +50,12 @@ class FileTagBackend: TagBackend {
         self.writer = writer
         self.filename = filename
         try self.reloadData()
+        
+    }
+    
+    func removeTagText(from file: TaggedFile) {
+        dirty = true 
+        file.tags.forEach { $0.imageTextContent.content.removeAll(); $0.recoginitionState = .uninitialized }
     }
     
     func addTag(_ tag: Tag, to file: TaggedFile) {
@@ -60,7 +68,7 @@ class FileTagBackend: TagBackend {
         dirty = true
         file.tags.remove(t)
     }
-
+    
     func clearTags(of file: TaggedFile) {
         dirty = true
         file.tags.removeAll()
@@ -75,7 +83,7 @@ class FileTagBackend: TagBackend {
             let path = saveFile
             let tags = Dictionary(uniqueKeysWithValues: files.map { ($0.id, $0.tags) })
             writer.saveTo(path: path, store: TagStore(tagData: tags))
-            dirty = false 
+            dirty = false
         }
     }
     

@@ -17,7 +17,7 @@ class PreviewViewController: NSViewController, QLPreviewingController {
     @IBOutlet var dirLabel: NSTextField!
     
     @IBOutlet weak var table: NSTableView!
-        
+    
     override var nibName: NSNib.Name? {
         return NSNib.Name("PreviewViewController")
     }
@@ -32,10 +32,12 @@ class PreviewViewController: NSViewController, QLPreviewingController {
     
     func preparePreviewOfFile(at url: URL, completionHandler handler: @escaping (Error?) -> Void) {
         dirLabel.stringValue = url.absolutePath
-        data = try? CompressedCustomTagStoreWriter().loadFrom(path: url.absolutePath).tagData.map { (key, value) in (key, value) }
+        
+        data = try?  CompressedCustomTagStoreWriter().loadFrom(path: url.absolutePath).tagData.map { (key, value) in (key, value) }
         table.reloadData()
         handler(nil)
     }
+    
     
 }
 
@@ -73,7 +75,7 @@ extension PreviewViewController: NSTableViewDelegate {
     
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         
-    
+        
         guard let item = data?[row] else {
             return nil
         }
@@ -87,7 +89,7 @@ extension PreviewViewController: NSTableViewDelegate {
                     case 1:
                         return (item.0 as NSString).pathExtension
                     case 2:
-                        return item.1.map{ $0.value }.joined(separator: ", ")
+                        return item.1.map{ $0.description }.joined(separator: ", ")
                     case 3:
                         return item.1.count.description
                     default:
@@ -95,7 +97,7 @@ extension PreviewViewController: NSTableViewDelegate {
                     } })()
                     return cell
                 }
-                break 
+                break
             }
         }
         

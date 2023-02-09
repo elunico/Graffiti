@@ -107,6 +107,10 @@ struct GraffitiApp: App {
             
         }).keyboardShortcut("0")
         
+        Settings {
+            SettingsView().environmentObject(appState)
+        }
+        
         Window("Convert a Tag Store File", id: "convertwindow", content: {
             ConvertView()
         }).keyboardShortcut("1")

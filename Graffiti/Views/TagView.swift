@@ -13,16 +13,44 @@ struct TagView: View {
     @State var selected: Tag.ID?
     @State var currentTag: String = ""
     @State var showingHelp = false
+    @State var isDroppingImage = false
+    @State var imageHovering = false
+    @State var tagImage: URL? = nil
+    @State var qlPreviewLink: URL? = nil
+    @State var selectedView: ViewSelection = .text
     @EnvironmentObject var directory: TaggedDirectory
     @EnvironmentObject var appState: ApplicationState
     
     var prohibitedCharacters: Set<Character>
     var done: (Set<TaggedFile>) -> ()
     
-    func performDelete() {
+    enum ViewSelection: Hashable {
+        case text
+        case image
+    }
+    
+    func performDelete()  {
         guard let index = selected else { return }
-        let tag = Tag(value: index)
-        directory.removeTag(withID: index, fromAll: files.filter { $0.tags.contains(tag) })
+        print("index \(index)")
+        let tag =  Tag.tag(fromID: index)!
+        print(tag.id)
+        files.forEach { file in print(file.tags.map {$0.id})}
+        let f = files.filter { $0.tags.contains(tag) }.map { $0 }
+        print(f)
+        directory.removeTag(withID: index, fromAll: f)
+    }
+    
+    func setImage(toURL url: URL) {
+        tagImage = url
+    }
+    
+    func imageOfFile(_ url: URL) -> Image {
+        if let tagImage, FileManager.default.fileExists(atPath: tagImage.absolutePath) {
+            return Image(nsImage:  NSImage(byReferencing: tagImage))
+        } else {
+            return Image(systemName: "exclamationmark.triangle")
+        }
+        
     }
     
     var body: some View {
@@ -42,16 +70,103 @@ struct TagView: View {
                 }
                 
                 Table(files.map { $0.tags }.flatten().unique(), selection: $selected, columns: {
-                    TableColumn("Tag", value: \Tag.value)
+                    TableColumn("Tag") { item in
+                        if item.image != nil {
+                            HStack {
+//                                Image(nsImage: NSImage(byReferencing: item.image!))
+                                imageOfFile(item.image!)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 150, height: 75, alignment: .center)
+                                Spacer()
+                                Button {
+                                    if let selected, selected.tagIDTypePrefix == "IU" {
+                                        qlPreviewLink = URL(string: String(selected.tagIDContent))
+                                    }
+                                } label: {
+                                    Image(systemName: "eye")
+                                }
+                                    
+                            }
+                        } else {
+                            Text(item.value)
+                        }
+                    }
                 }).onDeleteCommand(perform: self.performDelete)
                 
                 
-                TextField("Add Tag", text: $currentTag, prompt: Text("Tag"))
-                    .onChange(of: currentTag) { _ in
-                        currentTag.removeAll(where: { prohibitedCharacters.contains($0) })
-                    }.onSubmit {
-                        self.addCurrentTag()
-                    }
+                TabView(selection: $selectedView) {
+                    HStack {
+                        Spacer()
+                        
+                        TextField("Add Tag", text: $currentTag, prompt: Text("Tag"))
+                            .onChange(of: currentTag) { _ in
+                                currentTag.removeAll(where: { prohibitedCharacters.contains($0) })
+                            }.onSubmit {
+                                self.addCurrentTag()
+                            }
+                        Spacer()
+                        
+                    }.tabItem({
+                        Text("Text")
+                    }).tag(ViewSelection.text)
+                    
+                    Group {
+                        if tagImage == nil {
+                            Rectangle()
+                                .padding()
+                                .shadow(color: .accentColor, radius: 3.0)
+                                .frame(width: 200, height: 150)
+                                .foregroundColor(Color(.systemGray.blended(withFraction: 0.67, of: .black) ?? .gray))
+                                .onDrop(of: ["public.file-url"], isTargeted: $isDroppingImage, perform: { providers in
+                                    return receiveDroppedImage(from: providers)
+                                }).onTapGesture {
+                                    DispatchQueue.main.async {
+                                        selectFile(ofTypes: [.image]) { urls in
+                                            guard let originalURL = urls.first else { return }
+                                            if appState.copyOwnedImages {
+                                                let url = try!  takeOwnership(of: originalURL)
+                                                setImage(toURL: url)
+                                                
+                                            } else {
+                                                setImage(toURL: originalURL)
+                                            }
+                                        }
+                                    }
+                                }
+                        } else {
+                            ZStack(alignment: .topLeading) {
+                                
+                                imageOfFile(tagImage!)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 200, height: 150)
+                                    .onDrop(of: ["public.file-url"], isTargeted: $isDroppingImage, perform: { providers in
+                                        return receiveDroppedImage(from: providers)
+                                    })
+                                    .offset(x: 0, y: 0)
+                                    
+                                if imageHovering {
+                                    Image(systemName: "x.square")
+                                        .background(in: Rectangle(), fillStyle: FillStyle())
+                                        .foregroundColor(.primary)
+                                        .font(.system(size: 18.0))
+                                        .onTapGesture {
+                                            tagImage = nil
+                                        }
+                                        .offset(x: 0, y: 0)
+                                }
+                            }.onHover {
+                                imageHovering = $0
+                            }
+                        }
+                    }.tabItem({
+                        Text("Image")
+                    }).tag(ViewSelection.image)
+                }
+                
+                
+                
                 HStack {
                     HStack {
                         Button("Undo") {
@@ -70,7 +185,7 @@ struct TagView: View {
                         }.disabled(selected == nil)
                         Button("Add Tag") {
                             self.addCurrentTag()
-                        }.disabled(currentTag == "")
+                        }.disabled(currentTag == "" && tagImage == nil)
                     }
                 }
                 Button("Close") {
@@ -89,6 +204,7 @@ struct TagView: View {
                     appState.select(only: id)
                 }
             })
+            .quickLookPreview($qlPreviewLink)
             .frame(minWidth: 500.0, minHeight: 500.0,  alignment: Alignment.center)
             .sheet(isPresented: $showingHelp, content: {
                 FilesEditingInspectorView(done: { showingHelp = false }, removeFileWithID: { id in
@@ -100,13 +216,44 @@ struct TagView: View {
             })
     }
     
+    static let validImageExtensions: Set<String> = ["bmp", "tiff", "png", "jpeg", "jpg", "gif", "dng"]
+    
+    func receiveDroppedImage(from providers: [NSItemProvider]) -> Bool {
+        guard let provider = providers.first else { return false }
+        _ = provider.loadDataRepresentation(forTypeIdentifier: "public.file-url", completionHandler: { data, error in
+            if let data, let s = String(data: data, encoding: .utf8), let originalURL = URL(string: s) {
+                if TagView.validImageExtensions.contains(originalURL.pathExtension.lowercased()) {
+                    // TODO: handle the error
+                    if appState.copyOwnedImages {
+                        let url = try!  takeOwnership(of: originalURL)
+                        setImage(toURL: url)
+                        
+                    } else {
+                        setImage(toURL: originalURL)
+                    }
+                } else {
+                    // TODO: alert user
+                }
+                
+            }
+        })
+        
+        return true
+    }
+    
     func addCurrentTag() {
-        if currentTag.isEmpty || currentTag.allSatisfy({$0.isWhitespace}) {
+        if (currentTag.isEmpty || currentTag.allSatisfy({$0.isWhitespace})) &&
+            tagImage == nil {
             return
         }
-        let tag = Tag(value: currentTag)
+        var tag: Tag
+        if tagImage == nil {
+            tag = Tag.tag(withString: currentTag)
+            currentTag = ""
+        } else {
+            tag = Tag.tag(imageURL: tagImage!, format: appState.serializeFullImages ? .content : .url)
+            tagImage = nil
+        }
         directory.addTags(tag, toAll: files.map { $0 })
-        
-        currentTag = ""
     }
 }

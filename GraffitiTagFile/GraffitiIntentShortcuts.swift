@@ -19,14 +19,15 @@ struct LibraryAppShorcuts: AppShortcutsProvider {
 
 
 struct StoreFormatOptionsProvider: DynamicOptionsProvider {
-    func results() async throws -> [String] {
+    func results()  throws -> [String] {
         Format.allCases.map { $0.description }
     }
 }
 
 extension AppIntent {
     
-    func setup(storageType: IntentParameter<String>, file: IntentParameter<IntentFile>) throws -> (TaggedDirectory, TaggedFile) {
+    
+    func setup(storageType: IntentParameter<String>, file: IntentParameter<IntentFile>)  throws -> (TaggedDirectory, TaggedFile) {
         guard let format = Format.allCases.first(where: { $0.description == storageType.wrappedValue })
         else { throw storageType.needsValueError("Choose a tag storage type") }
         
@@ -34,7 +35,7 @@ extension AppIntent {
         os_log("%s", log: .default, type: .error, file.wrappedValue.fileURL!.deletingLastPathComponent().absolutePath)
         let d = TaggedDirectory.empty.copy() as! TaggedDirectory
 
-        guard (try? d.load(directory: file.wrappedValue.fileURL!.deletingLastPathComponent().absolutePath, format: format)) != nil else {
+        guard (try?  d.load(directory: file.wrappedValue.fileURL!.deletingLastPathComponent().absolutePath, format: format)) != nil else {
             throw FileError.couldNotRead
         }
         

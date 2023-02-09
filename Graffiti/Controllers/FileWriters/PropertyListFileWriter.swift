@@ -44,7 +44,7 @@ class PropertyListFileWriter: FileWriter {
             }
             
             for (path, listOfDicts) in data {
-                let s: [Tag] = listOfDicts.map { d in Tag(value: d[Tag.valueFieldName]!) }
+                let s: [Tag] = listOfDicts.map { d in Tag.tag(withString: d[Tag.valueFieldName]!) }
                 retValue[path] = Set(s)
             }
         } else {

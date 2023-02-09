@@ -42,7 +42,7 @@ class CSVFileWriter: FileWriter {
                 throw FileWriterError.InvalidFileFormat
             }
             let tags = cols[1].components(separatedBy: CSVFileWriter.kTagSeparator)
-            retValue[cols[0]] = Set(tags.map { Tag(value: $0) })
+//            retValue[cols[0]] = Set(tags.map { Tag(value: $0) })
         }
         return TagStore(tagData: retValue)
     }

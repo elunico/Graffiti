@@ -20,6 +20,10 @@ class TaggedFile: ObservableObject, NSCopying {
     private weak var backend: TagBackend?
     @Published var tags: Set<Tag> = Set()
     
+    var searchableMetadataString: String {
+        tags.map { $0.searchableMetadataString }.joined(separator: " ")
+    }
+    
     convenience init(atPath path: String, backend: TagBackend?) {
         var components = path.components(separatedBy: "/")
         let filename = components.removeLast()
@@ -83,7 +87,7 @@ extension TaggedFile: Equatable, Hashable {
 extension TaggedFile {
     // KeyPaths for Table view
     var tagString: String {
-        tags.map { $0.value }.joined(separator: ", ")
+        tags.map { $0.description }.joined(separator: ", ")
     }
     
     var tagCount: String {

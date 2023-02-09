@@ -20,13 +20,14 @@ class ThumbnailProvider: QLThumbnailProvider {
         let contextSize = request.maximumSize
         guard let image = NSImage(systemSymbolName: "doc", accessibilityDescription: "") else { return }
         guard let tagImage = NSImage(systemSymbolName: "tag", accessibilityDescription: "") else { return }
-
+        
         image.size.height = 15
         image.size.width = 15
         tagImage.size.height = 15
         tagImage.size.width = 15
         
-        let store = try? CompressedCustomTagStoreWriter().loadFrom(path: request.fileURL.absolutePath)
+        
+        let store = try?  CompressedCustomTagStoreWriter().loadFrom(path: request.fileURL.absolutePath)
         let fileCount = store?.tagData.count.description ?? "???"
         let tagCount = store?.tagData.map { (key, value) in value.count }.reduce(0, +).description ?? "???"
         
@@ -53,7 +54,7 @@ class ThumbnailProvider: QLThumbnailProvider {
             // Return true if the thumbnail was successfully drawn inside this block.
             return true
         }), nil)
-
-
+        
+        
     }
 }

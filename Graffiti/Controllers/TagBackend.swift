@@ -12,6 +12,7 @@ protocol TagBackend: NSCopying {
     func removeTag(withID id: Tag.ID, from file: TaggedFile)
     func loadTags(at path: String) -> Set<Tag>
     func clearTags(of file: TaggedFile)
+    func removeTagText(from: TaggedFile)
     
     /// used to implement lazy backend systems or other time delay ones
     /// exists here because implementers need to see it

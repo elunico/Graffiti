@@ -36,7 +36,7 @@ class JSONFileWriter: FileWriter {
         }
         
         for (path, listOfDicts) in data {
-            let s: [Tag] = listOfDicts.map { d in Tag(value: d) }
+            let s: [Tag] = listOfDicts.map { d in Tag.tag(withString: d) }
             retValue[path] = Set(s)
         }
         

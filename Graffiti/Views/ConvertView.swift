@@ -28,7 +28,7 @@ struct ConvertView: View {
         showingError = true
     }
     
-    func performConversion(overwriting: Bool) {
+    func performConversion(overwriting: Bool)  {
         guard let sourceFile else { return }
         
         if let resultFile, !overwriting && FileManager.default.fileExists(atPath: resultFile) {
@@ -36,11 +36,11 @@ struct ConvertView: View {
             return
         }
         
-        let currentWriter = try? getSandboxedAccess(to: sourceFile.deletingLastPathComponent().absolutePath, thenPerform: {
+        let currentWriter = try?  getSandboxedAccess(to: sourceFile.deletingLastPathComponent().absolutePath, thenPerform: {
             try (beginFormat.implementation(in: URL(fileURLWithPath: $0)) as! FileTagBackend).writer
         })
         
-        let nextWriter = try? getSandboxedAccess(to: sourceFile.deletingLastPathComponent().absolutePath, thenPerform: {
+        let nextWriter = try?  getSandboxedAccess(to: sourceFile.deletingLastPathComponent().absolutePath, thenPerform: {
             try (endFormat.implementation(in: URL(fileURLWithPath: $0)) as! FileTagBackend).writer
         })
         
@@ -52,7 +52,7 @@ struct ConvertView: View {
             return fail(reason: "Could not create interface to destination file")
         }
         
-        if (try? convert(file: sourceFile, isUsing: currentWriter!, willUse: nextWriter!)) != nil {
+        if  (try? convert(file: sourceFile, isUsing: currentWriter!, willUse: nextWriter!)) != nil {
             showingSuccess = true
         } else {
             fail(reason: "Could not perform conversion between \(sourceFile) and \(type(of: nextWriter!).writePath(in: sourceFile.deletingLastPathComponent(), named: nil))")
@@ -136,7 +136,7 @@ struct ConvertView: View {
                     }
                     Button("Overwrite file") {
                         showingConfirmOverwrite = false
-                        performConversion(overwriting: true)
+                        performConversion(overwriting: true) 
                     }
                 }.padding()
             })

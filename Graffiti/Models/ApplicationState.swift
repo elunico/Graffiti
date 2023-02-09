@@ -48,6 +48,10 @@ class ApplicationState: ObservableObject {
     
     @Published var selectionModels: [AnySelectionModel] = []
     
+    @Published var copyOwnedImages: Bool = true
+    @Published var serializeFullImages: Bool = false
+    @Published var doTextRecognition: Bool = true 
+    
     func reset() {
         currentState = .StartScreen
         isImporting = false

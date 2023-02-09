@@ -31,12 +31,22 @@ extension String {
 
 extension URL {
     var absolutePath: String {
-        absoluteString.replacingOccurrences(of: "file://", with: "")
+        let s = absoluteString.replacingOccurrences(of: "file://", with: "")
+        return s.removingPercentEncoding ?? s
     }
     
     var prettyPrinted: String {
         let home = FileManager.default.homeDirectoryForCurrentUser
         return absolutePath.replacingOccurrences(of: home.absolutePath, with: "~/")
+    }
+}
+
+extension Sequence {
+    func also(_ action: (Element) -> ()) -> Self {
+        for elt in self {
+            action(elt)
+        }
+        return self
     }
 }
 
@@ -78,7 +88,7 @@ extension Array where Element: Hashable {
 }
 
 enum FileError: Error {
-    case userCancelled, permissionRequested, couldNotRead
+    case userCancelled, permissionRequested, couldNotRead, fileDirectoryMismatch
 }
 
 fileprivate var didRequestPermission: Set<String> = []
@@ -100,13 +110,15 @@ func accessBookmark(of url: URL) throws -> URL? {
     return newURL
 }
 
-func getSandboxedAccess<R>(to directory: String, thenPerform action: (String) throws -> (R)) throws -> R {
+
+func getSandboxedAccess<R>(to directory: String, thenPerform action: (String)  throws -> (R))  throws -> R {
     do {
         let bookmarkedURL = try accessBookmark(of: URL(fileURLWithPath: directory))
         defer { bookmarkedURL?.stopAccessingSecurityScopedResource() }
         bookmarkedURL?.startAccessingSecurityScopedResource()
-        return try action(directory)
+        return try  action(directory)
     } catch _ where !didRequestPermission.contains(directory) {
+        var result: R? = nil
         
         let panel = NSOpenPanel()
         panel.canChooseFiles = false
@@ -114,22 +126,90 @@ func getSandboxedAccess<R>(to directory: String, thenPerform action: (String) th
         panel.directoryURL = URL(fileURLWithPath: directory)
         panel.message = "Select the folder you are targeting to grant Graffiti permission to access it"
         let response = panel.runModal()
-        // TODO: save bookmark so permissions is only requested once
         if response == NSApplication.ModalResponse.OK {
+            // TODO: save bookmark so permissions is only requested once
             try saveBookmark(of: panel.url!)
             didRequestPermission.insert(directory)
-            return try action(panel.url!.absolutePath)
+            result = try  action(panel.url!.absolutePath)
         }
-        throw FileError.userCancelled
+        
+        
+        if result == nil {
+            throw FileError.userCancelled
+        } else {
+            return result!
+        }
+        
     } catch let error {
         throw error
     }
 }
 
-func getContentsOfDirectory(atPath directory: String) throws -> [String] {
-    try getSandboxedAccess(to: directory) { try FileManager.default.contentsOfDirectory(atPath: $0) }
+
+func getContentsOfDirectory(atPath directory: String)  throws -> [String] {
+    try  getSandboxedAccess(to: directory) { try FileManager.default.contentsOfDirectory(atPath: $0) }
 }
 
 func TPData(contentsOf url: URL) throws -> Data {
     try Data(contentsOf: url)
 }
+
+func createOwnedImageURL()  throws -> URL {
+    let path = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.applicationSupportDirectory, .userDomainMask, true).first!
+    let name = UUID()
+    let imageDirectory = URL(fileURLWithPath: path).appending(path: "ownedImages")
+    
+    return try  getSandboxedAccess(to: imageDirectory.absolutePath, thenPerform: { imageDirectoryString in
+        let imageDirectory = URL(fileURLWithPath: imageDirectoryString)
+        var ownedURL = imageDirectory.appending(path: name.uuidString)
+        
+        var isdir: ObjCBool = false
+        let exists = FileManager.default.fileExists(atPath: imageDirectory.absolutePath, isDirectory: &isdir)
+        if exists {
+            if !isdir.boolValue {
+                throw FileError.fileDirectoryMismatch
+            }
+        } else if !exists {
+            try FileManager.default.createDirectory(at: imageDirectory, withIntermediateDirectories: true)
+        }
+        
+        return ownedURL
+    })
+    
+}
+
+func takeOwnership(of file: URL)  throws -> URL {
+    
+    let path = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.applicationSupportDirectory, .userDomainMask, true).first!
+    let name = file.lastPathComponent
+    let imageDirectory = URL(fileURLWithPath: path).appending(path: "ownedImages")
+    
+    return try  getSandboxedAccess(to: imageDirectory.absolutePath, thenPerform: { imageDirectoryString in
+        let imageDirectory = URL(fileURLWithPath: imageDirectoryString)
+        var ownedURL = imageDirectory.appending(path: name)
+        
+        var isdir: ObjCBool = false
+        let exists = FileManager.default.fileExists(atPath: imageDirectory.absolutePath, isDirectory: &isdir)
+        if exists {
+            if !isdir.boolValue {
+                throw FileError.fileDirectoryMismatch
+            }
+        } else if !exists {
+            try FileManager.default.createDirectory(at: imageDirectory, withIntermediateDirectories: true)
+        }
+        
+        if FileManager.default.fileExists(atPath: ownedURL.absolutePath) {
+            let temporaryName = try createOwnedImageURL()
+            try FileManager.default.copyItem(at: file, to: temporaryName)
+            ownedURL = try FileManager.default.replaceItemAt(ownedURL, withItemAt: temporaryName) ?? ownedURL
+        } else {
+            try FileManager.default.copyItem(at: file, to: ownedURL)
+        }
+        
+        return ownedURL
+    })
+    
+    
+}
+
+
