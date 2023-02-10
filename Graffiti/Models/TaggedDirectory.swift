@@ -8,6 +8,8 @@
 import Foundation
 import Vision
 import AppKit
+import CoreML
+import CoreImage
 
 class Sorter: SortComparator {
     typealias Compared = TaggedFile
@@ -37,6 +39,7 @@ class Sorter: SortComparator {
     }
 }
 
+
 class TaggedDirectory: ObservableObject, NSCopying {
     func copy(with zone: NSZone? = nil) -> Any {
         let d = TaggedDirectory()
@@ -62,10 +65,10 @@ class TaggedDirectory: ObservableObject, NSCopying {
     @Published private(set) var transactions: [TagTransaction] = []
     @Published private(set) var redoStack: [TagTransaction] = []
     
-    @Published var doTextRecognition: Bool = true {
+    @Published var doImageVision: Bool = true {
         didSet {
-            if doTextRecognition {
-                recognizeText()
+            if doImageVision {
+                performVisionActions()
             } else {
                 files.forEach { file in backend.removeTagText(from: file) }
             }
@@ -100,7 +103,7 @@ class TaggedDirectory: ObservableObject, NSCopying {
         self.indexMap.removeAll()
         self.files.removeAll()
         self.directory = directory
-        self.doTextRecognition = doTextRecognition
+        self.doImageVision = doTextRecognition
         guard let backend = try format.implementation(in: URL(fileURLWithPath: directory), withFileName: filename) else { return }
         self.backend = backend
         let content = try  getContentsOfDirectory(atPath: directory)
@@ -112,50 +115,85 @@ class TaggedDirectory: ObservableObject, NSCopying {
             idx += 1
         }
         if doTextRecognition {
-            recognizeText()
+            performVisionActions()
         }
     }
     
-    func recognizeText() {
-        if !doTextRecognition { return }
-        DispatchQueue.global(qos: .background).async {
-            for file in self.files {
-                for tag in file.tags where tag.recoginitionState == .uninitialized {
-                    guard let imageURL = tag.image else { return }
-                    tag.recoginitionState = .started
-                    
-                    guard let cgImage = NSImage(byReferencing: imageURL).cgImage(forProposedRect: nil, context: nil , hints: nil) else { return }
-
-                    // Create a new image-request handler.
-                    let requestHandler = VNImageRequestHandler(cgImage: cgImage)
-
-                    // Create a new request to recognize text.
-                    let request = VNRecognizeTextRequest(completionHandler: {(request: VNRequest, error: Error?) in
-                        guard let observations =
-                                request.results as? [VNRecognizedTextObservation] else {
-                            return
-                        }
-                        let recognizedStrings = observations.compactMap { observation in
-                            // Return the string of the top VNRecognizedText instance.
-                            return observation.topCandidates(1).first?.string
-                        }
-                        
-                        // Process the recognized strings.
-                        tag.imageTextContent.content.append(contentsOf: recognizedStrings)
-                        print(recognizedStrings)
-                        tag.recoginitionState = .recognized
-                    })
-
-                    do {
-                        // Perform the text-recognition request.
-                        try requestHandler.perform([request])
-                    } catch {
-                        print("Unable to perform the requests: \(error).")
-                    }
-                }
+    func recognizeObjects(in tag: Tag) {
+        guard let model = try? VNCoreMLModel(for: MobileNetV2(configuration: MLModelConfiguration()).model)
+        else {
+            return
+        }
+        
+        let request = VNCoreMLRequest(model: model)
+        
+        guard let url = tag.image, let nsImage = NSImage(contentsOf: url), let cgImage = nsImage.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return }
+        
+        let handler = VNImageRequestHandler(ciImage: CIImage(cgImage: cgImage), options: [:])
+        
+        try? handler.perform([request])
+        
+        guard let results = request.results as? [VNClassificationObservation] else {
+            return
+        }
+        
+        let observations = results[0..<5].filter{ (!$0.hasPrecisionRecallCurve) || ($0.hasPrecisionRecallCurve && $0.hasMinimumPrecision(0.8, forRecall: 0.8)) }.map { $0.identifier }
+        
+        
+        tag.imageTextContent.content.append(contentsOf: observations)
+        
+    }
+    
+    func recognizeText(in tag: Tag) {
+        
+        guard let imageURL = tag.image else { return }
+        
+        guard let cgImage = NSImage(byReferencing: imageURL).cgImage(forProposedRect: nil, context: nil , hints: nil) else { return }
+        
+        // Create a new image-request handler.
+        let requestHandler = VNImageRequestHandler(cgImage: cgImage)
+        
+        // Create a new request to recognize text.
+        let request = VNRecognizeTextRequest(completionHandler: {(request: VNRequest, error: Error?) in
+            guard let observations =
+                    request.results as? [VNRecognizedTextObservation] else {
+                return
+            }
+            let recognizedStrings = observations.compactMap { observation in
+                // Return the string of the top VNRecognizedText instance.
+                return observation.topCandidates(1).first?.string
             }
             
+            // Process the recognized strings.
+            tag.imageTextContent.content.append(contentsOf: recognizedStrings)
+            print(recognizedStrings)
+        })
+        
+        do {
+            // Perform the text-recognition request.
+            try requestHandler.perform([request])
+        } catch {
+            print("Unable to perform the requests: \(error).")
         }
+    }
+    
+    
+    
+    
+    
+    func performVisionActions() {
+        if !doImageVision { return }
+        DispatchQueue.global(qos: .background).async { [self] in
+            for file in self.files {
+                for tag in file.tags where tag.recoginitionState == .uninitialized {
+                    tag.recoginitionState = .started
+                    recognizeText(in: tag)
+                    recognizeObjects(in: tag)
+                    tag.recoginitionState = .recognized
+                }
+            }
+        }
+        
     }
     
     
@@ -177,7 +215,7 @@ class TaggedDirectory: ObservableObject, NSCopying {
         transactions.append(AddTagToManyFilesTransaction(backend: backend, tag: tag, files: files))
         transactions.last?.perform()
         invalidateRedo()
-        recognizeText()
+        performVisionActions()
     }
     
     func addTag(_ tag: Tag, to file: TaggedFile) {
@@ -185,13 +223,14 @@ class TaggedDirectory: ObservableObject, NSCopying {
         transactions.append(AddTagTransaction(backend: backend, tag: tag, file: file))
         transactions.last?.perform()
         invalidateRedo()
-        recognizeText()
+        performVisionActions()
     }
     
     
     func removeTag(withID id: Tag.ID, from file: TaggedFile) {
 //        backend.removeTag(withID: id, from: file)
-        transactions.append(RemoveTagTransaction(backend: backend, tag: Tag.tag(fromID: id)!, file: file))
+        guard let tag = Tag.tag(fromID: id) else { return }
+        transactions.append(RemoveTagTransaction(backend: backend, tag: tag, file: file))
         transactions.last?.perform()
         invalidateRedo()
     }
@@ -199,7 +238,8 @@ class TaggedDirectory: ObservableObject, NSCopying {
     
     func removeTag(withID id: Tag.ID, fromAll files: [TaggedFile]) {
 //        backend.removeTag(withID: id, from: file)
-        transactions.append(RemoveTagFromManyFilesTransaction(backend: backend, tag: Tag.tag(fromID: id)!, files: files)) 
+        guard let tag = Tag.tag(fromID: id) else { return }
+        transactions.append(RemoveTagFromManyFilesTransaction(backend: backend, tag: tag, files: files))
         transactions.last?.perform()
         invalidateRedo()
     }
@@ -231,6 +271,7 @@ class TaggedDirectory: ObservableObject, NSCopying {
     }
     
     func clearTags(of file: TaggedFile) {
+        file.tags.forEach { $0.relieve() }
         backend.clearTags(of: file)
         invalidateUndo()
         invalidateRedo()

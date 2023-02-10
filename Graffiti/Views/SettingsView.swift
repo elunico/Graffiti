@@ -23,7 +23,7 @@ struct SettingsView: View {
     @EnvironmentObject var appState: ApplicationState
     
     static let copyOwnedImagesDefaultsKey = "com.tom.graffiti-copyOwnedImages"
-    static let serializeFullImagesDefaultsKey = "com.tom.graffiti-serializeFullImages"
+    static let saveImageURLsDefaultsKey = "com.tom.graffiti-saveImageURLs"
     static let doTextRecognition = "com.tom.graffiti-doTextRecognition"
     
     var body: some View {
@@ -31,33 +31,37 @@ struct SettingsView: View {
             Group {
                 
                 Text("File Control").font(.headline)
-                Toggle("Copy images that are used to tag files", isOn: $appState.copyOwnedImages)
-                    .onChange(of: appState.copyOwnedImages, perform: {
-                        UserDefaults.thisAppDomain?.set($0, forKey: SettingsView.copyOwnedImagesDefaultsKey)
-                    })
+//                Toggle("Copy images that are used to tag files", isOn: $appState.copyOwnedImages)
+//                    .onChange(of: appState.copyOwnedImages, perform: {
+//                        UserDefaults.thisAppDomain?.set($0, forKey: SettingsView.copyOwnedImagesDefaultsKey)
+//                    })
                 Text("If you choose NOT to copy images, you must grant Graffiti full disk access in System Settings or you will not be able to see your images in the app")
                     .wrapText()
                     .font(.caption2)
                     .offset(x: 10)
-                Toggle("Save image data instead of file locations to Tag Store files", isOn: $appState.serializeFullImages)
-                    .onChange(of: appState.serializeFullImages, perform: {
-                        UserDefaults.thisAppDomain?.set($0, forKey: SettingsView.serializeFullImagesDefaultsKey)
-                    })
+                
+                Text("Format for Saving Images")
+                Picker("", selection: $appState.imageSaveFormat, content: {
+                    Text("Save References to files locally stored on the computer (faster; less space)").tag(Tag.ImageFormat.url)
+                    Text("Save Image Content to Tag Store file directly (portable; larger files)").tag(Tag.ImageFormat.content)
+                }).onChange(of: appState.imageSaveFormat, perform: {
+                    UserDefaults.thisAppDomain?.set($0 == .url, forKey: SettingsView.saveImageURLsDefaultsKey)
+                })
             }
             Divider()
             Group {
                 Text("Application Behavior").font(.headline)
-                Toggle("Recognize Text in Images", isOn: $appState.doTextRecognition)
-                    .onChange(of: appState.doTextRecognition, perform: {
+                Toggle("Recognize Text in Images", isOn: $appState.doImageVision)
+                    .onChange(of: appState.doImageVision, perform: {
                         UserDefaults.thisAppDomain?.set($0, forKey: SettingsView.doTextRecognition)
                     })
             }
             
         }.padding()
             .onAppear {
-                appState.copyOwnedImages = UserDefaults.thisAppDomain?.bool(forKey: SettingsView.copyOwnedImagesDefaultsKey) ?? true
-                appState.serializeFullImages = UserDefaults.thisAppDomain?.bool(forKey: SettingsView.serializeFullImagesDefaultsKey) ?? false
-                appState.doTextRecognition = UserDefaults.thisAppDomain?.bool(forKey: SettingsView.doTextRecognition) ?? true
+//                appState.copyOwnedImages = UserDefaults.thisAppDomain?.bool(forKey: SettingsView.copyOwnedImagesDefaultsKey) ?? true
+                appState.imageSaveFormat = UserDefaults.thisAppDomain?.bool(forKey: SettingsView.saveImageURLsDefaultsKey) ?? true  ? Tag.ImageFormat.url : Tag.ImageFormat.content
+                appState.doImageVision = UserDefaults.thisAppDomain?.bool(forKey: SettingsView.doTextRecognition) ?? true
                 
             }
     }

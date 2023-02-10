@@ -48,9 +48,9 @@ class ApplicationState: ObservableObject {
     
     @Published var selectionModels: [AnySelectionModel] = []
     
-    @Published var copyOwnedImages: Bool = true
-    @Published var serializeFullImages: Bool = false
-    @Published var doTextRecognition: Bool = true 
+//    @Published var copyOwnedImages: Bool = true
+    @Published var doImageVision: Bool = true
+    @Published var imageSaveFormat: Tag.ImageFormat = .url
     
     func reset() {
         currentState = .StartScreen

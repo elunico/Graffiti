@@ -325,11 +325,12 @@ struct MainView: View {
             .onClearAll(message: (selected.count == 0 ? "This will remove EVERY tag from EVERY file currently in view in the table" : "This will remove EVERY tag from every SELECTED file in the table") + "\nYou cannot undo this action", isPresented: $appState.isPresentingConfirm, clearAction: { [unowned files] in
                 if selected.count == 0 {
                     for file in files.filter(by: query) {
-                        file.clearTags()
+                        files.clearTags(of: file)
                     }
+                    
                 } else {
                     for file in files.getFiles(withIDs: selected) {
-                        file.clearTags()
+                        files.clearTags(of: file)
                     }
                 }
             })
@@ -340,8 +341,8 @@ struct MainView: View {
         .toolbar(content: {
             MainToolbar()
         })
-        .onChange(of: appState.doTextRecognition, perform: { recognize in
-            files.doTextRecognition = recognize
+        .onChange(of: appState.doImageVision, perform: { recognize in
+            files.doImageVision = recognize
         })
         .quickLookPreview($selectedFileURL, in: selectedFileURLs)
         .onDisappear(perform: self.teardown)

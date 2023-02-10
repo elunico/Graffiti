@@ -172,7 +172,6 @@ class CompressedCustomTagStoreWriter: FileWriter {
             data.append(pdata)
             data.append(tags.count.bigEndianBytes)
             for tag in tags {
-//                let tdata = tag.value.data(using: .utf8)!
                 let tdata = try! tag.serializeToData(imageFormat: .url)
                 data.append(tdata.count.bigEndianBytes)
                 data.append(tdata)

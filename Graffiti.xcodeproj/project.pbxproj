@@ -79,6 +79,11 @@
 		DC5FA2F22975032800084CB2 /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5FA2F12975032800084CB2 /* Version.swift */; };
 		DC5FA2F42975091500084CB2 /* TagStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5FA2F32975091500084CB2 /* TagStore.swift */; };
 		DC8E14632963EAE0002E1788 /* TaggedDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8E14622963EAE0002E1788 /* TaggedDirectory.swift */; };
+		DC94CA44299583EF007E64A2 /* MobileNetV2.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = DC94CA43299583EF007E64A2 /* MobileNetV2.mlmodel */; };
+		DC94CA45299590CF007E64A2 /* MobileNetV2.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = DC94CA43299583EF007E64A2 /* MobileNetV2.mlmodel */; };
+		DC94CA46299590DB007E64A2 /* MobileNetV2.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = DC94CA43299583EF007E64A2 /* MobileNetV2.mlmodel */; };
+		DC94CA47299590DC007E64A2 /* MobileNetV2.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = DC94CA43299583EF007E64A2 /* MobileNetV2.mlmodel */; };
+		DC94CA492995E2F0007E64A2 /* ImageSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC94CA482995E2F0007E64A2 /* ImageSelector.swift */; };
 		DC9BBD1B2985C0720035543D /* TagTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9BBD1A2985C0720035543D /* TagTransaction.swift */; };
 		DC9BBD1C2985C54D0035543D /* TagTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9BBD1A2985C0720035543D /* TagTransaction.swift */; };
 		DC9BBD1D2985C54D0035543D /* TagTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9BBD1A2985C0720035543D /* TagTransaction.swift */; };
@@ -192,6 +197,8 @@
 		DC5FA2F12975032800084CB2 /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
 		DC5FA2F32975091500084CB2 /* TagStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagStore.swift; sourceTree = "<group>"; };
 		DC8E14622963EAE0002E1788 /* TaggedDirectory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaggedDirectory.swift; sourceTree = "<group>"; };
+		DC94CA43299583EF007E64A2 /* MobileNetV2.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = MobileNetV2.mlmodel; sourceTree = "<group>"; };
+		DC94CA482995E2F0007E64A2 /* ImageSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSelector.swift; sourceTree = "<group>"; };
 		DC9BBD1A2985C0720035543D /* TagTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagTransaction.swift; sourceTree = "<group>"; };
 		DC9BBD202985DFE40035543D /* Graffiti.profdata */ = {isa = PBXFileReference; lastKnownFileType = file; path = Graffiti.profdata; sourceTree = "<group>"; };
 		DC9CCB422980ECC000A2D622 /* GraffitiGetTagsOfFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraffitiGetTagsOfFile.swift; sourceTree = "<group>"; };
@@ -344,6 +351,7 @@
 				DC341E2329814D3F003B5153 /* ConvertView.swift */,
 				DC341E2529814D8F003B5153 /* FormatSelector.swift */,
 				DCBE181429926CCE0005AEC9 /* SettingsView.swift */,
+				DC94CA482995E2F0007E64A2 /* ImageSelector.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -364,6 +372,7 @@
 		DCFA39C12965DD090002690A /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				DC94CA43299583EF007E64A2 /* MobileNetV2.mlmodel */,
 				DC1B7BC72962299B00DEED22 /* TaggedFile.swift */,
 				DCFA39C22965DD1C0002690A /* Tag.swift */,
 				DC8E14622963EAE0002E1788 /* TaggedDirectory.swift */,
@@ -569,6 +578,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DC94CA46299590DB007E64A2 /* MobileNetV2.mlmodel in Sources */,
 				DC4E79AD297DF3AC003AEE68 /* XattrBridge.m in Sources */,
 				DC4E79AB297DF2E3003AEE68 /* CSVFileWriter.swift in Sources */,
 				DCDFF2352984414000A2B6CF /* Format.swift in Sources */,
@@ -610,11 +620,13 @@
 				DCEAB19E296A018A00843BE4 /* FileTagBackend.swift in Sources */,
 				DCFA39C82965DD680002690A /* XattrTagBackend.swift in Sources */,
 				DC5FA2F42975091500084CB2 /* TagStore.swift in Sources */,
+				DC94CA44299583EF007E64A2 /* MobileNetV2.mlmodel in Sources */,
 				DC2809B22967722F003915A5 /* FilesEditingInspectorView.swift in Sources */,
 				DC5FA2F22975032800084CB2 /* Version.swift in Sources */,
 				DCFDE988296F4AEC005F00E9 /* JSONFileWriter.swift in Sources */,
 				DCFA39CA296604740002690A /* MainView.swift in Sources */,
 				DC09FE3B297DB5F600BD51D9 /* Utility.swift in Sources */,
+				DC94CA492995E2F0007E64A2 /* ImageSelector.swift in Sources */,
 				DC21D4D32979ED910024E644 /* CompressedCustomTagStoreWriter.swift in Sources */,
 				DC341E2429814D3F003B5153 /* ConvertView.swift in Sources */,
 				DCBE181529926CCE0005AEC9 /* SettingsView.swift in Sources */,
@@ -648,6 +660,7 @@
 				DC5D2668297EE93D009D3868 /* TaggedFile.swift in Sources */,
 				DC9CCB432980ECC000A2D622 /* GraffitiGetTagsOfFile.swift in Sources */,
 				DC5D265C297EE7B5009D3868 /* Format.swift in Sources */,
+				DC94CA45299590CF007E64A2 /* MobileNetV2.mlmodel in Sources */,
 				DC5D2661297EE8D2009D3868 /* JSONFileWriter.swift in Sources */,
 				DC5D266C297EEA83009D3868 /* XattrBridge.m in Sources */,
 				DC5D2660297EE8D2009D3868 /* CSVFileWriter.swift in Sources */,
@@ -660,6 +673,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DC94CA47299590DC007E64A2 /* MobileNetV2.mlmodel in Sources */,
 				DC09FE42297DB66700BD51D9 /* TaggedDirectory.swift in Sources */,
 				DCDFF2342984413F00A2B6CF /* Format.swift in Sources */,
 				DC09FE40297DB64000BD51D9 /* XattrBridge.m in Sources */,
@@ -722,7 +736,7 @@
 				CODE_SIGN_ENTITLEMENTS = CCTSThumbnailProvider/CCTSThumbnailProvider.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23FE09A;
+				CURRENT_PROJECT_VERSION = 23FE09B;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -737,7 +751,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 13.0.0;
+				MARKETING_VERSION = 14.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.CCTSThumbnailProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -753,7 +767,7 @@
 				CODE_SIGN_ENTITLEMENTS = CCTSThumbnailProvider/CCTSThumbnailProvider.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23FE09A;
+				CURRENT_PROJECT_VERSION = 23FE09B;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -768,7 +782,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 13.0.0;
+				MARKETING_VERSION = 14.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.CCTSThumbnailProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -927,7 +941,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 13.0.0;
+				MARKETING_VERSION = 14.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -964,7 +978,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 13.0.0;
+				MARKETING_VERSION = 14.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -980,7 +994,7 @@
 				CODE_SIGN_ENTITLEMENTS = GraffitiTagFile/GraffitiTagFile.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23FE09A;
+				CURRENT_PROJECT_VERSION = 23FE09B;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -995,7 +1009,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 13.0.0;
+				MARKETING_VERSION = 14.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.GraffitiTagFile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1011,7 +1025,7 @@
 				CODE_SIGN_ENTITLEMENTS = GraffitiTagFile/GraffitiTagFile.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23FE09A;
+				CURRENT_PROJECT_VERSION = 23FE09B;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1026,7 +1040,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 13.0.0;
+				MARKETING_VERSION = 14.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.GraffitiTagFile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1042,7 +1056,7 @@
 				CODE_SIGN_ENTITLEMENTS = CCTSQLPlugin/CCTSQLPlugin.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23FE09A;
+				CURRENT_PROJECT_VERSION = 23FE09B;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1057,7 +1071,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 13.0.0;
+				MARKETING_VERSION = 14.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.CCTSQLPlugin;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1073,7 +1087,7 @@
 				CODE_SIGN_ENTITLEMENTS = CCTSQLPlugin/CCTSQLPlugin.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23FE09A;
+				CURRENT_PROJECT_VERSION = 23FE09B;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1088,7 +1102,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 13.0.0;
+				MARKETING_VERSION = 14.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.CCTSQLPlugin;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

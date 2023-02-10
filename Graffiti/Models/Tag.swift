@@ -56,6 +56,27 @@ class Tag : Equatable, Hashable, Codable {
     var image: URL? = nil
     var imageFormat: ImageFormat = .url
     
+    // refCount only cares about TaggedFile references so until the refCount is incremented
+    // by the addition of the tag to a file it should not exist
+    private var refCount: Int = 0
+    
+    func acquire() {
+        refCount += 1
+        print("INCR: Tag \(description) now has rc=\(refCount)")
+    }
+    
+    func relieve() {
+        refCount -= 1
+        print("DECR: Tag \(description) now has rc=\(refCount)")
+        if refCount <= 0 {
+            print("Tag \(description) is no longer referenced and is being freed")
+            Tag.registry.removeValue(forKey: self.id)
+            if let imageURL = image {
+                try! FileManager.default.removeItem(at: imageURL)
+            }
+        }
+    }
+    
     var recoginitionState : RecognitionState = .uninitialized
     
     static let valueFieldName: String = "value"
@@ -182,6 +203,7 @@ class Tag : Equatable, Hashable, Codable {
                     data.append(sdata)
                 }
                 data.append(recoginitionState.rawValue.bigEndianBytes)
+                data.append(refCount.bigEndianBytes)
                 return data
             case .content:
                 let magic : [UInt8] = [66, 68]
@@ -196,6 +218,8 @@ class Tag : Equatable, Hashable, Codable {
                     data = data.appending(stringLength.bigEndianBytes).appending(sdata)
                 }
                 data.append(recoginitionState.rawValue.bigEndianBytes)
+                data.append(refCount.bigEndianBytes)
+
                 return data
             }
         } else {
@@ -203,6 +227,8 @@ class Tag : Equatable, Hashable, Codable {
             let vdata = value.data(using: .utf8)!
             var data = Data(magic).appending(vdata.count.bigEndianBytes).appending(vdata)
             data.append(recoginitionState.rawValue.bigEndianBytes)
+            data.append(refCount.bigEndianBytes)
+
             return data
         }
     }
@@ -232,6 +258,7 @@ class Tag : Equatable, Hashable, Codable {
         case noPathLength, noPath, noStringCount, noStringLength, noString
         case noImage
         case noState
+        case noRefCount
     }
     
     private static func deserilizeRecognizedStrings(count stringCount: Int, fromIterator iter: inout Data.Iterator, to tag: inout Tag) throws {
@@ -242,6 +269,7 @@ class Tag : Equatable, Hashable, Codable {
             print("stringData \(stringData)")
                     guard let string = String(data: stringData, encoding: .utf8) else { throw DeserializeTagError.noString }
             tag.imageTextContent.content.append(string)
+            
         }
     }
     
@@ -262,8 +290,13 @@ class Tag : Equatable, Hashable, Codable {
             
             guard let recognitionState = iter.nextBEInt() else { throw DeserializeTagError.noState }
             t.recoginitionState = RecognitionState(rawValue: recognitionState)!
+        } else {
+            // discard state
+            iter.nextBEInt()
         }
         
+        guard let rc = iter.nextBEInt() else { throw DeserializeTagError.noRefCount }
+        t.refCount = rc
         return t
         
         
@@ -290,8 +323,12 @@ class Tag : Equatable, Hashable, Codable {
             
             guard let recognitionState = iter.nextBEInt() else { throw DeserializeTagError.noState }
             t.recoginitionState = RecognitionState(rawValue: recognitionState)!
+        } else {
+            // discard state
+            iter.nextBEInt()
         }
-        
+        guard let rc = iter.nextBEInt() else { throw DeserializeTagError.noRefCount }
+        t.refCount = rc
         return t
         
         
@@ -307,6 +344,10 @@ class Tag : Equatable, Hashable, Codable {
         
         var t = Tag.tag(withString: value)
         t.recoginitionState = RecognitionState(rawValue: recognitionState)!
+        // discard state
+        iter.nextBEInt()
+        guard let rc = iter.nextBEInt() else { throw DeserializeTagError.noRefCount }
+        t.refCount = rc
         return t
         
         

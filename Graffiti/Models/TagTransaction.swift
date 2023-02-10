@@ -31,10 +31,12 @@ class AddTagTransaction: TagTransaction {
     }
     
     func perform() {
+        tag.acquire()
         backend.addTag(tag, to: file)
     }
     
     func undo() {
+        tag.relieve()
         backend.removeTag(withID: tag.id, from: file)
     }
 }
@@ -51,11 +53,11 @@ class AddTagToManyFilesTransaction: TagTransaction {
     }
     
     func perform() {
-        files.forEach { backend.addTag(tag, to: $0) }
+        files.forEach { backend.addTag(tag, to: $0); tag.acquire() }
     }
     
     func undo() {
-        files.forEach { backend.removeTag(withID: tag.id, from: $0) }
+        files.forEach { backend.removeTag(withID: tag.id, from: $0); tag.relieve() }
     }
 }
 
@@ -72,9 +74,11 @@ class RemoveTagTransaction: TagTransaction {
     
     func perform() {
         backend.removeTag(withID: tag.id, from: file)
+        tag.relieve()
     }
     
     func undo() {
+        tag.acquire()
         backend.addTag(tag, to: file)
     }
 }
@@ -91,10 +95,10 @@ class RemoveTagFromManyFilesTransaction: TagTransaction {
     }
     
     func perform() {
-        files.forEach { backend.removeTag(withID: tag.id, from: $0) }
+        files.forEach { backend.removeTag(withID: tag.id, from: $0); tag.relieve() }
     }
     
     func undo() {
-        files.forEach { backend.addTag(tag, to: $0) }
+        files.forEach { backend.addTag(tag, to: $0); tag.acquire() }
     }
 }

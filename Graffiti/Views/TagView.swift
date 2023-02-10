@@ -13,8 +13,7 @@ struct TagView: View {
     @State var selected: Tag.ID?
     @State var currentTag: String = ""
     @State var showingHelp = false
-    @State var isDroppingImage = false
-    @State var imageHovering = false
+//    @State var isDroppingImage = false
     @State var tagImage: URL? = nil
     @State var qlPreviewLink: URL? = nil
     @State var selectedView: ViewSelection = .text
@@ -44,14 +43,7 @@ struct TagView: View {
         tagImage = url
     }
     
-    func imageOfFile(_ url: URL) -> Image {
-        if let tagImage, FileManager.default.fileExists(atPath: tagImage.absolutePath) {
-            return Image(nsImage:  NSImage(byReferencing: tagImage))
-        } else {
-            return Image(systemName: "exclamationmark.triangle")
-        }
-        
-    }
+    
     
     var body: some View {
         GeometryReader { geometry in
@@ -74,7 +66,7 @@ struct TagView: View {
                         if item.image != nil {
                             HStack {
 //                                Image(nsImage: NSImage(byReferencing: item.image!))
-                                imageOfFile(item.image!)
+                                ImageSelector.imageOfFile(item.image!)
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 150, height: 75, alignment: .center)
@@ -112,54 +104,67 @@ struct TagView: View {
                     }).tag(ViewSelection.text)
                     
                     Group {
-                        if tagImage == nil {
-                            Rectangle()
-                                .padding()
-                                .shadow(color: .accentColor, radius: 3.0)
-                                .frame(width: 200, height: 150)
-                                .foregroundColor(Color(.systemGray.blended(withFraction: 0.67, of: .black) ?? .gray))
-                                .onDrop(of: ["public.file-url"], isTargeted: $isDroppingImage, perform: { providers in
-                                    return receiveDroppedImage(from: providers)
-                                }).onTapGesture {
-                                    DispatchQueue.main.async {
-                                        selectFile(ofTypes: [.image]) { urls in
-                                            guard let originalURL = urls.first else { return }
-                                            if appState.copyOwnedImages {
-                                                let url = try!  takeOwnership(of: originalURL)
-                                                setImage(toURL: url)
-                                                
-                                            } else {
-                                                setImage(toURL: originalURL)
-                                            }
-                                        }
-                                    }
+                        ImageSelector(selectedImage: $tagImage, onClick: { _ in
+                            DispatchQueue.main.async {
+                                selectFile(ofTypes: [.image]) { urls in
+                                    guard let originalURL = urls.first else { return }
+//                                    if appState.copyOwnedImages {
+                                        let url = try!  takeOwnership(of: originalURL)
+                                        setImage(toURL: url)
+                                        
+//                                    } else {
+//                                        setImage(toURL: originalURL)
+//                                    }
                                 }
-                        } else {
-                            ZStack(alignment: .topLeading) {
-                                
-                                imageOfFile(tagImage!)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 200, height: 150)
-                                    .onDrop(of: ["public.file-url"], isTargeted: $isDroppingImage, perform: { providers in
-                                        return receiveDroppedImage(from: providers)
-                                    })
-                                    .offset(x: 0, y: 0)
-                                    
-                                if imageHovering {
-                                    Image(systemName: "x.square")
-                                        .background(in: Rectangle(), fillStyle: FillStyle())
-                                        .foregroundColor(.primary)
-                                        .font(.system(size: 18.0))
-                                        .onTapGesture {
-                                            tagImage = nil
-                                        }
-                                        .offset(x: 0, y: 0)
-                                }
-                            }.onHover {
-                                imageHovering = $0
                             }
-                        }
+                        }, onDroppedFile: { (_, providers) in
+                            return receiveDroppedImage(from: providers)
+                        })
+                        
+//                        if tagImage == nil {
+//                            ImageSelector()
+//                                .onDrop(of: ["public.file-url"], isTargeted: $isDroppingImage, perform: { providers in
+//                                    return receiveDroppedImage(from: providers)
+//                                }).onTapGesture {
+//                                    DispatchQueue.main.async {
+//                                        selectFile(ofTypes: [.image]) { urls in
+//                                            guard let originalURL = urls.first else { return }
+//                                            if appState.copyOwnedImages {
+//                                                let url = try!  takeOwnership(of: originalURL)
+//                                                setImage(toURL: url)
+//
+//                                            } else {
+//                                                setImage(toURL: originalURL)
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//                        } else {
+//                            ZStack(alignment: .topLeading) {
+//
+//                                imageOfFile(tagImage!)
+//                                    .resizable()
+//                                    .scaledToFit()
+//                                    .frame(width: 200, height: 150)
+//                                    .onDrop(of: ["public.file-url"], isTargeted: $isDroppingImage, perform: { providers in
+//                                        return receiveDroppedImage(from: providers)
+//                                    })
+//                                    .offset(x: 0, y: 0)
+//
+//                                if imageHovering {
+//                                    Image(systemName: "x.square")
+//                                        .background(in: Rectangle(), fillStyle: FillStyle())
+//                                        .foregroundColor(.primary)
+//                                        .font(.system(size: 18.0))
+//                                        .onTapGesture {
+//                                            tagImage = nil
+//                                        }
+//                                        .offset(x: 0, y: 0)
+//                                }
+//                            }.onHover {
+//                                imageHovering = $0
+//                            }
+//                        }
                     }.tabItem({
                         Text("Image")
                     }).tag(ViewSelection.image)
@@ -224,13 +229,13 @@ struct TagView: View {
             if let data, let s = String(data: data, encoding: .utf8), let originalURL = URL(string: s) {
                 if TagView.validImageExtensions.contains(originalURL.pathExtension.lowercased()) {
                     // TODO: handle the error
-                    if appState.copyOwnedImages {
+//                    if appState.copyOwnedImages {
                         let url = try!  takeOwnership(of: originalURL)
                         setImage(toURL: url)
                         
-                    } else {
-                        setImage(toURL: originalURL)
-                    }
+//                    } else {
+//                        setImage(toURL: originalURL)
+//                    }
                 } else {
                     // TODO: alert user
                 }
@@ -251,7 +256,7 @@ struct TagView: View {
             tag = Tag.tag(withString: currentTag)
             currentTag = ""
         } else {
-            tag = Tag.tag(imageURL: tagImage!, format: appState.serializeFullImages ? .content : .url)
+            tag = Tag.tag(imageURL: tagImage!, format: appState.imageSaveFormat == .content ? .content : .url)
             tagImage = nil
         }
         directory.addTags(tag, toAll: files.map { $0 })
