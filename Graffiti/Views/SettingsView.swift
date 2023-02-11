@@ -35,10 +35,10 @@ struct SettingsView: View {
 //                    .onChange(of: appState.copyOwnedImages, perform: {
 //                        UserDefaults.thisAppDomain?.set($0, forKey: SettingsView.copyOwnedImagesDefaultsKey)
 //                    })
-                Text("If you choose NOT to copy images, you must grant Graffiti full disk access in System Settings or you will not be able to see your images in the app")
-                    .wrapText()
-                    .font(.caption2)
-                    .offset(x: 10)
+//                Text("If you choose NOT to copy images, you must grant Graffiti full disk access in System Settings or you will not be able to see your images in the app")
+//                    .wrapText()
+//                    .font(.caption2)
+//                    .offset(x: 10)
                 
                 Text("Format for Saving Images")
                 Picker("", selection: $appState.imageSaveFormat, content: {

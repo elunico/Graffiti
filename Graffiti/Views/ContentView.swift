@@ -145,8 +145,7 @@ struct ContentView: View {
                     allowedContentTypes: [.plainText],
                     allowsMultipleSelection: false
                 ) { result in
-                    print(result)
-                    do {
+                                        do {
                         guard let selectedFile: URL = try result.get().first else { return }
                         if FileManager.default.fileExists(atPath: selectedFile.absolutePath) {
                             loadDroppedFile(selectedFile)

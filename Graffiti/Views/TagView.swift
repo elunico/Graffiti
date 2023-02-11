@@ -30,13 +30,10 @@ struct TagView: View {
     
     func performDelete()  {
         guard let index = selected else { return }
-        print("index \(index)")
-        let tag =  Tag.tag(fromID: index)!
-        print(tag.id)
-        files.forEach { file in print(file.tags.map {$0.id})}
+                let tag =  Tag.tag(fromID: index)!
+                files.forEach { file in print(file.tags.map {$0.id})}
         let f = files.filter { $0.tags.contains(tag) }.map { $0 }
-        print(f)
-        directory.removeTag(withID: index, fromAll: f)
+                directory.removeTag(withID: index, fromAll: f)
     }
     
     func setImage(toURL url: URL) {
@@ -72,8 +69,12 @@ struct TagView: View {
                                     .frame(width: 150, height: 75, alignment: .center)
                                 Spacer()
                                 Button {
-                                    if let selected, selected.tagIDTypePrefix == "IU" {
-                                        qlPreviewLink = URL(string: String(selected.tagIDContent))
+                                    if item.id == selected {
+                                        if let selected, selected.tagIDTypePrefix == "IU" {
+                                            qlPreviewLink = URL(string: String(selected.tagIDContent))
+                                        }
+                                    } else if item.id.tagIDTypePrefix == "IU" {
+                                        qlPreviewLink = URL(string: String(item.id.tagIDContent))
                                     }
                                 } label: {
                                     Image(systemName: "eye")
@@ -120,51 +121,7 @@ struct TagView: View {
                         }, onDroppedFile: { (_, providers) in
                             return receiveDroppedImage(from: providers)
                         })
-                        
-//                        if tagImage == nil {
-//                            ImageSelector()
-//                                .onDrop(of: ["public.file-url"], isTargeted: $isDroppingImage, perform: { providers in
-//                                    return receiveDroppedImage(from: providers)
-//                                }).onTapGesture {
-//                                    DispatchQueue.main.async {
-//                                        selectFile(ofTypes: [.image]) { urls in
-//                                            guard let originalURL = urls.first else { return }
-//                                            if appState.copyOwnedImages {
-//                                                let url = try!  takeOwnership(of: originalURL)
-//                                                setImage(toURL: url)
-//
-//                                            } else {
-//                                                setImage(toURL: originalURL)
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                        } else {
-//                            ZStack(alignment: .topLeading) {
-//
-//                                imageOfFile(tagImage!)
-//                                    .resizable()
-//                                    .scaledToFit()
-//                                    .frame(width: 200, height: 150)
-//                                    .onDrop(of: ["public.file-url"], isTargeted: $isDroppingImage, perform: { providers in
-//                                        return receiveDroppedImage(from: providers)
-//                                    })
-//                                    .offset(x: 0, y: 0)
-//
-//                                if imageHovering {
-//                                    Image(systemName: "x.square")
-//                                        .background(in: Rectangle(), fillStyle: FillStyle())
-//                                        .foregroundColor(.primary)
-//                                        .font(.system(size: 18.0))
-//                                        .onTapGesture {
-//                                            tagImage = nil
-//                                        }
-//                                        .offset(x: 0, y: 0)
-//                                }
-//                            }.onHover {
-//                                imageHovering = $0
-//                            }
-//                        }
+                     
                     }.tabItem({
                         Text("Image")
                     }).tag(ViewSelection.image)

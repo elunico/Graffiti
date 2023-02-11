@@ -19,23 +19,22 @@ struct ImageSelector: View {
     var body: some View {
         if selectedImage == nil {
             ZStack {
-                    Image(systemName: "plus.square")
-                        .resizable()
-                        .scaledToFit()
-                        .scaleEffect(CGSize(width: 0.5, height: 0.5))
-                        .frame(width: 200, height: 150, alignment: .center)
-                        .offset(x: 0, y: 0)
-                        .zIndex(2)
-                    
-                    Rectangle()
-                        .padding()
-                        .shadow(color: .accentColor, radius: 3.0)
-                        .frame(width: 200, height: 150)
-                        .foregroundColor(Color(.systemGray.blended(withFraction: 0.67, of: .black) ?? .gray))
-                        .offset(x: 0, y: 0)
+                Image(systemName: "plus.square")
+                    .resizable()
+                    .scaledToFit()
+                    .scaleEffect(CGSize(width: 0.5, height: 0.5))
+                    .frame(width: 200, height: 150, alignment: .center)
+                    .offset(x: 0, y: 0)
+                    .zIndex(2)
+                
+                RoundedRectangle(cornerRadius: 18.0)
+                    .padding()
+                    .frame(width: 200, height: 150)
+                    .foregroundColor(Color(.systemGray))
+                    .offset(x: 0, y: 0)
             }
             .frame(width: 200, height: 150, alignment: .center)
-
+            
             .onDrop(of: ["public.file-url"], isTargeted: $isDroppingImage, perform: { providers in
                 return onDroppedFile(selectedImage, providers)
             }).onTapGesture {

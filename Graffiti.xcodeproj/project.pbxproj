@@ -341,17 +341,25 @@
 			path = OptimizationProfiles;
 			sourceTree = "<group>";
 		};
+		DCE579CB2996684300D1134B /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				DC94CA482995E2F0007E64A2 /* ImageSelector.swift */,
+				DC341E2529814D8F003B5153 /* FormatSelector.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
 		DCE8E1582967D45F002D0A05 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				DCE579CB2996684300D1134B /* Components */,
 				DC52448E2960ACB200821407 /* ContentView.swift */,
 				DCFA39C9296604740002690A /* MainView.swift */,
 				DCFA39BF2965DCC20002690A /* TagView.swift */,
 				DC2809B12967722F003915A5 /* FilesEditingInspectorView.swift */,
 				DC341E2329814D3F003B5153 /* ConvertView.swift */,
-				DC341E2529814D8F003B5153 /* FormatSelector.swift */,
 				DCBE181429926CCE0005AEC9 /* SettingsView.swift */,
-				DC94CA482995E2F0007E64A2 /* ImageSelector.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -736,7 +744,7 @@
 				CODE_SIGN_ENTITLEMENTS = CCTSThumbnailProvider/CCTSThumbnailProvider.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23FE09B;
+				CURRENT_PROJECT_VERSION = 23FE10A;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -751,7 +759,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 14.0.0;
+				MARKETING_VERSION = 14.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.CCTSThumbnailProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -767,7 +775,7 @@
 				CODE_SIGN_ENTITLEMENTS = CCTSThumbnailProvider/CCTSThumbnailProvider.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23FE09B;
+				CURRENT_PROJECT_VERSION = 23FE10A;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -782,7 +790,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 14.0.0;
+				MARKETING_VERSION = 14.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.CCTSThumbnailProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -926,7 +934,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 23FE09A;
+				CURRENT_PROJECT_VERSION = 23FE10A;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Graffiti/Preview Content\"";
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
@@ -941,7 +949,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 14.0.0;
+				MARKETING_VERSION = 14.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -963,7 +971,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 23FE09A;
+				CURRENT_PROJECT_VERSION = 23FE10A;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Graffiti/Preview Content\"";
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
@@ -978,7 +986,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 14.0.0;
+				MARKETING_VERSION = 14.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -994,7 +1002,7 @@
 				CODE_SIGN_ENTITLEMENTS = GraffitiTagFile/GraffitiTagFile.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23FE09B;
+				CURRENT_PROJECT_VERSION = 23FE10A;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1009,7 +1017,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 14.0.0;
+				MARKETING_VERSION = 14.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.GraffitiTagFile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1025,7 +1033,7 @@
 				CODE_SIGN_ENTITLEMENTS = GraffitiTagFile/GraffitiTagFile.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23FE09B;
+				CURRENT_PROJECT_VERSION = 23FE10A;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1040,7 +1048,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 14.0.0;
+				MARKETING_VERSION = 14.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.GraffitiTagFile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1056,7 +1064,7 @@
 				CODE_SIGN_ENTITLEMENTS = CCTSQLPlugin/CCTSQLPlugin.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23FE09B;
+				CURRENT_PROJECT_VERSION = 23FE10A;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1071,7 +1079,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 14.0.0;
+				MARKETING_VERSION = 14.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.CCTSQLPlugin;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1087,7 +1095,7 @@
 				CODE_SIGN_ENTITLEMENTS = CCTSQLPlugin/CCTSQLPlugin.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23FE09B;
+				CURRENT_PROJECT_VERSION = 23FE10A;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1102,7 +1110,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 14.0.0;
+				MARKETING_VERSION = 14.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.CCTSQLPlugin;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

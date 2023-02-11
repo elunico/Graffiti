@@ -40,17 +40,7 @@ class Sorter: SortComparator {
 }
 
 
-class TaggedDirectory: ObservableObject, NSCopying {
-    func copy(with zone: NSZone? = nil) -> Any {
-        let d = TaggedDirectory()
-        d.directory = directory
-        d.files = files.map { $0.copy() as! TaggedFile }
-        d.backend = backend.copy() as! TagBackend
-        d.indexMap = indexMap
-        d.filterPredicate = filterPredicate
-        return d 
-    }
-    
+class TaggedDirectory: ObservableObject {
     static let empty: TaggedDirectory = TaggedDirectory()
     private static let alwaysTrue: (TaggedFile) -> Bool = { _ in true }
     
@@ -70,7 +60,10 @@ class TaggedDirectory: ObservableObject, NSCopying {
             if doImageVision {
                 performVisionActions()
             } else {
-                files.forEach { file in backend.removeTagText(from: file) }
+                files.forEach { file in
+                    backend.removeTagText(from: file)
+                    file.tags.forEach { tag in tag.recoginitionState = .uninitialized }
+                }
             }
         }
     }
@@ -118,85 +111,6 @@ class TaggedDirectory: ObservableObject, NSCopying {
             performVisionActions()
         }
     }
-    
-    func recognizeObjects(in tag: Tag) {
-        guard let model = try? VNCoreMLModel(for: MobileNetV2(configuration: MLModelConfiguration()).model)
-        else {
-            return
-        }
-        
-        let request = VNCoreMLRequest(model: model)
-        
-        guard let url = tag.image, let nsImage = NSImage(contentsOf: url), let cgImage = nsImage.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return }
-        
-        let handler = VNImageRequestHandler(ciImage: CIImage(cgImage: cgImage), options: [:])
-        
-        try? handler.perform([request])
-        
-        guard let results = request.results as? [VNClassificationObservation] else {
-            return
-        }
-        
-        let observations = results[0..<5].filter{ (!$0.hasPrecisionRecallCurve) || ($0.hasPrecisionRecallCurve && $0.hasMinimumPrecision(0.8, forRecall: 0.8)) }.map { $0.identifier }
-        
-        
-        tag.imageTextContent.content.append(contentsOf: observations)
-        
-    }
-    
-    func recognizeText(in tag: Tag) {
-        
-        guard let imageURL = tag.image else { return }
-        
-        guard let cgImage = NSImage(byReferencing: imageURL).cgImage(forProposedRect: nil, context: nil , hints: nil) else { return }
-        
-        // Create a new image-request handler.
-        let requestHandler = VNImageRequestHandler(cgImage: cgImage)
-        
-        // Create a new request to recognize text.
-        let request = VNRecognizeTextRequest(completionHandler: {(request: VNRequest, error: Error?) in
-            guard let observations =
-                    request.results as? [VNRecognizedTextObservation] else {
-                return
-            }
-            let recognizedStrings = observations.compactMap { observation in
-                // Return the string of the top VNRecognizedText instance.
-                return observation.topCandidates(1).first?.string
-            }
-            
-            // Process the recognized strings.
-            tag.imageTextContent.content.append(contentsOf: recognizedStrings)
-            print(recognizedStrings)
-        })
-        
-        do {
-            // Perform the text-recognition request.
-            try requestHandler.perform([request])
-        } catch {
-            print("Unable to perform the requests: \(error).")
-        }
-    }
-    
-    
-    
-    
-    
-    func performVisionActions() {
-        if !doImageVision { return }
-        DispatchQueue.global(qos: .background).async { [self] in
-            for file in self.files {
-                for tag in file.tags where tag.recoginitionState == .uninitialized {
-                    tag.recoginitionState = .started
-                    recognizeText(in: tag)
-                    recognizeObjects(in: tag)
-                    tag.recoginitionState = .recognized
-                }
-            }
-        }
-        
-    }
-    
-    
     
     func getFile(withID id: String) -> TaggedFile? {
         guard let index = indexMap[id] else { return nil }
@@ -319,5 +233,94 @@ extension TaggedDirectory {
             }
         }
         return files.filter(filterPredicate)
+    }
+}
+
+extension TaggedDirectory {
+    func recognizeObjects(in tag: Tag) {
+        guard let model = try? VNCoreMLModel(for: MobileNetV2(configuration: MLModelConfiguration()).model) else { return }
+        
+        let request = VNCoreMLRequest(model: model)
+        
+        guard let url = tag.image, let nsImage = NSImage(contentsOf: url), let cgImage = nsImage.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return }
+        
+        let handler = VNImageRequestHandler(ciImage: CIImage(cgImage: cgImage), options: [:])
+        
+        try? handler.perform([request])
+        
+        guard let results = request.results as? [VNClassificationObservation] else {
+            return
+        }
+        
+        let observations = results[0..<5].filter{ (!$0.hasPrecisionRecallCurve) || ($0.hasPrecisionRecallCurve && $0.hasMinimumPrecision(0.8, forRecall: 0.8)) }.map { $0.identifier }
+        
+        
+        tag.imageTextContent.content.append(contentsOf: observations)
+        
+    }
+    
+    func recognizeText(in tag: Tag) {
+        
+        guard let imageURL = tag.image else { return }
+        
+        guard let cgImage = NSImage(byReferencing: imageURL).cgImage(forProposedRect: nil, context: nil , hints: nil) else { return }
+        
+        // Create a new image-request handler.
+        let requestHandler = VNImageRequestHandler(cgImage: cgImage)
+        
+        // Create a new request to recognize text.
+        let request = VNRecognizeTextRequest(completionHandler: {(request: VNRequest, error: Error?) in
+            guard let observations =
+                    request.results as? [VNRecognizedTextObservation] else {
+                return
+            }
+            let recognizedStrings = observations.compactMap { observation in
+                // Return the string of the top VNRecognizedText instance.
+                return observation.topCandidates(1).first?.string
+            }
+            
+            // Process the recognized strings.
+            tag.imageTextContent.content.append(contentsOf: recognizedStrings)
+            print(recognizedStrings)
+        })
+        
+        do {
+            // Perform the text-recognition request.
+            try requestHandler.perform([request])
+        } catch {
+            print("Unable to perform the requests: \(error).")
+        }
+    }
+    
+    
+    
+    
+    
+    func performVisionActions() {
+        if !doImageVision { return }
+        DispatchQueue.global(qos: .background).async { [self] in
+            for file in self.files {
+                for tag in file.tags where tag.recoginitionState == .uninitialized {
+                    tag.recoginitionState = .started
+                    recognizeText(in: tag)
+                    recognizeObjects(in: tag)
+                    tag.recoginitionState = .recognized
+                }
+            }
+        }
+        
+    }
+    
+}
+
+extension TaggedDirectory: NSCopying {
+    func copy(with zone: NSZone? = nil) -> Any {
+        let d = TaggedDirectory()
+        d.directory = directory
+        d.files = files.map { $0.copy() as! TaggedFile }
+        d.backend = backend.copy() as! TagBackend
+        d.indexMap = indexMap
+        d.filterPredicate = filterPredicate
+        return d
     }
 }

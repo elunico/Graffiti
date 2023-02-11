@@ -34,6 +34,10 @@ class ImageTextContent: Equatable, Hashable, Codable {
 }
 
 class Tag : Equatable, Hashable, Codable {
+    static let valueFieldName: String = "value"
+    private static var registry: [Tag.ID: Tag] = [:]
+    
+    
     static func == (lhs: Tag, rhs: Tag) -> Bool {
         if lhs.image != nil && rhs.image != nil {
             return lhs.image == rhs.image && lhs.imageFormat == rhs.imageFormat && lhs.recoginitionState == rhs.recoginitionState
@@ -42,44 +46,29 @@ class Tag : Equatable, Hashable, Codable {
         }
     }
     
-    func hash(into hasher: inout Hasher) {
-        if image != nil {
-            hasher.combine(image)
-            hasher.combine(imageFormat)
-            hasher.combine(recoginitionState)
-        } else {
-            hasher.combine(value)
-        }
+    
+    enum ImageFormat: Codable {
+        case url, content
     }
+    enum RecognitionState: Int, Codable {
+        case uninitialized, started, recognized
+    }
+    enum SerializeTagError : Error {
+        case invalidBytes
+    }
+    enum DeserializeTagError: Error {
+        case noPathLength, noPath, noStringCount, noStringLength, noString
+        case noImage
+        case noState
+        case noRefCount
+    }
+    
+    
     
     var value: String = ""
     var image: URL? = nil
     var imageFormat: ImageFormat = .url
-    
-    // refCount only cares about TaggedFile references so until the refCount is incremented
-    // by the addition of the tag to a file it should not exist
-    private var refCount: Int = 0
-    
-    func acquire() {
-        refCount += 1
-        print("INCR: Tag \(description) now has rc=\(refCount)")
-    }
-    
-    func relieve() {
-        refCount -= 1
-        print("DECR: Tag \(description) now has rc=\(refCount)")
-        if refCount <= 0 {
-            print("Tag \(description) is no longer referenced and is being freed")
-            Tag.registry.removeValue(forKey: self.id)
-            if let imageURL = image {
-                try! FileManager.default.removeItem(at: imageURL)
-            }
-        }
-    }
-    
     var recoginitionState : RecognitionState = .uninitialized
-    
-    static let valueFieldName: String = "value"
     
     var imageTextContent: ImageTextContent = ImageTextContent()
     
@@ -91,14 +80,34 @@ class Tag : Equatable, Hashable, Codable {
         }
     }
     
-    enum ImageFormat: Codable {
-        case url, content
-    }
-    enum RecognitionState: Int, Codable {
-        case uninitialized, started, recognized
-    }
+    // refCount only cares about TaggedFile references so until the refCount is incremented
+    // by the addition of the tag to a file it should not exist
+    private var refCount: Int = 0
     
-    private static var registry: [Tag.ID: Tag] = [:]
+    
+    static func deserialize(from data: Data, imageFormat: ImageFormat)  throws -> Tag {
+        func intern() throws -> Tag {
+            if let s = String(data: data, encoding: .utf8), let existing = registry[s] { return existing }
+            let typeQualifier = Array(data[0..<2])
+            let content = Data(data[2...])
+            
+            switch typeQualifier {
+            case [73, 85]:
+                return try deserializeImageURL(content: content)
+            case [66, 68]:
+                return try deserializeImageContent(content: content)
+            case [83, 86]:
+                return try deserializeString(content: content)
+            default:
+                fatalError()
+            }
+        }
+        
+        let tag = try intern()
+        print(tag.debugDescription)
+        return tag
+        
+    }
     
     static func tag(fromID string: Tag.ID) -> Tag? {
         
@@ -133,10 +142,20 @@ class Tag : Equatable, Hashable, Codable {
     
     static func tag(withString string: String) -> Tag {
         if let tag = registry["SV\(string)"] {
-            print("Fonud existing tag")
             return tag
         } else {
             let tag = Tag(string: string)
+            registry[tag.id] = tag
+            return tag
+        }
+    }
+    
+    static func tag(imageURL url: URL, format: ImageFormat) -> Tag {
+        let tag = Tag(imageURL: url , format: format)
+        
+        if let tag = registry[tag.id] {
+            return tag
+        } else {
             registry[tag.id] = tag
             return tag
         }
@@ -153,36 +172,37 @@ class Tag : Equatable, Hashable, Codable {
         self.imageFormat = format
     }
     
-    static func tag(imageURL url: URL, format: ImageFormat) -> Tag {
-        let tag = Tag(imageURL: url , format: format)
-
-//        let key = format == .content ? "BD\(url.absolutePath)" : "IU\(url.absolutePath)"
-        
-        if let tag = registry[tag.id] {
-            print("Fonud existing tag")
-            return tag
-        } else {
-            registry[tag.id] = tag
-            return tag
+    func acquire() {
+        refCount += 1
+        print("INCR: Tag \(description) now has rc=\(refCount)")
+    }
+    
+    func relieve() {
+        refCount -= 1
+        print("DECR: Tag \(description) now has rc=\(refCount)")
+        if refCount <= 0 {
+            print("Tag \(description) is no longer referenced and is being freed")
+            Tag.registry.removeValue(forKey: self.id)
+            if let imageURL = image {
+                try! FileManager.default.removeItem(at: imageURL)
+            }
         }
     }
     
-    //    func serializeToString(imageFormat: ImageFormat) throws -> String {
-    //        if image != nil {
-    //            switch imageFormat {
-    //            case .url:
-    //                return "IU\(image!.absolutePath)"
-    //            case .content:
-    //                return "BD\(try TPData(contentsOf: image!).base64EncodedString())"
-    //            }
-    //        } else {
-    //            return "SV\(value)"
-    //        }
-    //    }
-    
-    enum SerializeTagError : Error {
-        case invalidBytes
+    deinit {
+        print("Deinit of \(String(describing: self))")
     }
+    
+    func hash(into hasher: inout Hasher) {
+        if image != nil {
+            hasher.combine(image)
+            hasher.combine(imageFormat)
+            hasher.combine(recoginitionState)
+        } else {
+            hasher.combine(value)
+        }
+    }
+    
     
     func serializeToData(imageFormat: ImageFormat) throws -> Data {
         if image != nil {
@@ -219,7 +239,7 @@ class Tag : Equatable, Hashable, Codable {
                 }
                 data.append(recoginitionState.rawValue.bigEndianBytes)
                 data.append(refCount.bigEndianBytes)
-
+                
                 return data
             }
         } else {
@@ -228,48 +248,29 @@ class Tag : Equatable, Hashable, Codable {
             var data = Data(magic).appending(vdata.count.bigEndianBytes).appending(vdata)
             data.append(recoginitionState.rawValue.bigEndianBytes)
             data.append(refCount.bigEndianBytes)
-
+            
             return data
         }
     }
     
-    //    static func deserialize(from string: String, imageFormat: ImageFormat)  throws -> Tag {
-    //        if let existing = registry[string] { return existing }
-    //        let typeQualifier = string[string.startIndex..<string.index(string.startIndex, offsetBy: 2)]
-    //        let content = String(string[string.index(string.startIndex, offsetBy: 2)...])
-    //        switch typeQualifier {
-    //        case "IU":
-    //            return Tag(string: content)
-    //        case "BD":
-    //            let data = Data(base64Encoded: content, options: .ignoreUnknownCharacters)
-    //            let ownedURL = try  createOwnedImageURL()
-    //            try data?.write(to: ownedURL)
-    //            return Tag(imageURL: ownedURL, format: .content)
-    //        case "SV":
-    //            return Tag(imageURL: URL(string: content)!, format: .url)
-    //        default:
-    //            fatalError()
-    //        }
-    //
-    //    }
     
     
-    enum DeserializeTagError: Error {
-        case noPathLength, noPath, noStringCount, noStringLength, noString
-        case noImage
-        case noState
-        case noRefCount
-    }
     
     private static func deserilizeRecognizedStrings(count stringCount: Int, fromIterator iter: inout Data.Iterator, to tag: inout Tag) throws {
         for _ in 0..<stringCount {
             guard let stringLength = iter.nextBEInt() else { throw DeserializeTagError.noStringLength }
-            print("stringLength \(stringLength)")
             guard let stringData = iter.next(stringLength) else { throw DeserializeTagError.noStringLength }
-            print("stringData \(stringData)")
-                    guard let string = String(data: stringData, encoding: .utf8) else { throw DeserializeTagError.noString }
+            guard let string = String(data: stringData, encoding: .utf8) else { throw DeserializeTagError.noString }
             tag.imageTextContent.content.append(string)
             
+        }
+    }
+    
+    private static func skipRecognizedStrings(count stringCount: Int, fromIterator iter: inout Data.Iterator) throws {
+        for _ in 0..<stringCount {
+            guard let stringLength = iter.nextBEInt() else { throw DeserializeTagError.noStringLength }
+            guard let stringData = iter.next(stringLength) else { throw DeserializeTagError.noStringLength }
+            guard String(data: stringData, encoding: .utf8) != nil else { throw DeserializeTagError.noString }
         }
     }
     
@@ -279,18 +280,18 @@ class Tag : Equatable, Hashable, Codable {
         guard let pathLength = iter.nextBEInt() else { throw DeserializeTagError.noPathLength}
         
         guard let data = iter.next(pathLength), let path = String(data: data, encoding: .utf8) else { throw DeserializeTagError.noPath }
-        print(path)
         guard let stringCount = iter.nextBEInt() else { throw DeserializeTagError.noStringCount }
-        print("Attempting to restore \(stringCount) strings")
         
         var t = Tag.tag(imageURL: URL(fileURLWithPath: path), format: .url)
-        
+        print("Deserializing \(String(reflecting: t))")
         if t.recoginitionState == .uninitialized {
             try deserilizeRecognizedStrings(count: stringCount, fromIterator: &iter, to: &t)
             
             guard let recognitionState = iter.nextBEInt() else { throw DeserializeTagError.noState }
             t.recoginitionState = RecognitionState(rawValue: recognitionState)!
         } else {
+            // TODO: Do not store strings for every tag
+            try skipRecognizedStrings(count: stringCount, fromIterator: &iter)
             // discard state
             iter.nextBEInt()
         }
@@ -324,6 +325,9 @@ class Tag : Equatable, Hashable, Codable {
             guard let recognitionState = iter.nextBEInt() else { throw DeserializeTagError.noState }
             t.recoginitionState = RecognitionState(rawValue: recognitionState)!
         } else {
+            // TODO: Do not store strings for every tag
+            try skipRecognizedStrings(count: stringCount, fromIterator: &iter)
+
             // discard state
             iter.nextBEInt()
         }
@@ -339,13 +343,12 @@ class Tag : Equatable, Hashable, Codable {
         var iter = content.makeIterator()
         guard let pathLength = iter.nextBEInt() else { throw DeserializeTagError.noPathLength}
         
-        guard let data = iter.next(pathLength), let value = String(data: data, encoding: .utf8) else { throw DeserializeTagError.noImage }
+        guard let data = iter.next(pathLength), let value = String(data: data, encoding: .utf8) else { throw DeserializeTagError.noPath }
         guard let recognitionState = iter.nextBEInt() else { throw DeserializeTagError.noState }
         
         var t = Tag.tag(withString: value)
         t.recoginitionState = RecognitionState(rawValue: recognitionState)!
-        // discard state
-        iter.nextBEInt()
+        
         guard let rc = iter.nextBEInt() else { throw DeserializeTagError.noRefCount }
         t.refCount = rc
         return t
@@ -353,23 +356,6 @@ class Tag : Equatable, Hashable, Codable {
         
     }
     
-    static func deserialize(from data: Data, imageFormat: ImageFormat)  throws -> Tag {
-        if let s = String(data: data, encoding: .utf8), let existing = registry[s] { return existing }
-        let typeQualifier = Array(data[0..<2])
-        let content = Data(data[2...])
-        
-        switch typeQualifier {
-        case [73, 85]:
-            return try deserializeImageURL(content: content)
-        case [66, 68]:
-            return try deserializeImageContent(content: content)
-        case [83, 86]:
-            return try deserializeString(content: content)
-        default:
-            fatalError()
-        }
-        
-    }
     
 }
 
@@ -398,3 +384,10 @@ extension Tag: CustomStringConvertible {
     }
 }
 
+extension Tag: CustomDebugStringConvertible {
+    var debugDescription: String {
+        "Tag(ref: \(ObjectIdentifier(self)) rc: \(refCount), value: \(value), image: \(image?.lastPathComponent ?? "nil"), state: \(recoginitionState), strings: \(imageTextContent.content))"
+    }
+    
+    
+}
