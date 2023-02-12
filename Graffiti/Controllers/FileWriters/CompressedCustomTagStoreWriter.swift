@@ -72,24 +72,6 @@ extension Version {
     }
 }
 
-/// Format of this file type
-/// All data is compressed using lzma before writing to disk
-/// All ints are laid out big-endian
-/// All strings are utf-8 encoded
-///
-/// 2 bytes for major version
-/// 2 bytes for minor version
-/// 2 bytes for patch version
-/// 4 bytes number of files in store
-/// ---
-///   4 bytes path length
-///   variable path to file
-///   4 bytes number of tags
-///   ----
-///     4 bytes tag length
-///     variable tag bytes
-///   ---- repeats indefinitely
-/// --- Repeats until EOF
 class CompressedCustomTagStoreWriter: FileWriter {
     let fileProhibitedCharacters: Set<Character> = Set()
     static let fileExtension: String = ".ccts"
@@ -100,13 +82,14 @@ class CompressedCustomTagStoreWriter: FileWriter {
         var isDir: ObjCBool = false
         
         if !FileManager.default.fileExists(atPath: path, isDirectory: &isDir) && !isDir.boolValue {
-            FileManager.default.createFile(atPath: path, contents: try! Data(NSData(data: TagStore.default.version.encodedForCCTS.appending(0.bigEndianBytes)).compressed(using: .lzma)))
+            FileManager.default.createFile(atPath: path, contents: try! Data(NSData(data: TagStore.default.version.encodedForCCTS.appending(0.bigEndianBytes).appending(0.bigEndianBytes)).compressed(using: .lzma)))
         }
         
         if isDir.boolValue {
             throw FileWriterError.IsADirectory
         }
         
+        print(path)
         guard let contents = try? TPData(contentsOf: URL(fileURLWithPath: path)) else {
             throw FileWriterError.DeniedFileAccess
         }
@@ -132,7 +115,14 @@ class CompressedCustomTagStoreWriter: FileWriter {
             throw FileWriterError.VersionMismatch
         }
         
+        guard let totalTags = iter.nextBEInt() else { throw FileWriterError.InvalidFileFormat }
+        
+        for _ in 0..<totalTags {
+            let _ = try Tag.deserialize(from: &iter, imageFormat: .url)
+        }
+        
         guard let totalFiles = iter.nextBEInt() else { throw FileWriterError.InvalidFileFormat }
+        print(totalFiles)
         
         for _ in 0..<totalFiles {
             guard let pathLength = iter.nextBEInt(), let pathData = iter.next(Int(pathLength)), let path = String(data: pathData, encoding: .utf8) else {
@@ -147,12 +137,13 @@ class CompressedCustomTagStoreWriter: FileWriter {
             }
             for _ in 0..<tagCount {
                 // TODO: store the recognized text and flag
-                guard let tagLen = iter.nextBEInt(), let tagData = iter.next(Int(tagLen)) else {
+                guard let tagLen = iter.nextBEInt(), let idData = iter.next(Int(tagLen)), let tagID = String(data: idData, encoding: .utf8) else {
                     os_log("%s", log: .default, type: .error, "Invalid tag length")
                     throw FileWriterError.InvalidFileFormat
                 }
-                let tag = try  Tag.deserialize(from: tagData, imageFormat: .url)
-                retValue[path]!.insert(tag)
+                if let tag = Tag.tag(fromID: tagID) {
+                    retValue[path]!.insert(tag)
+                }
             }
         }
         
@@ -164,6 +155,14 @@ class CompressedCustomTagStoreWriter: FileWriter {
     func saveTo(path: String, store: TagStore) {
         var data = Data()
         data.append(store.version.encodedForCCTS)
+        
+        let allTags = store.tagData.values.flatMap { $0 }.unique()
+        data.append(allTags.count.bigEndianBytes)
+        
+        for tag in allTags {
+            data.append(try! tag.serializeToData(imageFormat: .url))
+        }
+        
         data.append(store.tagData.count.bigEndianBytes)
         
         for (path, tags) in store.tagData {
@@ -172,9 +171,10 @@ class CompressedCustomTagStoreWriter: FileWriter {
             data.append(pdata)
             data.append(tags.count.bigEndianBytes)
             for tag in tags {
-                let tdata = try! tag.serializeToData(imageFormat: .url)
-                data.append(tdata.count.bigEndianBytes)
-                data.append(tdata)
+                if let tdata = tag.id.data(using: .utf8) {
+                    data.append(tdata.count.bigEndianBytes)
+                    data.append(tdata)
+                }
             }
         }
                 

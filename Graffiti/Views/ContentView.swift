@@ -94,10 +94,6 @@ struct ContentView: View {
                     Label("Go!", systemImage: "arrowshape.forward")
                 }.disabled(directory == nil || formatChoice == .none)
                 Spacer().frame(height: 50.0)
-                Divider().frame(width: geometry.size.width / 2)
-                Button("Convert an existing tag store") {
-                    openWindow(id: "convertwindow")
-                }
             }
             .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
             .padding()
@@ -228,7 +224,7 @@ struct ContentView: View {
             if FileManager.default.fileExists(atPath: url.absolutePath, isDirectory: &isDir) && isDir.boolValue {
                 directory = url
                 loadedFile = nil
-                formatChoice = .xattr
+                formatChoice = .none
             } else {
                 loadedFile = url
                 var matchedImport = false

@@ -85,19 +85,19 @@ class Tag : Equatable, Hashable, Codable {
     private var refCount: Int = 0
     
     
-    static func deserialize(from data: Data, imageFormat: ImageFormat)  throws -> Tag {
+    static func deserialize(from iterator: inout Data.Iterator, imageFormat: ImageFormat)  throws -> Tag {
         func intern() throws -> Tag {
-            if let s = String(data: data, encoding: .utf8), let existing = registry[s] { return existing }
-            let typeQualifier = Array(data[0..<2])
-            let content = Data(data[2...])
+//            if let s = String(data: data, encoding: .utf8), let existing = registry[s] { return existing }
+            let typeQualifier = Array(iterator.next(2)!)
+            
             
             switch typeQualifier {
             case [73, 85]:
-                return try deserializeImageURL(content: content)
+                return try deserializeImageURL(content: &iterator)
             case [66, 68]:
-                return try deserializeImageContent(content: content)
+                return try deserializeImageContent(content: &iterator)
             case [83, 86]:
-                return try deserializeString(content: content)
+                return try deserializeString(content: &iterator)
             default:
                 fatalError()
             }
@@ -274,9 +274,9 @@ class Tag : Equatable, Hashable, Codable {
         }
     }
     
-    private static func deserializeImageURL(content: Data) throws -> Tag {
+    private static func deserializeImageURL(content iter: inout Data.Iterator) throws -> Tag {
         
-        var iter = content.makeIterator()
+        
         guard let pathLength = iter.nextBEInt() else { throw DeserializeTagError.noPathLength}
         
         guard let data = iter.next(pathLength), let path = String(data: data, encoding: .utf8) else { throw DeserializeTagError.noPath }
@@ -303,9 +303,7 @@ class Tag : Equatable, Hashable, Codable {
         
     }
     
-    private static func deserializeImageContent(content: Data) throws -> Tag {
-        
-        var iter = content.makeIterator()
+    private static func deserializeImageContent(content iter: inout Data.Iterator) throws -> Tag {
         guard let pathLength = iter.nextBEInt() else { throw DeserializeTagError.noPathLength}
         
         guard let data = iter.next(pathLength), let imageContent = NSImage(data: data) else { throw DeserializeTagError.noImage }
@@ -338,9 +336,8 @@ class Tag : Equatable, Hashable, Codable {
         
     }
     
-    private static func deserializeString(content: Data) throws -> Tag {
-        
-        var iter = content.makeIterator()
+    private static func deserializeString(content iter: inout Data.Iterator) throws -> Tag {
+    
         guard let pathLength = iter.nextBEInt() else { throw DeserializeTagError.noPathLength}
         
         guard let data = iter.next(pathLength), let value = String(data: data, encoding: .utf8) else { throw DeserializeTagError.noPath }

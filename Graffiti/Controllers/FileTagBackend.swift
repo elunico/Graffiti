@@ -10,9 +10,14 @@ import Foundation
 class FileTagBackend: TagBackend {
     
     func copy(with zone: NSZone? = nil) -> Any {
-        guard let f = try? FileTagBackend( withFileName: filename, forFilesIn: directory, writer: writer) else { fatalError("Failed to produce copy() of FileTagBackend") }
-        f.dirty = dirty
-        return f
+        do {
+            let f = try FileTagBackend( withFileName: filename, forFilesIn: directory, writer: writer)
+            f.dirty = dirty
+            return f
+        } catch let error {
+            print(error)
+            fatalError()
+        }
     }
     
     private var lastAccessTime: Date? = nil
@@ -21,10 +26,15 @@ class FileTagBackend: TagBackend {
     func reloadData()  throws {
         
         try  getSandboxedAccess(to: directory.absolutePath, thenPerform: { path in
-            let intermediate = try  writer.loadFrom(path: saveFile)
-            let data = intermediate.tagData
-            for (p, tags) in data {
-                cachedData[p] = tags
+            do {
+                let intermediate = try  writer.loadFrom(path: saveFile)
+                print("passing intermediate")
+                let data = intermediate.tagData
+                for (p, tags) in data {
+                    cachedData[p] = tags
+                }
+            } catch let error {
+                print(error)
             }
         })
         
@@ -51,6 +61,12 @@ class FileTagBackend: TagBackend {
         self.filename = filename
         try self.reloadData()
         
+    }
+    
+    init() {
+        self.writer = CompressedCustomTagStoreWriter()
+        self.directory = URL(fileURLWithPath: "/")
+        self.filename = ""
     }
     
     func removeTagText(from file: TaggedFile) {

@@ -110,10 +110,6 @@ struct GraffitiApp: App {
         Settings {
             SettingsView().environmentObject(appState)
         }
-        
-        Window("Convert a Tag Store File", id: "convertwindow", content: {
-            ConvertView()
-        }).keyboardShortcut("1")
     }
     
     var canEditTags: Bool {

@@ -31,7 +31,7 @@ class TaggedFile: ObservableObject, NSCopying {
         self.init(parent: parent, filename: filename, backend: backend)
     }
     
-    init(parent: String, filename: String, backend: TagBackend? = XattrTagBackend()) {
+    init(parent: String, filename: String, backend: TagBackend? = FileTagBackend()) {
         self.parent = parent
         self.filename = filename
         var b: ObjCBool = false

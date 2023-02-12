@@ -46,7 +46,7 @@ class TaggedDirectory: ObservableObject {
     
     @Published var directory: String
     @Published var files: [TaggedFile] = []
-    private var backend: TagBackend
+    private var backend: TagBackend?
     private var indexMap: [TaggedFile.ID: Int] = [:]
     
     private var filterPredicate: (TaggedFile) -> Bool = alwaysTrue
@@ -61,7 +61,7 @@ class TaggedDirectory: ObservableObject {
                 performVisionActions()
             } else {
                 files.forEach { file in
-                    backend.removeTagText(from: file)
+                    backend?.removeTagText(from: file)
                     file.tags.forEach { tag in tag.recoginitionState = .uninitialized }
                 }
             }
@@ -82,7 +82,7 @@ class TaggedDirectory: ObservableObject {
     
     private init() {
         self.directory = ""
-        self.backend = XattrTagBackend()
+        self.backend = nil
     }
     
     func sort(with sorter: Sorter?) {
@@ -126,7 +126,9 @@ class TaggedDirectory: ObservableObject {
     }
     
     func addTags(_ tag: Tag, toAll files: [TaggedFile]) {
-        transactions.append(AddTagToManyFilesTransaction(backend: backend, tag: tag, files: files))
+        if let backend {
+            transactions.append(AddTagToManyFilesTransaction(backend: backend, tag: tag, files: files))
+        }
         transactions.last?.perform()
         invalidateRedo()
         performVisionActions()
@@ -134,7 +136,9 @@ class TaggedDirectory: ObservableObject {
     
     func addTag(_ tag: Tag, to file: TaggedFile) {
 //        backend.addTag(tag, to: file)
-        transactions.append(AddTagTransaction(backend: backend, tag: tag, file: file))
+        if let backend {
+            transactions.append(AddTagTransaction(backend: backend, tag: tag, file: file))
+        }
         transactions.last?.perform()
         invalidateRedo()
         performVisionActions()
@@ -144,7 +148,9 @@ class TaggedDirectory: ObservableObject {
     func removeTag(withID id: Tag.ID, from file: TaggedFile) {
 //        backend.removeTag(withID: id, from: file)
         guard let tag = Tag.tag(fromID: id) else { return }
-        transactions.append(RemoveTagTransaction(backend: backend, tag: tag, file: file))
+        if let backend {
+            transactions.append(RemoveTagTransaction(backend: backend, tag: tag, file: file))
+        }
         transactions.last?.perform()
         invalidateRedo()
     }
@@ -153,7 +159,9 @@ class TaggedDirectory: ObservableObject {
     func removeTag(withID id: Tag.ID, fromAll files: [TaggedFile]) {
 //        backend.removeTag(withID: id, from: file)
         guard let tag = Tag.tag(fromID: id) else { return }
-        transactions.append(RemoveTagFromManyFilesTransaction(backend: backend, tag: tag, files: files))
+        if let backend {
+            transactions.append(RemoveTagFromManyFilesTransaction(backend: backend, tag: tag, files: files))
+        }
         transactions.last?.perform()
         invalidateRedo()
     }
@@ -179,24 +187,24 @@ class TaggedDirectory: ObservableObject {
     }
     
     func loadTags(at path: String) -> Set<Tag> {
-        let t = backend.loadTags(at: path)
+        let t = backend?.loadTags(at: path) ?? []
         invalidateUndo()
         return t
     }
     
     func clearTags(of file: TaggedFile) {
         file.tags.forEach { $0.relieve() }
-        backend.clearTags(of: file)
+        backend?.clearTags(of: file)
         invalidateUndo()
         invalidateRedo()
     }
     
     func commit() {
-        backend.commit(files: files)
+        backend?.commit(files: files)
     }
     
     func commit(files: [TaggedFile]) {
-        backend.commit(files: files)
+        backend?.commit(files: files)
         self.indexMap.removeAll()
         self.files.removeAll(keepingCapacity: true)
         invalidateUndo()
@@ -204,11 +212,11 @@ class TaggedDirectory: ObservableObject {
     
     /// special characters used by the Tag backend that are
     /// prohibited from being used in Tags themselves
-    var implementationProhibitedCharacters: Set<Character> { backend.implementationProhibitedCharacters }
+    var implementationProhibitedCharacters: Set<Character> { backend?.implementationProhibitedCharacters ?? [] }
 
 
     var prohibitedCharacters: Set<Character> {
-        backend.prohibitedCharacters
+        backend?.prohibitedCharacters ?? []
     }
 
 }
@@ -318,7 +326,7 @@ extension TaggedDirectory: NSCopying {
         let d = TaggedDirectory()
         d.directory = directory
         d.files = files.map { $0.copy() as! TaggedFile }
-        d.backend = backend.copy() as! TagBackend
+        d.backend = backend?.copy() as? TagBackend
         d.indexMap = indexMap
         d.filterPredicate = filterPredicate
         return d
