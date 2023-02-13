@@ -82,7 +82,7 @@ class Tag : Equatable, Hashable, Codable {
     
     // refCount only cares about TaggedFile references so until the refCount is incremented
     // by the addition of the tag to a file it should not exist
-    private var refCount: Int = 0
+    private(set) var refCount: Int = 0
     
     
     static func deserialize(from iterator: inout Data.Iterator, imageFormat: ImageFormat)  throws -> Tag {
@@ -172,15 +172,17 @@ class Tag : Equatable, Hashable, Codable {
         self.imageFormat = format
     }
     
-    func acquire() {
+    @discardableResult
+    func acquire() -> Tag {
         refCount += 1
         print("INCR: Tag \(description) now has rc=\(refCount)")
+        return self
     }
     
     func relieve() {
         refCount -= 1
         print("DECR: Tag \(description) now has rc=\(refCount)")
-        if refCount <= 0 {
+        if refCount == 0 {
             print("Tag \(description) is no longer referenced and is being freed")
             Tag.registry.removeValue(forKey: self.id)
             if let imageURL = image {
@@ -204,7 +206,7 @@ class Tag : Equatable, Hashable, Codable {
     }
     
     
-    func serializeToData(imageFormat: ImageFormat) throws -> Data {
+    func serializeToData() throws -> Data {
         if image != nil {
             switch imageFormat {
             case .url:

@@ -73,6 +73,7 @@ extension Version {
 }
 
 class CompressedCustomTagStoreWriter: FileWriter {
+    
     let fileProhibitedCharacters: Set<Character> = Set()
     static let fileExtension: String = ".ccts"
 
@@ -156,11 +157,11 @@ class CompressedCustomTagStoreWriter: FileWriter {
         var data = Data()
         data.append(store.version.encodedForCCTS)
         
-        let allTags = store.tagData.values.flatMap { $0 }.unique()
+        let allTags = store.uniqueTags()
         data.append(allTags.count.bigEndianBytes)
         
         for tag in allTags {
-            data.append(try! tag.serializeToData(imageFormat: .url))
+            data.append(try! tag.serializeToData())
         }
         
         data.append(store.tagData.count.bigEndianBytes)

@@ -34,7 +34,7 @@ class FileTagBackend: TagBackend {
                     cachedData[p] = tags
                 }
             } catch let error {
-                print(error)
+                print("reloadData() error \(error)")
             }
         })
         
@@ -53,12 +53,14 @@ class FileTagBackend: TagBackend {
     var writer: FileWriter
     var directory: URL
     var dirty: Bool = false
+    var format: Tag.ImageFormat
     var filename: String?
     
-    init(withFileName filename: String?, forFilesIn directory: URL, writer: FileWriter) throws {
+    init(withFileName filename: String?, forFilesIn directory: URL, writer: FileWriter, format: Tag.ImageFormat = .url) throws {
         self.directory = directory
         self.writer = writer
         self.filename = filename
+        self.format = format
         try self.reloadData()
         
     }
@@ -67,6 +69,7 @@ class FileTagBackend: TagBackend {
         self.writer = CompressedCustomTagStoreWriter()
         self.directory = URL(fileURLWithPath: "/")
         self.filename = ""
+        self.format = .url
     }
     
     func removeTagText(from file: TaggedFile) {

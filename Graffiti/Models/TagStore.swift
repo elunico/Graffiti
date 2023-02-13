@@ -14,3 +14,9 @@ struct TagStore: Equatable, Hashable, Codable {
     
     static let `default`: TagStore = TagStore(tagData: [:])
 }
+
+extension TagStore {
+    func uniqueTags() -> [Tag] {
+        tagData.values.flatMap { $0 }.unique()
+    }
+}

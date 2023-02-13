@@ -12,6 +12,7 @@ enum Format: Hashable, CustomStringConvertible, CaseIterable {
     var description: String {
         switch self {
         case .ccts: return "Custom Compressed Tag Store"
+        case .json: return "JSON File"
         case .none: return "<<none>>"
         }
     }
@@ -19,6 +20,7 @@ enum Format: Hashable, CustomStringConvertible, CaseIterable {
     var contentType: UTType? {
         switch self {
         case .none: return nil
+        case .json: return UTType("public.json")
         case .ccts: return UTType("com.tom.ccts")
         }
     }
@@ -26,6 +28,7 @@ enum Format: Hashable, CustomStringConvertible, CaseIterable {
     var fileExtension: String? {
         switch self {
         case .none: return nil
+        case .json: return "json"
         case .ccts: return "ccts"
         }
     }
@@ -36,6 +39,8 @@ enum Format: Hashable, CustomStringConvertible, CaseIterable {
         switch self {
         case .none:
             return nil
+        case .json:
+            b = try FileTagBackend(withFileName: filename, forFilesIn: directory, writer: JSONFileWriter())
         case .ccts:
             b = try FileTagBackend(withFileName: filename, forFilesIn: directory, writer: CompressedCustomTagStoreWriter())
         }
@@ -51,6 +56,6 @@ enum Format: Hashable, CustomStringConvertible, CaseIterable {
         return nil 
     }
     
-    case ccts
+    case ccts, json
     case none
 }

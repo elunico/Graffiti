@@ -22,7 +22,8 @@ struct FormatSelector: View {
     
         
     var options: [Format: FormatOption] = [
-        .ccts: FormatOption(format: .ccts, name: "Custom Compressed Tag Store File", description: "Saves all tags of all files in a directory to a single custom compressed binary format meant to make efficient use of space at the cost of compatibility with external editors")
+        .ccts: FormatOption(format: .ccts, name: "Custom Compressed Tag Store File", description: "Saves all tags of all files in a directory to a single custom compressed binary format meant to make efficient use of space at the cost of compatibility with external editors"),
+        .json: FormatOption(format: .json, name: "JSON File", description: "Saves all tags of all files in a directory to a JSON file. Useful for external editing or programmatic manipulation, but creates larger files")
     ]
     
     func removing(formatOption option: Format?) -> FormatSelector {

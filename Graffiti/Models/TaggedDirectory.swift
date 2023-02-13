@@ -200,7 +200,7 @@ class TaggedDirectory: ObservableObject {
     }
     
     func commit() {
-        backend?.commit(files: files)
+        commit(files: self.files)
     }
     
     func commit(files: [TaggedFile]) {
@@ -218,13 +218,17 @@ class TaggedDirectory: ObservableObject {
     var prohibitedCharacters: Set<Character> {
         backend?.prohibitedCharacters ?? []
     }
+    
+    func convertTagStorage(to format: Tag.ImageFormat) {
+        files.forEach { file in file.tags.forEach { tag in tag.imageFormat = format } }
+    }
 
 }
 
 // Functions for filtering
 extension TaggedDirectory {
 
-    func filter(by query: String) -> [TaggedFile] {
+    func filter(by query: String, onlyUntagged: Bool = false) -> [TaggedFile] {
         self.query = query
         if query.isEmpty {
             filterPredicate = TaggedDirectory.alwaysTrue
@@ -240,7 +244,11 @@ extension TaggedDirectory {
                 }
             }
         }
-        return files.filter(filterPredicate)
+        if onlyUntagged {
+            return files.filter { $0.tags.isEmpty && filterPredicate($0) }
+        } else {
+            return files.filter(filterPredicate)
+        }
     }
 }
 

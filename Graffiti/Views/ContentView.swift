@@ -94,6 +94,10 @@ struct ContentView: View {
                     Label("Go!", systemImage: "arrowshape.forward")
                 }.disabled(directory == nil || formatChoice == .none)
                 Spacer().frame(height: 50.0)
+                Divider().frame(width: geometry.size.width / 2)
+                Button("Convert an existing tag store") {
+                    openWindow(id: "convertwindow")
+                }
             }
             .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
             .padding()
@@ -133,7 +137,8 @@ struct ContentView: View {
     
     var body: some View {
         if appState.isLoading {
-            ProgressView().progressViewStyle(CircularProgressViewStyle())
+            ProgressView().progressViewStyle(CircularProgressViewStyle()).onAppear {
+                loadDefaultSettings(from: appState)            }
         } else if appState.showingOptions {
             selectionView
                 .fileImporter(
@@ -158,13 +163,18 @@ struct ContentView: View {
                     appState.currentState = .Loading
                     loadDroppedFile(path)
                     
-                })
+                }).onAppear {
+                    loadDefaultSettings(from: appState)
+                }
         } else {
             MainView(choice: formatChoice, directory: self.directory, showOptions: { [unowned appState, unowned taggedDirectory] in
                 formatChoice = .none
 //                appState.reset()
 //                taggedDirectory.reset()
             })
+            .onAppear {
+                loadDefaultSettings(from: appState)
+            }
             
         }
         

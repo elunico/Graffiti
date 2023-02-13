@@ -151,7 +151,7 @@ func getContentsOfDirectory(atPath directory: String)  throws -> [String] {
 }
 
 func TPData(contentsOf url: URL) throws -> Data {
-    try Data(contentsOf: url)
+    try getSandboxedAccess(to: url.absolutePath) { try Data(contentsOf: URL(fileURLWithPath: $0)) }
 }
 
 func createOwnedImageURL()  throws -> URL {

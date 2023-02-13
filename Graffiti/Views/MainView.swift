@@ -29,6 +29,7 @@ struct MainView: View {
     @State private var selectedFileURL: URL? = nil
     @State private var richKind: Bool = false
     @State private var sorter: [Sorter] = []
+    @State private var showOnlyUntagged: Bool = false
     
     @State private var currentFileList: [TaggedFile] = []
     
@@ -269,7 +270,7 @@ struct MainView: View {
             TextField("Search", text: $query)
                 .onChange(of: query, perform: { [unowned files] _ in
                     
-                    currentFileList = files.filter(by: query)
+                    currentFileList = files.filter(by: query, onlyUntagged: showOnlyUntagged)
                     var noLongerSeen = selected
                     currentFileList.forEach { noLongerSeen.remove($0.id) }
                     selected.subtract(noLongerSeen)
@@ -295,10 +296,17 @@ struct MainView: View {
                                 Text(appState.showingMoreInfo ? "Less" : "More")
                             })
                             Spacer()
-                            Toggle("Spotlight File Kinds", isOn: $richKind)
-                                .onChange(of: richKind, perform: { _ in
-                                    UserDefaults.thisAppDomain?.set(richKind, forKey: MainView.kUserDefaultsRichKindKey)
-                                })
+                            VStack {
+                                Toggle("Spotlight File Kinds", isOn: $richKind)
+                                    .onChange(of: richKind, perform: { _ in
+                                        UserDefaults.thisAppDomain?.set(richKind, forKey: MainView.kUserDefaultsRichKindKey)
+                                    })
+                                Toggle("Show Only Untagged", isOn: $showOnlyUntagged)
+                                    .onChange(of: showOnlyUntagged, perform: { showOnly in
+                                        currentFileList = files.filter(by: query, onlyUntagged: showOnly)
+                                    })
+                            }
+                                
                             
                         }
                         if appState.showingMoreInfo {
@@ -324,7 +332,7 @@ struct MainView: View {
             }
             .onClearAll(message: (selected.count == 0 ? "This will remove EVERY tag from EVERY file currently in view in the table" : "This will remove EVERY tag from every SELECTED file in the table") + "\nYou cannot undo this action", isPresented: $appState.isPresentingConfirm, clearAction: { [unowned files] in
                 if selected.count == 0 {
-                    for file in files.filter(by: query) {
+                    for file in files.filter(by: query, onlyUntagged: showOnlyUntagged) {
                         files.clearTags(of: file)
                     }
                     
@@ -344,6 +352,9 @@ struct MainView: View {
         .onChange(of: appState.doImageVision, perform: { recognize in
             files.doImageVision = recognize
         })
+        .onChange(of: appState.imageSaveFormat, perform: { format in
+            files.convertTagStorage(to: format)
+        })
         .quickLookPreview($selectedFileURL, in: selectedFileURLs)
         .onDisappear(perform: self.teardown)
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification), perform: {output in self.teardown()})
@@ -355,7 +366,8 @@ struct MainView: View {
             guard let path = self.directory?.absolutePath else { return }
             
             try! self.files.load(directory: path, format: choice)
-            currentFileList = files.filter(by: query)
+            files.convertTagStorage(to: appState.imageSaveFormat)
+            currentFileList = files.filter(by: query, onlyUntagged: showOnlyUntagged)
             
             richKind = UserDefaults.thisAppDomain?.bool(forKey: MainView.kUserDefaultsRichKindKey) ?? false
             appState.createSelectionModel()

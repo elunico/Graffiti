@@ -59,12 +59,16 @@ struct SettingsView: View {
             
         }.padding()
             .onAppear {
-//                appState.copyOwnedImages = UserDefaults.thisAppDomain?.bool(forKey: SettingsView.copyOwnedImagesDefaultsKey) ?? true
-                appState.imageSaveFormat = UserDefaults.thisAppDomain?.bool(forKey: SettingsView.saveImageURLsDefaultsKey) ?? true  ? Tag.ImageFormat.url : Tag.ImageFormat.content
-                appState.doImageVision = UserDefaults.thisAppDomain?.bool(forKey: SettingsView.doTextRecognition) ?? true
+                loadDefaultSettings(from: appState)
                 
             }
     }
+}
+
+func loadDefaultSettings(from appState: ApplicationState) {
+    //                appState.copyOwnedImages = UserDefaults.thisAppDomain?.bool(forKey: SettingsView.copyOwnedImagesDefaultsKey) ?? true
+                    appState.imageSaveFormat = UserDefaults.thisAppDomain?.bool(forKey: SettingsView.saveImageURLsDefaultsKey) ?? true  ? Tag.ImageFormat.url : Tag.ImageFormat.content
+                    appState.doImageVision = UserDefaults.thisAppDomain?.bool(forKey: SettingsView.doTextRecognition) ?? true
 }
 
 struct SettingsView_Previews: PreviewProvider {
