@@ -144,6 +144,15 @@ class TaggedDirectory: ObservableObject {
         performVisionActions()
     }
     
+    func removeTag(withString string: String, from file: TaggedFile) {
+//        backend.removeTag(withID: id, from: file)
+        let tag = Tag.tag(withString: string) 
+        if let backend {
+            transactions.append(RemoveTagTransaction(backend: backend, tag: tag, file: file))
+        }
+        transactions.last?.perform()
+        invalidateRedo()
+    }
     
     func removeTag(withID id: Tag.ID, from file: TaggedFile) {
 //        backend.removeTag(withID: id, from: file)

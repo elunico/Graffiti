@@ -33,10 +33,13 @@ class ImageTextContent: Equatable, Hashable, Codable {
     var content: [String] = []
 }
 
-class Tag : Equatable, Hashable, Codable {
+class Tag : Equatable, Hashable, Codable, Identifiable {
     static let valueFieldName: String = "value"
     private static var registry: [Tag.ID: Tag] = [:]
+    private static var stringRegistry: [String: Tag.ID] = [:]
+    private static var imageRegistry: [URL: Tag.ID] = [:]
     
+    var id: UUID = UUID()
     
     static func == (lhs: Tag, rhs: Tag) -> Bool {
         if lhs.image != nil && rhs.image != nil {
@@ -61,6 +64,7 @@ class Tag : Equatable, Hashable, Codable {
         case noImage
         case noState
         case noRefCount
+        case noUUID
     }
     
     
@@ -109,9 +113,7 @@ class Tag : Equatable, Hashable, Codable {
         
     }
     
-    static func tag(fromID string: Tag.ID) -> Tag? {
-        
-        //    convenience init?(fromID string: Tag.ID)  {
+    private func recreateTag(from string: String) -> Tag? {
         func createTag() -> Tag? {
             let typeQualifier = string.tagIDTypePrefix
             let content = String(string.tagIDContent)
@@ -131,59 +133,63 @@ class Tag : Equatable, Hashable, Codable {
             }
         }
         
-        if let tag = registry[string] {
-            return tag
-        } else {
-            guard let tag = createTag() else { return nil }
-            registry[tag.id] = tag
-            return tag
-        }
+        return createTag()
+    }
+    
+    static func tag(fromID id: Tag.ID) -> Tag? {
+        return registry[id]
     }
     
     static func tag(withString string: String) -> Tag {
-        if let tag = registry["SV\(string)"] {
+        if let id = stringRegistry[string], let tag = registry[id] {
             return tag
         } else {
-            let tag = Tag(string: string)
-            registry[tag.id] = tag
-            return tag
+            assert(registry.values.allSatisfy { $0.value != string })
+            return Tag(string: string)
         }
     }
-    
-    static func tag(imageURL url: URL, format: ImageFormat) -> Tag {
-        let tag = Tag(imageURL: url , format: format)
+
+    static func tag(imageURL url: URL) -> Tag {
         
-        if let tag = registry[tag.id] {
+        if let id = imageRegistry[url], let tag = registry[id] {
             return tag
         } else {
-            registry[tag.id] = tag
-            return tag
+            assert(Tag.registry.values.allSatisfy { $0.image != url })
+            return Tag(imageURL: url, format: .url)
         }
     }
     
-    private init(string: String) {
+    private init(string: String, id: UUID? = nil) {
         self.image = nil
         self.value = string
+        if let id {
+            self.id = id
+        }
+        Tag.registry[self.id] = self
+        Tag.stringRegistry[string] = self.id
     }
     
-    private init(imageURL: URL, format: ImageFormat) {
+    private init(imageURL: URL, format: ImageFormat, id: UUID? = nil) {
         self.image = imageURL
         self.value = imageURL.absolutePath
         self.imageFormat = format
+        if let id {
+            self.id = id
+        }
+        Tag.registry[self.id] = self
+        Tag.imageRegistry[imageURL] = self.id
     }
     
     @discardableResult
     func acquire() -> Tag {
         refCount += 1
-        print("INCR: Tag \(description) now has rc=\(refCount)")
         return self
     }
     
     func relieve() {
         refCount -= 1
-        print("DECR: Tag \(description) now has rc=\(refCount)")
         if refCount == 0 {
-            print("Tag \(description) is no longer referenced and is being freed")
+            print("Tag \(ObjectIdentifier(self)) is no longer referenced and is being freed")
             Tag.registry.removeValue(forKey: self.id)
             if let imageURL = image {
                 try! FileManager.default.removeItem(at: imageURL)
@@ -214,7 +220,7 @@ class Tag : Equatable, Hashable, Codable {
                 let magic: [UInt8] = [73, 85]
                 let pathLength = imPath.count
                 let path = imPath
-                var data = Data(magic).appending(pathLength.bigEndianBytes).appending(path)
+                var data = Data(magic).appending(Data(id.uuidSequence)).appending(pathLength.bigEndianBytes).appending(path)
                 let stringCount = imageTextContent.content.count
                 data.append(stringCount.bigEndianBytes)
                 for string in imageTextContent.content {
@@ -231,7 +237,7 @@ class Tag : Equatable, Hashable, Codable {
                 let magic : [UInt8] = [66, 68]
                 let imageData = try TPData(contentsOf: image!)
                 let contentLength = imageData.count
-                var data = Data(magic).appending(contentLength.bigEndianBytes).appending(imageData)
+                var data = Data(magic).appending(Data(id.uuidSequence)).appending(contentLength.bigEndianBytes).appending(imageData)
                 let stringCount = imageTextContent.content.count
                 data = data.appending(stringCount.bigEndianBytes)
                 for string in imageTextContent.content {
@@ -247,7 +253,7 @@ class Tag : Equatable, Hashable, Codable {
         } else {
             let magic: [UInt8] = [83, 86]
             let vdata = value.data(using: .utf8)!
-            var data = Data(magic).appending(vdata.count.bigEndianBytes).appending(vdata)
+            var data = Data(magic).appending(Data(id.uuidSequence)).appending(vdata.count.bigEndianBytes).appending(vdata)
             data.append(recoginitionState.rawValue.bigEndianBytes)
             data.append(refCount.bigEndianBytes)
             
@@ -278,13 +284,15 @@ class Tag : Equatable, Hashable, Codable {
     
     private static func deserializeImageURL(content iter: inout Data.Iterator) throws -> Tag {
         
+        guard let id = iter.nextUUID() else { throw DeserializeTagError.noUUID }
         
-        guard let pathLength = iter.nextBEInt() else { throw DeserializeTagError.noPathLength}
+        guard let pathLength = iter.nextBEInt() else { throw DeserializeTagError.noPathLength }
         
         guard let data = iter.next(pathLength), let path = String(data: data, encoding: .utf8) else { throw DeserializeTagError.noPath }
         guard let stringCount = iter.nextBEInt() else { throw DeserializeTagError.noStringCount }
         
-        var t = Tag.tag(imageURL: URL(fileURLWithPath: path), format: .url)
+//        var t = Tag.tag(imageURL: URL(fileURLWithPath: path), format: .url)
+        var t = Tag(imageURL: URL(fileURLWithPath: path), format: .url, id: id)
         print("Deserializing \(String(reflecting: t))")
         if t.recoginitionState == .uninitialized {
             try deserilizeRecognizedStrings(count: stringCount, fromIterator: &iter, to: &t)
@@ -300,12 +308,15 @@ class Tag : Equatable, Hashable, Codable {
         
         guard let rc = iter.nextBEInt() else { throw DeserializeTagError.noRefCount }
         t.refCount = rc
+
         return t
         
         
     }
     
     private static func deserializeImageContent(content iter: inout Data.Iterator) throws -> Tag {
+        guard let id = iter.nextUUID() else { throw DeserializeTagError.noUUID }
+        
         guard let pathLength = iter.nextBEInt() else { throw DeserializeTagError.noPathLength}
         
         guard let data = iter.next(pathLength), let imageContent = NSImage(data: data) else { throw DeserializeTagError.noImage }
@@ -316,8 +327,8 @@ class Tag : Equatable, Hashable, Codable {
         let name = try createOwnedImageURL()
         try data.write(to: name)
         
-        var t = Tag.tag(imageURL: name, format: .content)
-        
+        var t = Tag(imageURL: name, format: .content, id: id)
+
         if t.recoginitionState == .uninitialized {
             
             try deserilizeRecognizedStrings(count: stringCount, fromIterator: &iter, to: &t)
@@ -333,23 +344,26 @@ class Tag : Equatable, Hashable, Codable {
         }
         guard let rc = iter.nextBEInt() else { throw DeserializeTagError.noRefCount }
         t.refCount = rc
+        
         return t
         
         
     }
     
     private static func deserializeString(content iter: inout Data.Iterator) throws -> Tag {
+        guard let id = iter.nextUUID() else { throw DeserializeTagError.noUUID }
     
         guard let pathLength = iter.nextBEInt() else { throw DeserializeTagError.noPathLength}
         
         guard let data = iter.next(pathLength), let value = String(data: data, encoding: .utf8) else { throw DeserializeTagError.noPath }
         guard let recognitionState = iter.nextBEInt() else { throw DeserializeTagError.noState }
         
-        var t = Tag.tag(withString: value)
+        var t = Tag(string: value, id: id)
         t.recoginitionState = RecognitionState(rawValue: recognitionState)!
         
         guard let rc = iter.nextBEInt() else { throw DeserializeTagError.noRefCount }
         t.refCount = rc
+
         return t
         
         
@@ -358,8 +372,10 @@ class Tag : Equatable, Hashable, Codable {
     
 }
 
-extension Tag: Identifiable {
-    var id: String {
+extension Tag {
+
+    
+    var serializedContentString: String {
         if image == nil {
             return "SV\(value)"
         } else if image != nil && imageFormat == .url {

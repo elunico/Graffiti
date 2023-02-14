@@ -16,6 +16,13 @@ extension Int {
     }
 }
 
+extension UUID {
+    var uuidSequence: [UInt8] {
+        [uuid.0, uuid.1, uuid.2, uuid.3, uuid.4, uuid.5, uuid.6, uuid.7,
+         uuid.8, uuid.9, uuid.10, uuid.11, uuid.12, uuid.13, uuid.14, uuid.15]
+    }
+}
+
 extension Data {
     func last(_ n: Int) -> Data {
         assert(subdata(in: 0..<n).allSatisfy { $0 == 0 })
@@ -52,6 +59,14 @@ extension Data.Iterator {
             d.append(v)
         }
         return d
+    }
+    
+    mutating func nextUUID() -> UUID? {
+        var bytes = next(16)
+        return (bytes?.withUnsafeBytes {
+            ptr in
+            return NSUUID(uuidBytes: ptr)
+        }) as UUID?
     }
 }
 
@@ -138,12 +153,14 @@ class CompressedCustomTagStoreWriter: FileWriter {
             }
             for _ in 0..<tagCount {
                 // TODO: store the recognized text and flag
-                guard let tagLen = iter.nextBEInt(), let idData = iter.next(Int(tagLen)), let tagID = String(data: idData, encoding: .utf8) else {
+                guard let tagLen = iter.nextBEInt(), let id = iter.nextUUID() else {
                     os_log("%s", log: .default, type: .error, "Invalid tag length")
                     throw FileWriterError.InvalidFileFormat
                 }
-                if let tag = Tag.tag(fromID: tagID) {
+                if let tag = Tag.tag(fromID: id) {
                     retValue[path]!.insert(tag)
+                } else {
+                    print("Missing tag for id \(id)")
                 }
             }
         }
@@ -172,10 +189,11 @@ class CompressedCustomTagStoreWriter: FileWriter {
             data.append(pdata)
             data.append(tags.count.bigEndianBytes)
             for tag in tags {
-                if let tdata = tag.id.data(using: .utf8) {
+                let tbytes = tag.id.uuidSequence
+                let tdata = Data(tbytes)
                     data.append(tdata.count.bigEndianBytes)
                     data.append(tdata)
-                }
+                
             }
         }
                 

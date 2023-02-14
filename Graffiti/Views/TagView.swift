@@ -39,9 +39,7 @@ struct TagView: View {
     func setImage(toURL url: URL) {
         tagImage = url
     }
-    
-    
-    
+        
     var body: some View {
         GeometryReader { geometry in
             VStack {
@@ -70,11 +68,11 @@ struct TagView: View {
                                 Spacer()
                                 Button {
                                     if item.id == selected {
-                                        if let selected, selected.tagIDTypePrefix == "IU" {
-                                            qlPreviewLink = URL(string: String(selected.tagIDContent))
+                                        if let selected, let url = Tag.tag(fromID: selected)?.image {
+                                            qlPreviewLink = url
                                         }
-                                    } else if item.id.tagIDTypePrefix == "IU" {
-                                        qlPreviewLink = URL(string: String(item.id.tagIDContent))
+                                    } else if let url = item.image {
+                                        qlPreviewLink = url 
                                     }
                                 } label: {
                                     Image(systemName: "eye")
@@ -85,7 +83,8 @@ struct TagView: View {
                             Text(item.value)
                         }
                     }
-                }).onDeleteCommand(perform: self.performDelete)
+                })
+                .onDeleteCommand(perform: self.performDelete)
                 
                 
                 TabView(selection: $selectedView) {
@@ -186,13 +185,8 @@ struct TagView: View {
             if let data, let s = String(data: data, encoding: .utf8), let originalURL = URL(string: s) {
                 if TagView.validImageExtensions.contains(originalURL.pathExtension.lowercased()) {
                     // TODO: handle the error
-//                    if appState.copyOwnedImages {
-                        let url = try!  takeOwnership(of: originalURL)
-                        setImage(toURL: url)
-                        
-//                    } else {
-//                        setImage(toURL: originalURL)
-//                    }
+                    let url = try!  takeOwnership(of: originalURL)
+                    setImage(toURL: url)
                 } else {
                     // TODO: alert user
                 }
@@ -213,7 +207,7 @@ struct TagView: View {
             tag = Tag.tag(withString: currentTag)
             currentTag = ""
         } else {
-            tag = Tag.tag(imageURL: tagImage!, format: appState.imageSaveFormat == .content ? .content : .url)
+            tag = Tag.tag(imageURL: tagImage!)
             tagImage = nil
         }
         directory.addTags(tag, toAll: files.map { $0 })

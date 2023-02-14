@@ -26,7 +26,7 @@ struct GraffitiRemoveTagsFromFile: AppIntent {
         let (directory, tagFile) = try  setup(storageType: $storageType, file: $file)
         
         for tag in tags {
-             directory.removeTag(withID: tag, from: tagFile)
+             directory.removeTag(withString: tag, from: tagFile)
         }
         return .result()
 
