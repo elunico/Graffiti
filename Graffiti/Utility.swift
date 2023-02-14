@@ -8,7 +8,15 @@
 import Foundation
 import AppKit
 
-
+extension Dictionary {
+    @discardableResult
+    mutating func removeValue(forMaybeKey key: Key?) -> Value? {
+        if let key {
+            return removeValue(forKey: key)
+        }
+        return nil
+    }
+}
 
 protocol AnyOptional {
     associatedtype Element

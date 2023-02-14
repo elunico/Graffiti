@@ -94,9 +94,7 @@ struct ConvertView: View {
                     FormatSelector(formatChoice: $endFormat)
                         .removing(formatOption: Format.none)
                         .removing(formatOption: beginFormat)
-                        .onChange(of: endFormat, perform: { _ in 
-                            print("End format is now \(endFormat) and ext = \(endFormat.fileExtension ?? "<nil>")")
-                        })
+                        
                 } else {
                     Text("Choose a file to begin")
                         .frame(height: 100.0)

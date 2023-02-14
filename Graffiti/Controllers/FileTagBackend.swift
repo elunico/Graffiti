@@ -25,16 +25,16 @@ class FileTagBackend: TagBackend {
     
     func reloadData()  throws {
         
-        try  getSandboxedAccess(to: directory.absolutePath, thenPerform: { path in
+        try getSandboxedAccess(to: directory.absolutePath, thenPerform: { path in
             do {
-                let intermediate = try  writer.loadFrom(path: saveFile)
-                print("passing intermediate")
+                let intermediate = try writer.loadFrom(path: saveFile)
                 let data = intermediate.tagData
                 for (p, tags) in data {
                     cachedData[p] = tags
                 }
             } catch let error {
                 print("reloadData() error \(error)")
+                
             }
         })
         

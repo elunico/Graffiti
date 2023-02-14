@@ -306,7 +306,7 @@ extension TaggedDirectory {
             
             // Process the recognized strings.
             tag.imageTextContent.content.append(contentsOf: recognizedStrings)
-            print(recognizedStrings)
+            print("Recognized strings: \(recognizedStrings)")
         })
         
         do {

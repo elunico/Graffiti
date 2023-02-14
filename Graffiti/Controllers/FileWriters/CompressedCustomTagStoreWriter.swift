@@ -6,7 +6,19 @@
 //
 
 import Foundation
-import os
+//import os
+
+enum Log {
+    case `default`
+}
+
+enum `Type` {
+    case error
+}
+
+func os_log(_ fmt: String, log: Log, type: `Type`, _ message: String) {
+    print(message)
+}
 
 extension Int {
     var bigEndianBytes: Data {
@@ -105,7 +117,6 @@ class CompressedCustomTagStoreWriter: FileWriter {
             throw FileWriterError.IsADirectory
         }
         
-        print(path)
         guard let contents = try? TPData(contentsOf: URL(fileURLWithPath: path)) else {
             throw FileWriterError.DeniedFileAccess
         }
@@ -132,13 +143,12 @@ class CompressedCustomTagStoreWriter: FileWriter {
         }
         
         guard let totalTags = iter.nextBEInt() else { throw FileWriterError.InvalidFileFormat }
-        
+        print("Total tags \(totalTags)")
         for _ in 0..<totalTags {
             let _ = try Tag.deserialize(from: &iter, imageFormat: .url)
         }
         
         guard let totalFiles = iter.nextBEInt() else { throw FileWriterError.InvalidFileFormat }
-        print(totalFiles)
         
         for _ in 0..<totalFiles {
             guard let pathLength = iter.nextBEInt(), let pathData = iter.next(Int(pathLength)), let path = String(data: pathData, encoding: .utf8) else {

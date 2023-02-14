@@ -31,9 +31,9 @@ struct TagView: View {
     func performDelete()  {
         guard let index = selected else { return }
         let tag =  Tag.tag(fromID: index)!
-        files.forEach { file in print(file.tags.map {$0.id})}
         let f = files.filter { $0.tags.contains(tag) }.map { $0 }
         directory.removeTag(withID: index, fromAll: f)
+        selected = nil
     }
     
     func setImage(toURL url: URL) {

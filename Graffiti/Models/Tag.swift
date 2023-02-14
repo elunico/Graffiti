@@ -33,6 +33,27 @@ class ImageTextContent: Equatable, Hashable, Codable {
     var content: [String] = []
 }
 
+/// The `Tag` class represents a `String` or an `NSImage` that tags a particular file
+///
+/// `Tag` instances are unique across runs of the program. Every file that is
+/// tagged with the same `String` or `NSImage` holds a reference to a single `Tag` object
+///
+/// The `Tag` class manages a registry of objects to distribute to users. There are
+/// 6 ways to obtains a `Tag` object, generally broken up into 4 categories
+///
+/// 1) Calling ``deserialize(from:imageFormat:)`` is done to deserialize a tag
+/// from the CCTS file format. When the method is used on data from the CCTS format it is
+/// efficient, but it does not check for existing tags before construction so it may construct
+/// a new `Tag` and replace an existing instance which destroys the invariants of the `Tag` class.
+/// As such this method should only be called on data directly obtained from a CCTS file.
+/// Calling `deserialize` twice for the same `Tag` data will break `Tag` invariants. This should never be done. The structure of a CCTS file ensures this does not happen
+///
+/// 2) Calling an appropriate constructor: either ``init(string:id:)`` or ``init(imageURL:format:id:)``. Like ``deserialize(from:imageFormat:)`` there is a risk of
+/// breaking class invariants when using the constructors. They are necessary, however, when constructing a `Tag` with a known id. This occurs on deserialization of non-CCTS file formats where a `UUID` is preserved across saves, since the `UUID` connects files and their tags it must be consistent between loads. These constructors should not be used unless it is **required** that the caller pass a known `UUID` to the tag rather than accept the generated `UUID` provided. If these constructors are called multiple times for the same `String` or `NSImage`, they will break the `Tag` class. To use the constructors care should be taken to first query the `Tag` class for existing `Tag`s with the same data by using the query method ``Tag/tag(fromID:)``. Call this method first to determine if the tag with the given ID already exists, and, only if ``Tag/tag(fromID:)`` returns `  `, is it safe to construct the tag with the given ID. If you need to construct a tag but do not need to specify its ID, use the ``Tag/tag(withString:)`` or ``Tag/tag(imageURL:)`` static methods.
+///
+/// 3) The ``Tag/tag(withString:)`` or ``Tag/tag(imageURL:)`` static methods. These methods are the safest way to construct new tags because they check for existing tags with that data and only if they are not present do they then construct and return new tags. Prefer these methods as long as they are possible
+///
+/// 4) The last method has already been mentioned and is ``Tag/tag(fromID:)``. This method does not construct a `Tag` instance at all, but only returns an existing `Tag` with the given ID, if it exists. This is the ideal method to call and can always be called without breaking any aspect of the Tag class, but it does return an `Optional<Tag>` so other methods are, at least in principle, necessary.
 class Tag : Equatable, Hashable, Codable, Identifiable {
     static let valueFieldName: String = "value"
     private static var registry: [Tag.ID: Tag] = [:]
@@ -85,6 +106,9 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
     private(set) var refCount: Int = 0
     
     
+    /// Deserialize a `Tag` instance from a CCTS file.
+    ///
+    /// Warning! Using this method comes with serious caveats see the documentation on the ``Tag`` class for more information
     static func deserialize(from iterator: inout Data.Iterator, imageFormat: ImageFormat)  throws -> Tag {
         func intern() throws -> Tag {
 //            if let s = String(data: data, encoding: .utf8), let existing = registry[s] { return existing }
@@ -104,7 +128,6 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
         }
         
         let tag = try intern()
-        print(tag.debugDescription)
         return tag
         
     }
@@ -132,10 +155,16 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
         return createTag()
     }
     
+    /// Obtain an existing `Tag` instance from its ID if it exists.
+    ///
+    /// Warning! Using this method comes with serious caveats see the documentation on the ``Tag`` class for more information
     static func tag(fromID id: Tag.ID) -> Tag? {
         return registry[id]
     }
     
+    /// Obtain an existing `Tag` instance from its `String` value if it exists or create it if it doesn't
+    ///
+    /// Warning! Using this method comes with serious caveats see the documentation on the ``Tag`` class for more information
     static func tag(withString string: String) -> Tag {
         if let id = stringRegistry[string], let tag = registry[id] {
             return tag
@@ -145,6 +174,9 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
         }
     }
 
+    /// Obtain an existing `Tag` instance from its known `URL` to an Image if it exists or create it if it doesn't
+    ///
+    /// Warning! Using this method comes with serious caveats see the documentation on the ``Tag`` class for more information
     static func tag(imageURL url: URL) -> Tag {
         
         if let id = imageRegistry[url], let tag = registry[id] {
@@ -155,7 +187,10 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
         }
     }
     
-    private init(string: String, id: UUID? = nil) {
+    /// Construct a new `Tag` instance with a `String` and `UUID`
+    ///
+    /// Warning! Using this method comes with serious caveats see the documentation on the ``Tag`` class for more information
+    init(string: String, id: UUID? = nil) {
         self.image = nil
         self.value = string
         if let id {
@@ -165,7 +200,10 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
         Tag.stringRegistry[string] = self.id
     }
     
-    private init(imageURL: URL, format: ImageFormat, id: UUID? = nil) {
+    /// Construct a new `Tag` instance with a Image file `URL` and `UUID`
+    ///
+    /// Warning! Using this method comes with serious caveats see the documentation on the ``Tag`` class for more information
+    init(imageURL: URL, format: ImageFormat, id: UUID? = nil) {
         self.image = imageURL
         self.value = imageURL.absolutePath
         self.imageFormat = format
@@ -176,19 +214,29 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
         Tag.imageRegistry[imageURL] = self.id
     }
     
+    /// Indicates the `Tag` is being held by something
+    ///
+    /// This method is called on a `Tag` instance when it becomes associated with a file. It increment the `refCount` of the `Tag` instance indicating another file holds a reference to this tag. This method must be called when assigning a Tag instance to a file. In general, this method should be called any time any entity is holding a reference to a particular `Tag` instance. Failure to properly call this method will result in `Tag` instances not known to the `Tag` class and images getting deleted from the filesystem
+    ///
+    /// - Returns: self
     @discardableResult
     func acquire() -> Tag {
         refCount += 1
         return self
     }
     
+    /// Indicates the `Tag` is no longer being used
+    ///
+    /// This method is called on Tags when they are removed from a file. It decrements the `refCount` and, if necessary, removes the `Tag` from the registry that the `Tag` class keeps and, if necessary, removes the associated image file that the `Tag` has. Since this method removes filesystem resources, this method should be called whenever an entity is sure that a tag will not be needed again for the remaining lifetime of the program.
     func relieve() {
         refCount -= 1
         if refCount == 0 {
-            print("Tag \(ObjectIdentifier(self)) is no longer referenced and is being freed")
+            print("Tag \(self.id) is no longer needed by any file but has retainCount: \(CFGetRetainCount(self))")
             Tag.registry.removeValue(forKey: self.id)
+            Tag.stringRegistry.removeValue(forKey: self.value)
+            Tag.imageRegistry.removeValue(forMaybeKey: self.image)
             if let imageURL = image {
-                try! FileManager.default.removeItem(at: imageURL)
+                try? FileManager.default.removeItem(at: imageURL)
             }
         }
     }
@@ -201,7 +249,9 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
         hasher.combine(id)
     }
     
-    
+    /// Serializes the Tag to a format appropriate for CCTS files
+    ///
+    /// This method produces a Data representation of the `Tag` object that is suitable for writing to a CCTS file. 
     func serializeToData() throws -> Data {
         if image != nil {
             switch imageFormat {
@@ -362,22 +412,21 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
     
 }
 
-extension Tag {
-
-    
-    var serializedContentString: String {
-        if image == nil {
-            return "SV\(value)"
-        } else if image != nil && imageFormat == .url {
-            return "IU\(image!)"
-        } else if image != nil && imageFormat == .content {
-            return "BD\(try! Data(contentsOf: image!).base64EncodedString())"
-        } else {
-            fatalError("Unidentifiable tag")
-        }
-        
-    }
-}
+//extension Tag {
+//
+//        var serializedContentString: String {
+//        if image == nil {
+//            return "SV\(value)"
+//        } else if image != nil && imageFormat == .url {
+//            return "IU\(image!)"
+//        } else if image != nil && imageFormat == .content {
+//            return "BD\(try! Data(contentsOf: image!).base64EncodedString())"
+//        } else {
+//            fatalError("Unidentifiable tag")
+//        }
+//
+//    }
+//}
 
 extension Tag: CustomStringConvertible {
     var description: String {
@@ -391,7 +440,7 @@ extension Tag: CustomStringConvertible {
 
 extension Tag: CustomDebugStringConvertible {
     var debugDescription: String {
-        "Tag(ref: \(ObjectIdentifier(self)) rc: \(refCount), value: \(value), image: \(image?.lastPathComponent ?? "nil"), state: \(recoginitionState), strings: \(imageTextContent.content))"
+        "Tag(id: \(self.id.uuidString) rc: \(refCount), value: \(value), image: \(image?.lastPathComponent ?? "nil"), state: \(recoginitionState), strings: \(imageTextContent.content))"
     }
     
     
