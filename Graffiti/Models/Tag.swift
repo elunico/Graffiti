@@ -42,11 +42,7 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
     var id: UUID = UUID()
     
     static func == (lhs: Tag, rhs: Tag) -> Bool {
-        if lhs.image != nil && rhs.image != nil {
-            return lhs.image == rhs.image && lhs.imageFormat == rhs.imageFormat && lhs.recoginitionState == rhs.recoginitionState
-        } else {
-            return lhs.value == rhs.value
-        }
+        lhs.id == rhs.id
     }
     
     
@@ -202,13 +198,7 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
     }
     
     func hash(into hasher: inout Hasher) {
-        if image != nil {
-            hasher.combine(image)
-            hasher.combine(imageFormat)
-            hasher.combine(recoginitionState)
-        } else {
-            hasher.combine(value)
-        }
+        hasher.combine(id)
     }
     
     
