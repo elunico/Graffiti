@@ -74,7 +74,7 @@ class FileTagBackend: TagBackend {
     
     func removeTagText(from file: TaggedFile) {
         dirty = true 
-        file.tags.forEach { $0.imageTextContent.content.removeAll(); $0.recoginitionState = .uninitialized }
+        file.tags.forEach { $0.imageTextContent.removeAll(); $0.recoginitionState = .uninitialized }
     }
     
     func addTag(_ tag: Tag, to file: TaggedFile) {

@@ -8,17 +8,26 @@
 import Foundation
 import SwiftUI
 
+infix operator =>
+
+func => <A, B>(_ lhs: A, _ rhs: B) -> B {
+    return rhs
+}
+
 struct TagView: View {
     @State var files: Set<TaggedFile>
-    @State var selected: Tag.ID?
+    @State var selected: Set<Tag.ID> = []
     @State var currentTag: String = ""
     @State var showingHelp = false
-//    @State var isDroppingImage = false
     @State var tagImage: URL? = nil
+    @State var tagImageThumbnail: URL? = nil
     @State var qlPreviewLink: URL? = nil
     @State var selectedView: ViewSelection = .text
     @EnvironmentObject var directory: TaggedDirectory
     @EnvironmentObject var appState: ApplicationState
+    
+    @State var chosenFormat: Tag.ImageFormat = .url
+    @State var tags: Array<Tag> = []
     
     var prohibitedCharacters: Set<Character>
     var done: (Set<TaggedFile>) -> ()
@@ -29,15 +38,18 @@ struct TagView: View {
     }
     
     func performDelete()  {
-        guard let index = selected else { return }
-        let tag =  Tag.tag(fromID: index)!
-        let f = files.filter { $0.tags.contains(tag) }.map { $0 }
-        directory.removeTag(withID: index, fromAll: f)
-        selected = nil
+        for index in selected {
+            let tag =  Tag.tag(fromID: index)!
+            let f = files.filter { $0.tags.contains(tag) }.map { $0 }
+            directory.removeTag(withID: index, fromAll: f)
+        }
+        tags = files.map { $0.tags }.flatten().unique()
+        selected = []
     }
     
-    func setImage(toURL url: URL) {
+    func setImage(url: URL, thumbnail thumbnailURL: URL) {
         tagImage = url
+        tagImageThumbnail = thumbnailURL
     }
         
     var body: some View {
@@ -56,28 +68,27 @@ struct TagView: View {
                     Text("This list includes all the tags across all of the selected files. Each tag may not be present on any one individual file. Any tag added in this view will be added to all selected files")
                 }
                 
-                Table(files.map { $0.tags }.flatten().unique(), selection: $selected, columns: {
+                Table(tags, selection: $selected, columns: {
                     TableColumn("Tag") { item in
                         if item.image != nil {
                             HStack {
-//                                Image(nsImage: NSImage(byReferencing: item.image!))
-                                ImageSelector.imageOfFile(item.image!)
+                                ImageSelector.imageOfFile(item.thumbnail)
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 150, height: 75, alignment: .center)
                                 Spacer()
                                 Button {
-                                    if item.id == selected {
-                                        if let selected, let url = Tag.tag(fromID: selected)?.image {
+                                    if selected.contains(item.id) {
+                                        if let selected = selected.first, let url = Tag.tag(fromID: selected)?.image {
                                             qlPreviewLink = url
                                         }
                                     } else if let url = item.image {
-                                        qlPreviewLink = url 
+                                        qlPreviewLink = url
                                     }
                                 } label: {
                                     Image(systemName: "eye")
                                 }
-                                    
+                                
                             }
                         } else {
                             Text(item.value)
@@ -86,6 +97,23 @@ struct TagView: View {
                 })
                 .onDeleteCommand(perform: self.performDelete)
                 
+                HStack {
+                    Picker(selection: $chosenFormat, content: {
+                        Text("References").tag(Tag.ImageFormat.url)
+                        Text("Image Data").tag(Tag.ImageFormat.content)
+                        Text("").tag(Tag.ImageFormat.none).disabled(true)
+                    }, label: {
+                        Text("Save Format")
+                    }).disabled(
+                        selected.count == 0 ||
+                        selected.allSatisfy { Tag.tag(fromID: $0)?.image == nil }
+                    )
+                    Spacer().frame(width: 20.0)
+                    Button("Change Formats") {
+                        selected.forEach { Tag.tag(fromID: $0)?.imageFormat = chosenFormat }
+                    }.disabled(chosenFormat != .none)
+                }
+               
                 
                 TabView(selection: $selectedView) {
                     HStack {
@@ -108,13 +136,8 @@ struct TagView: View {
                             DispatchQueue.main.async {
                                 selectFile(ofTypes: [.image]) { urls in
                                     guard let originalURL = urls.first else { return }
-//                                    if appState.copyOwnedImages {
-                                        let url = try!  takeOwnership(of: originalURL)
-                                        setImage(toURL: url)
-                                        
-//                                    } else {
-//                                        setImage(toURL: originalURL)
-//                                    }
+                                    let (url, thumbnailURL) = try! acquireImage(at: originalURL)
+                                    setImage(url: url, thumbnail: thumbnailURL)
                                 }
                             }
                         }, onDroppedFile: { (_, providers) in
@@ -124,7 +147,7 @@ struct TagView: View {
                     }.tabItem({
                         Text("Image")
                     }).tag(ViewSelection.image)
-                }
+                }.frame(width: ImageSelector.size.width + 50, height: ImageSelector.size.height + 50)
                 
                 
                 
@@ -143,7 +166,7 @@ struct TagView: View {
                     HStack {
                         Button("Delete Tag") {
                             self.performDelete()
-                        }.disabled(selected == nil)
+                        }.disabled(selected.isEmpty)
                         Button("Add Tag") {
                             self.addCurrentTag()
                         }.disabled(currentTag == "" && tagImage == nil)
@@ -156,13 +179,18 @@ struct TagView: View {
         }.padding()
             .onAppear {
                 appState.createSelectionModel()
+                tags = files.map { $0.tags }.flatten().unique()
             }
             .onDisappear {
                 appState.releaseSelectionModel()
             }
             .onChange(of: selected, perform: { _ in
-                if let id = selected {
-                    appState.select(only: id)
+                appState.select(only: selected)
+                let f = selected.compactMap({ tag in Tag.tag(fromID: tag)?.imageFormat }).unique()
+                if f.allSame() {
+                    chosenFormat = f.first ?? .none
+                } else {
+                    chosenFormat = .none 
                 }
             })
             .quickLookPreview($qlPreviewLink)
@@ -185,8 +213,8 @@ struct TagView: View {
             if let data, let s = String(data: data, encoding: .utf8), let originalURL = URL(string: s) {
                 if TagView.validImageExtensions.contains(originalURL.pathExtension.lowercased()) {
                     // TODO: handle the error
-                    let url = try!  takeOwnership(of: originalURL)
-                    setImage(toURL: url)
+                    let (url, thumb) = try!  acquireImage(at: originalURL)
+                    setImage(url: url, thumbnail: thumb)
                 } else {
                     // TODO: alert user
                 }
@@ -207,9 +235,10 @@ struct TagView: View {
             tag = Tag.tag(withString: currentTag)
             currentTag = ""
         } else {
-            tag = Tag.tag(imageURL: tagImage!)
+            tag = Tag.tag(imageURL: tagImage!, thumbnail: tagImageThumbnail!)
             tagImage = nil
         }
         directory.addTags(tag, toAll: files.map { $0 })
+        tags = files.map { $0.tags }.flatten().unique()
     }
 }

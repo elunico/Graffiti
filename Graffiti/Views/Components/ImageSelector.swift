@@ -7,7 +7,43 @@
 
 import SwiftUI
 
+
+extension NSCache {
+    @objc convenience init(countLimit: Int) {
+        self.init()
+        self.countLimit = countLimit
+    }
+}
+
+class URLHolder: NSObject {
+    let url: URL
+    
+    init(url: URL) {
+        self.url = url
+    }
+    
+    private static var cache: [Int: URLHolder] = [:]
+    
+    static func `for`(url: URL) -> URLHolder {
+        if let u = cache[url.hashValue] {
+            return u
+        } else {
+            let v = URLHolder(url: url)
+            cache[url.hashValue] = v
+            return v
+        }
+    }
+}
+
+fileprivate var thumbnailCache : NSCache<URLHolder, NSImage> = NSCache(countLimit: 25)
+
 struct ImageSelector: View {
+    
+    public static let size = CGSize(width: 200, height: 150)
+    public static let hoverScale = 1.08
+    
+    private var w: Double { Double(ImageSelector.size.width) }
+    private var h: Double { Double(ImageSelector.size.height) }
     
     @Binding var selectedImage: URL?
     
@@ -15,6 +51,7 @@ struct ImageSelector: View {
     @State private var imageHovering = false
     @State var onClick: (_ existingImage: URL?) -> ()
     @State var onDroppedFile: (_ existingImage: URL?, _ providers: [NSItemProvider]) -> Bool
+    @State var scaleFactor: Double = 1.0
     
     var body: some View {
         if selectedImage == nil {
@@ -23,31 +60,43 @@ struct ImageSelector: View {
                     .resizable()
                     .scaledToFit()
                     .scaleEffect(CGSize(width: 0.5, height: 0.5))
-                    .frame(width: 200, height: 150, alignment: .center)
+                    .frame(idealWidth: w, maxWidth: w, idealHeight: h, maxHeight: h, alignment: .center)
+                    .shadow(radius: 10.0)
                     .offset(x: 0, y: 0)
+                    .onHover(perform: {
+                        
+                        scaleFactor = $0 ? ImageSelector.hoverScale : 1
+                    })
                     .zIndex(2)
                 
                 RoundedRectangle(cornerRadius: 18.0)
                     .padding()
-                    .frame(width: 200, height: 150)
+                    .frame(idealWidth: w, maxWidth: w, idealHeight: h, maxHeight: h)
                     .foregroundColor(Color(.systemGray))
                     .offset(x: 0, y: 0)
+                    .shadow(radius: 10)
+                    .onHover(perform: {
+                        scaleFactor = $0 ? ImageSelector.hoverScale : 1
+                    })
             }
-            .frame(width: 200, height: 150, alignment: .center)
+            .scaleEffect(x: scaleFactor, y: scaleFactor)
+            .animation(.easeInOut(duration: 0.1))
+            .onHover(perform: {
+                scaleFactor = $0 ? ImageSelector.hoverScale : 1
+            })
+            .frame(idealWidth: w, maxWidth: w, idealHeight: h, maxHeight: h, alignment: .center)
             
             .onDrop(of: ["public.file-url"], isTargeted: $isDroppingImage, perform: { providers in
                 return onDroppedFile(selectedImage, providers)
             }).onTapGesture {
-                
                 onClick(selectedImage)
-                
             }
         } else {
             ZStack(alignment: .topLeading) {
                 ImageSelector.imageOfFile(selectedImage!)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 200, height: 150)
+                    .frame(width: w, height: h)
                     .onDrop(of: ["public.file-url"], isTargeted: $isDroppingImage, perform: { providers in
                         onDroppedFile(selectedImage, providers)
                     })
@@ -64,13 +113,23 @@ struct ImageSelector: View {
                 }
             }.onHover {
                 imageHovering = $0
-            }
+            }.frame(idealWidth: w, maxWidth: w, idealHeight: h, maxHeight: h, alignment: .center)
         }
     }
     
-    static func imageOfFile(_ url: URL) -> Image {
-        if FileManager.default.fileExists(atPath: url.absolutePath) {
-            return Image(nsImage:  NSImage(byReferencing: url))
+    static func imageOfFile(_ url: URL?) -> Image {
+        
+        if let url {
+            let holder = URLHolder.for(url: url)
+            if let image = thumbnailCache.object(forKey: holder) {
+                display(message: "Cache hit for \(url)")
+                return Image(nsImage: image)
+            } else {
+                let nsImage = NSImage(byReferencing: url)
+                thumbnailCache.setObject(nsImage, forKey: holder)
+                display(message: "Load from disk for \(url)")
+                return Image(nsImage:  nsImage)
+            }
         } else {
             return Image(systemName: "exclamationmark.triangle")
         }

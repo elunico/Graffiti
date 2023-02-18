@@ -8,7 +8,6 @@
 import Cocoa
 import Vision
 
-
 extension String {
     var tagIDTypePrefix: Substring {
         if count < 2 { return "" }
@@ -21,17 +20,6 @@ extension String {
     }
 }
 
-class ImageTextContent: Equatable, Hashable, Codable {
-    static func == (lhs: ImageTextContent, rhs: ImageTextContent) -> Bool {
-        lhs.content == rhs.content
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(content)
-    }
-    
-    var content: [String] = []
-}
 
 /// The `Tag` class represents a `String` or an `NSImage` that tags a particular file
 ///
@@ -66,16 +54,20 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
         lhs.id == rhs.id
     }
     
-    
     enum ImageFormat: Codable {
         case url, content
+        /* DO NOT USE THIS CASE */
+        case none
     }
+
     enum RecognitionState: Int, Codable {
         case uninitialized, started, recognized
     }
+
     enum SerializeTagError : Error {
         case invalidBytes
     }
+
     enum DeserializeTagError: Error {
         case noPathLength, noPath, noStringCount, noStringLength, noString
         case noImage
@@ -83,19 +75,18 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
         case noRefCount
         case noUUID
     }
-    
-    
-    
+
     var value: String = ""
     var image: URL? = nil
+    var thumbnail: URL? = nil
     var imageFormat: ImageFormat = .url
     var recoginitionState : RecognitionState = .uninitialized
     
-    var imageTextContent: ImageTextContent = ImageTextContent()
+    var imageTextContent: [String] = []
     
     var searchableMetadataString: String {
         if image != nil {
-            return imageTextContent.content.joined(separator: " ")
+            return imageTextContent.joined(separator: " ")
         } else {
             return value
         }
@@ -177,13 +168,13 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
     /// Obtain an existing `Tag` instance from its known `URL` to an Image if it exists or create it if it doesn't
     ///
     /// Warning! Using this method comes with serious caveats see the documentation on the ``Tag`` class for more information
-    static func tag(imageURL url: URL) -> Tag {
+    static func tag(imageURL url: URL, thumbnail: URL) -> Tag {
         
         if let id = imageRegistry[url], let tag = registry[id] {
             return tag
         } else {
             assert(Tag.registry.values.allSatisfy { $0.image != url })
-            return Tag(imageURL: url, format: .url)
+            return Tag(imageURL: url, format: .url, thumbnail: thumbnail)
         }
     }
     
@@ -203,10 +194,15 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
     /// Construct a new `Tag` instance with a Image file `URL` and `UUID`
     ///
     /// Warning! Using this method comes with serious caveats see the documentation on the ``Tag`` class for more information
-    init(imageURL: URL, format: ImageFormat, id: UUID? = nil) {
+    init(imageURL: URL, format: ImageFormat, thumbnail: URL? = nil, id: UUID? = nil) {
         self.image = imageURL
         self.value = imageURL.absolutePath
         self.imageFormat = format
+        if thumbnail == nil {
+            self.thumbnail = try? makeThumbnail(of: imageURL)
+        } else {
+            self.thumbnail = thumbnail
+        }
         if let id {
             self.id = id
         }
@@ -222,6 +218,7 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
     @discardableResult
     func acquire() -> Tag {
         refCount += 1
+        print("Tag \(id) now has rc: \(refCount)")
         return self
     }
     
@@ -230,13 +227,17 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
     /// This method is called on Tags when they are removed from a file. It decrements the `refCount` and, if necessary, removes the `Tag` from the registry that the `Tag` class keeps and, if necessary, removes the associated image file that the `Tag` has. Since this method removes filesystem resources, this method should be called whenever an entity is sure that a tag will not be needed again for the remaining lifetime of the program.
     func relieve() {
         refCount -= 1
+        print("Tag \(id) now has rc: \(refCount)")
         if refCount == 0 {
-            print("Tag \(self.id) is no longer needed by any file but has retainCount: \(CFGetRetainCount(self))")
+            print("Tag \(self.id) is no longer needed by any file.")
             Tag.registry.removeValue(forKey: self.id)
             Tag.stringRegistry.removeValue(forKey: self.value)
             Tag.imageRegistry.removeValue(forMaybeKey: self.image)
             if let imageURL = image {
                 try? FileManager.default.removeItem(at: imageURL)
+            }
+            if let thumbnail {
+                try? FileManager.default.removeItem(at: thumbnail)
             }
         }
     }
@@ -251,20 +252,22 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
     
     /// Serializes the Tag to a format appropriate for CCTS files
     ///
-    /// This method produces a Data representation of the `Tag` object that is suitable for writing to a CCTS file. 
+    /// This method produces a Data representation of the `Tag` object that is suitable for writing to a CCTS file.
     func serializeToData() throws -> Data {
         if image != nil {
+            precondition(imageFormat != .none, "cannot save an image tag with a format of .none")
             switch imageFormat {
+            case .none:
+                fatalError("I told you not to use it")
             case .url:
                 let imPath = image!.absolutePath.data(using: .utf8)!
                 let magic: [UInt8] = [73, 85]
                 let pathLength = imPath.count
                 let path = imPath
                 var data = Data(magic).appending(Data(id.uuidSequence)).appending(pathLength.bigEndianBytes).appending(path)
-                let stringCount = imageTextContent.content.count
+                let stringCount = imageTextContent.count
                 data.append(stringCount.bigEndianBytes)
-                for string in imageTextContent.content {
-                    
+                for string in imageTextContent {
                     guard let sdata = string.data(using: .utf8) else {throw SerializeTagError.invalidBytes}
                     let stringLength = sdata.count
                     data.append(stringLength.bigEndianBytes)
@@ -278,9 +281,9 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
                 let imageData = try TPData(contentsOf: image!)
                 let contentLength = imageData.count
                 var data = Data(magic).appending(Data(id.uuidSequence)).appending(contentLength.bigEndianBytes).appending(imageData)
-                let stringCount = imageTextContent.content.count
+                let stringCount = imageTextContent.count
                 data = data.appending(stringCount.bigEndianBytes)
-                for string in imageTextContent.content {
+                for string in imageTextContent {
                     let sdata = string.data(using: .utf8)!
                     let stringLength = sdata.count
                     data = data.appending(stringLength.bigEndianBytes).appending(sdata)
@@ -309,7 +312,7 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
             guard let stringLength = iter.nextBEInt() else { throw DeserializeTagError.noStringLength }
             guard let stringData = iter.next(stringLength) else { throw DeserializeTagError.noStringLength }
             guard let string = String(data: stringData, encoding: .utf8) else { throw DeserializeTagError.noString }
-            tag.imageTextContent.content.append(string)
+            tag.imageTextContent.append(string)
             
         }
     }
@@ -331,8 +334,14 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
         guard let data = iter.next(pathLength), let path = String(data: data, encoding: .utf8) else { throw DeserializeTagError.noPath }
         guard let stringCount = iter.nextBEInt() else { throw DeserializeTagError.noStringCount }
         
-//        var t = Tag.tag(imageURL: URL(fileURLWithPath: path), format: .url)
-        var t = Tag(imageURL: URL(fileURLWithPath: path), format: .url, id: id)
+        let imageURL = URL(fileURLWithPath: path)
+
+        // if the thumbnail exists for this image, use it, otherwise the Tag.init method will create one from the provided image
+        var thumbnail: URL? = try tryGetThumbnail(for: imageURL)
+        
+        // if thumbnail is nil because no thumbnail exists, one will be created in the init
+        var t = Tag(imageURL: imageURL, format: .url, thumbnail: thumbnail, id: id)
+        t.imageFormat = .url 
         print("Deserializing \(String(reflecting: t))")
         if t.recoginitionState == .uninitialized {
             try deserilizeRecognizedStrings(count: stringCount, fromIterator: &iter, to: &t)
@@ -367,7 +376,12 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
         let name = try createOwnedImageURL()
         try data.write(to: name)
         
-        var t = Tag(imageURL: name, format: .content, id: id)
+        // if the thumbnail exists for this image, use it, otherwise the Tag.init method will create one from the provided image
+        var thumbnail: URL? = try tryGetThumbnail(for: name)
+        
+        // if thumbnail is nil because no thumbnail exists, one will be created in the init
+        var t = Tag(imageURL: name, format: .content, thumbnail: thumbnail, id: id)
+        t.imageFormat = .content
 
         if t.recoginitionState == .uninitialized {
             
@@ -431,7 +445,7 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
 extension Tag: CustomStringConvertible {
     var description: String {
         if image != nil {
-            return "<image\(imageTextContent.content.count == 0 ? "" : " (\(imageTextContent.content.count) strings)")>"
+            return "<image\(imageTextContent.count == 0 ? "" : " (\(imageTextContent.count) strings)")>"
         } else {
             return value
         }
@@ -440,7 +454,7 @@ extension Tag: CustomStringConvertible {
 
 extension Tag: CustomDebugStringConvertible {
     var debugDescription: String {
-        "Tag(id: \(self.id.uuidString) rc: \(refCount), value: \(value), image: \(image?.lastPathComponent ?? "nil"), state: \(recoginitionState), strings: \(imageTextContent.content))"
+        "Tag(id: \(self.id.uuidString) rc: \(refCount), value: \(value), image: \(image?.lastPathComponent ?? "nil"), state: \(recoginitionState), strings: \(imageTextContent))"
     }
     
     

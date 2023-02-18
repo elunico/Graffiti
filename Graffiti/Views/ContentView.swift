@@ -30,19 +30,19 @@ struct ContentView: View {
     @EnvironmentObject var appState: ApplicationState
     @State var formatChoice: Format = .none
     @State var lazyChoice: Bool = false
-//    @State var showingOptions: Bool = true
+    //    @State var showingOptions: Bool = true
     @State var showingError: Bool = false
     @State var loadedFile: URL? = nil
     @State var directory: URL? = nil
-//    @State var isImporting: Bool = false
-//    @State var isConverting: Bool = false
-//    @State var isLoading: Bool = false {
-//        didSet {
-//            if !isLoading {
-//                NSApplication.shared.requestUserAttention(.informationalRequest)
-//            }
-//        }
-//    }
+    //    @State var isImporting: Bool = false
+    //    @State var isConverting: Bool = false
+    //    @State var isLoading: Bool = false {
+    //        didSet {
+    //            if !isLoading {
+    //                NSApplication.shared.requestUserAttention(.informationalRequest)
+    //            }
+    //        }
+    //    }
     
     @State var targeted: Bool = false
     @State var errorString: String = ""
@@ -138,7 +138,7 @@ struct ContentView: View {
     var body: some View {
         if appState.isLoading {
             ProgressView().progressViewStyle(CircularProgressViewStyle()).onAppear {
-                loadDefaultSettings(from: appState)            }
+                loadDefaultSettings(to: appState)            }
         } else if appState.showingOptions {
             selectionView
                 .fileImporter(
@@ -146,7 +146,7 @@ struct ContentView: View {
                     allowedContentTypes: [.plainText],
                     allowsMultipleSelection: false
                 ) { result in
-                                        do {
+                    do {
                         guard let selectedFile: URL = try result.get().first else { return }
                         if FileManager.default.fileExists(atPath: selectedFile.absolutePath) {
                             loadDroppedFile(selectedFile)
@@ -164,16 +164,14 @@ struct ContentView: View {
                     loadDroppedFile(path)
                     
                 }).onAppear {
-                    loadDefaultSettings(from: appState)
+                    loadDefaultSettings(to: appState)
                 }
         } else {
-            MainView(choice: formatChoice, directory: self.directory, showOptions: { [unowned appState, unowned taggedDirectory] in
-                formatChoice = .none
-//                appState.reset()
-//                taggedDirectory.reset()
-            })
+            MainView(choice: formatChoice, directory: self.directory)
             .onAppear {
-                loadDefaultSettings(from: appState)
+                loadDefaultSettings(to: appState)
+            }.onDisappear {
+                formatChoice = .none
             }
             
         }
@@ -182,7 +180,7 @@ struct ContentView: View {
     
     func loadUserSelection(onDone completed: @escaping (_ success: Bool) -> Void) {
         appState.isLoading = true
-        
+                
         DispatchQueue.main.async {
             guard let dir = self.directory else { return completed(false) }
             let filename = loadedFile == nil ? nil : NSString(string: loadedFile!.lastPathComponent).deletingPathExtension

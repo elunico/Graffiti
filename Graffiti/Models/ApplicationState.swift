@@ -7,7 +7,7 @@
 
 import Cocoa
 
-enum AppState : Equatable {
+enum AppState : Equatable, Hashable {
     case StartScreen
     case Converting
     case Loading
@@ -17,6 +17,14 @@ enum AppState : Equatable {
     case EditingFileView
     case ShowingConfirm
     
+    static var tagChangeableStates: Set<AppState> {
+        var states = Set<AppState>()
+        states.insert(AppState.MainView(hasSelection: true))
+        states.insert(AppState.MainView(hasSelection: false))
+        states.insert(AppState.EditingTags)
+        states.insert(AppState.EditingFileView)
+        return states
+    }
 }
 
 class AnySelectionModel: ObservableObject {

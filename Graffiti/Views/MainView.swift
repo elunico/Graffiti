@@ -21,10 +21,6 @@ struct MainView: View {
     @State private var selected: Set<TaggedFile.ID> = Set()
     @State private var query: String = ""
     
-    //    @State private var editing: Bool = false
-    //    @State private var isPresentingConfirm: Bool = false
-    //    @State private var showingMoreInfo: Bool = false
-    
     @State private var selectedFileURLs: [URL] = []
     @State private var selectedFileURL: URL? = nil
     @State private var richKind: Bool = false
@@ -32,9 +28,7 @@ struct MainView: View {
     @State private var showOnlyUntagged: Bool = false
     
     @State private var currentFileList: [TaggedFile] = []
-    
-    var showOptions: () -> ()
-    
+        
     enum Orientation {
         case horizontally, vertically
     }
@@ -63,14 +57,7 @@ struct MainView: View {
                     
                     TableColumn(richKind  ? "Kind" : "Extension") { item in
                         if richKind  {
-                            if let mditem = MDItemCreate(nil, item.id as CFString),
-                               let mdnames = MDItemCopyAttributeNames(mditem),
-                               let mdattrs = MDItemCopyAttributes(mditem, mdnames) as? [String:Any],
-                               let mdkind = mdattrs[kMDItemKind as String] as? String {
-                                Text("\(mdkind)")
-                            } else {
-                                Text("<unknown>")
-                            }
+                            Text(getMDKind(ofFileAtPath: item.id) ?? "<unknown>")
                         } else {
                             Text("\(URL(fileURLWithPath: item.id).pathExtension)")
                         }
@@ -107,7 +94,6 @@ struct MainView: View {
                                     }, label: { Label("Reveal \(item.filename) in Finder", systemImage: "folder.badge.questionmark") })
                                     
                                     Button(action:  {
-                                        //                                        NSWorkspace.shared.openFile(item.id)
                                         NSWorkspace.shared.open(item.absoluteURL)
                                         
                                     }, label: { Label("Open \((selected.contains(item.id) && selected.count > 1) ? "\(selected.count) items" : item.filename)" , systemImage: "doc.viewfinder") })
@@ -134,16 +120,22 @@ struct MainView: View {
                                 }
                             }
                     }
-                }).onChange(of: sorter, perform: { _ in
-                    if let sorter = sorter.first {
-                        currentFileList.sort(using: sorter)
-                    }
+                }).onChange(of: sorter, perform: {
+//                    if let sorter = sorter.last {
+                        currentFileList.sort(using: $0)
+//                    }
+                    display(message: "sizeof sorter is \(sorter.count)")
                 }).onChange(of: selected, perform: { _ in
                     if selected.count > 0 {
                         appState.currentState = .MainView(hasSelection: true)
                     }
                     appState.select(only: selected)
-                })
+                }).onAppear {
+                    _ = launch(after: .minutes(5).and(.seconds(30)), repeats: true) { action in
+                        display(message: "Timer activated", log: .default, type: .error)
+                        mdCache.removeAll()
+                    }
+                }
                 
             }
         }
@@ -169,8 +161,8 @@ struct MainView: View {
                                 
                                 let temporaryFileURL = temporaryDirectoryURL.appendingPathComponent(ts.lastPathComponent)
                                 
-                                guard let data = try? TPData(contentsOf: url) else { return  NSItemProvider()}
-                                guard let _ = try? data.write(to: temporaryFileURL, options: .atomic) else { return  NSItemProvider()}
+                                let data = try TPData(contentsOf: url)
+                                let _ = try data.write(to: temporaryFileURL, options: .atomic)
                                 return NSItemProvider(item: temporaryFileURL as NSSecureCoding, typeIdentifier: "public.file-url")
                             } catch {
                                 return NSItemProvider()
@@ -321,7 +313,6 @@ struct MainView: View {
                         self.teardown()
                         appState.currentState = .StartScreen
                         appState.showingOptions = true
-                        showOptions()
                     }
                     Spacer()
                     Text("\(files.files.count) files")
@@ -352,9 +343,6 @@ struct MainView: View {
         .onChange(of: appState.doImageVision, perform: { recognize in
             files.doImageVision = recognize
         })
-        .onChange(of: appState.imageSaveFormat, perform: { format in
-            files.convertTagStorage(to: format)
-        })
         .quickLookPreview($selectedFileURL, in: selectedFileURLs)
         .onDisappear(perform: self.teardown)
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification), perform: {output in self.teardown()})
@@ -377,5 +365,7 @@ struct MainView: View {
     func teardown() {
         self.files.commit()
         self.appState.releaseSelectionModel()
+        try! pruneThumbnailCache(maxCount: 200)
+        
     }
 }

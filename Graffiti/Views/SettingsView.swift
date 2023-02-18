@@ -21,6 +21,7 @@ extension View {
 
 struct SettingsView: View {
     @EnvironmentObject var appState: ApplicationState
+    @EnvironmentObject var taggedDirectory: TaggedDirectory
     
     static let copyOwnedImagesDefaultsKey = "com.tom.graffiti-copyOwnedImages"
     static let saveImageURLsDefaultsKey = "com.tom.graffiti-saveImageURLs"
@@ -31,22 +32,21 @@ struct SettingsView: View {
             Group {
                 
                 Text("File Control").font(.headline)
-//                Toggle("Copy images that are used to tag files", isOn: $appState.copyOwnedImages)
-//                    .onChange(of: appState.copyOwnedImages, perform: {
-//                        UserDefaults.thisAppDomain?.set($0, forKey: SettingsView.copyOwnedImagesDefaultsKey)
-//                    })
-//                Text("If you choose NOT to copy images, you must grant Graffiti full disk access in System Settings or you will not be able to see your images in the app")
-//                    .wrapText()
-//                    .font(.caption2)
-//                    .offset(x: 10)
-                
-                Text("Format for Saving Images")
-                Picker("", selection: $appState.imageSaveFormat, content: {
-                    Text("Save References to files locally stored on the computer (faster; less space)").tag(Tag.ImageFormat.url)
-                    Text("Save Image Content to Tag Store file directly (portable; larger files)").tag(Tag.ImageFormat.content)
-                }).onChange(of: appState.imageSaveFormat, perform: {
-                    UserDefaults.thisAppDomain?.set($0 == .url, forKey: SettingsView.saveImageURLsDefaultsKey)
-                })
+                Section {
+                    Text("Change image save format of all tags")
+                    Text("Save Tag Images as")
+                    Picker("", selection: $appState.imageSaveFormat, content: {
+                        Text("Links to local image files (faster; less space)").tag(Tag.ImageFormat.url)
+                        Text("Inline full image data (portable; larger files)").tag(Tag.ImageFormat.content)
+                    }).disabled(!AppState.tagChangeableStates.contains(appState.currentState))
+                    Button("Change All Tags") {
+                        taggedDirectory.convertTagStorage(to: appState.imageSaveFormat)
+                        UserDefaults.thisAppDomain?.set(appState.imageSaveFormat == .url, forKey: SettingsView.saveImageURLsDefaultsKey)
+                    }.disabled(!AppState.tagChangeableStates.contains(appState.currentState))
+                }
+                Button("Clear Thumbnail Cache") {
+                    try? pruneThumbnailCache()
+                }
             }
             Divider()
             Group {
@@ -54,21 +54,21 @@ struct SettingsView: View {
                 Toggle("Recognize Text in Images", isOn: $appState.doImageVision)
                     .onChange(of: appState.doImageVision, perform: {
                         UserDefaults.thisAppDomain?.set($0, forKey: SettingsView.doTextRecognition)
-                    })
+                    }).disabled(!AppState.tagChangeableStates.contains(appState.currentState))
             }
+            
             
         }.padding()
             .onAppear {
-                loadDefaultSettings(from: appState)
+                loadDefaultSettings(to: appState)
                 
             }
     }
 }
 
-func loadDefaultSettings(from appState: ApplicationState) {
-    //                appState.copyOwnedImages = UserDefaults.thisAppDomain?.bool(forKey: SettingsView.copyOwnedImagesDefaultsKey) ?? true
-                    appState.imageSaveFormat = UserDefaults.thisAppDomain?.bool(forKey: SettingsView.saveImageURLsDefaultsKey) ?? true  ? Tag.ImageFormat.url : Tag.ImageFormat.content
-                    appState.doImageVision = UserDefaults.thisAppDomain?.bool(forKey: SettingsView.doTextRecognition) ?? true
+func loadDefaultSettings(to appState: ApplicationState) {
+    appState.imageSaveFormat = (UserDefaults.thisAppDomain?.bool(forKey: SettingsView.saveImageURLsDefaultsKey) ?? true)  ? Tag.ImageFormat.url : Tag.ImageFormat.content
+    appState.doImageVision = UserDefaults.thisAppDomain?.bool(forKey: SettingsView.doTextRecognition) ?? true
 }
 
 struct SettingsView_Previews: PreviewProvider {

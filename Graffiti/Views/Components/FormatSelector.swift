@@ -20,7 +20,7 @@ extension FormatOption: Identifiable {
 struct FormatSelector: View {
     @Binding var formatChoice: Format
     
-        
+    
     var options: [Format: FormatOption] = [
         .ccts: FormatOption(format: .ccts, name: "Custom Compressed Tag Store File", description: "Saves all tags of all files in a directory to a single custom compressed binary format meant to make efficient use of space at the cost of compatibility with external editors"),
         .json: FormatOption(format: .json, name: "JSON File", description: "Saves all tags of all files in a directory to a JSON file. Useful for external editing or programmatic manipulation, but creates larger files")
@@ -39,8 +39,8 @@ struct FormatSelector: View {
             Picker("", selection: $formatChoice, content: {
                 
                 ForEach(Array(options.values).sorted(by: { a, b in a.description < b.description }), content: { option in
-                        Text(option.name).tag(option.format).help(option.description)
-                    })
+                    Text(option.name).tag(option.format).help(option.description)
+                })
                 
             })
             .pickerStyle(RadioGroupPickerStyle())

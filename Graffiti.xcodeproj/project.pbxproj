@@ -14,7 +14,6 @@
 		DC09FE38297DB41E00BD51D9 /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5FA2F12975032800084CB2 /* Version.swift */; };
 		DC09FE39297DB41E00BD51D9 /* TagStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5FA2F32975091500084CB2 /* TagStore.swift */; };
 		DC09FE3B297DB5F600BD51D9 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09FE3A297DB5F600BD51D9 /* Utility.swift */; };
-		DC09FE3C297DB5F600BD51D9 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09FE3A297DB5F600BD51D9 /* Utility.swift */; };
 		DC09FE3D297DB60E00BD51D9 /* FileTagBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAB19D296A018A00843BE4 /* FileTagBackend.swift */; };
 		DC09FE3E297DB62E00BD51D9 /* TagBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC9296229C600DEED22 /* TagBackend.swift */; };
 		DC09FE40297DB64000BD51D9 /* XattrBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC42962066200DEED22 /* XattrBridge.m */; };
@@ -39,7 +38,6 @@
 		DC4E79A7297DF2E3003AEE68 /* CompressedCustomTagStoreWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC21D4D22979ED900024E644 /* CompressedCustomTagStoreWriter.swift */; };
 		DC4E79A8297DF2E3003AEE68 /* FileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAB1A2296A056B00843BE4 /* FileWriter.swift */; };
 		DC4E79A9297DF2E3003AEE68 /* TagBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC9296229C600DEED22 /* TagBackend.swift */; };
-		DC4E79AC297DF372003AEE68 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09FE3A297DB5F600BD51D9 /* Utility.swift */; };
 		DC4E79AD297DF3AC003AEE68 /* XattrBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC42962066200DEED22 /* XattrBridge.m */; };
 		DC4E79AE297E071C003AEE68 /* PreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFAEC70297AFD3400F8A80F /* PreviewViewController.swift */; };
 		DC4F4CD12985EB060001CCD9 /* ApplicationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4F4CD02985EB060001CCD9 /* ApplicationState.swift */; };
@@ -61,10 +59,10 @@
 		DC5D2668297EE93D009D3868 /* TaggedFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC72962299B00DEED22 /* TaggedFile.swift */; };
 		DC5D2669297EE93D009D3868 /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C22965DD1C0002690A /* Tag.swift */; };
 		DC5D266A297EE93D009D3868 /* TagStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5FA2F32975091500084CB2 /* TagStore.swift */; };
-		DC5D266B297EE981009D3868 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09FE3A297DB5F600BD51D9 /* Utility.swift */; };
 		DC5D266C297EEA83009D3868 /* XattrBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC42962066200DEED22 /* XattrBridge.m */; };
 		DC5FA2F22975032800084CB2 /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5FA2F12975032800084CB2 /* Version.swift */; };
 		DC5FA2F42975091500084CB2 /* TagStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5FA2F32975091500084CB2 /* TagStore.swift */; };
+		DC851DBA29A0714D00A9A90D /* TagCharts.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC851DB929A0714D00A9A90D /* TagCharts.swift */; };
 		DC8E14632963EAE0002E1788 /* TaggedDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8E14622963EAE0002E1788 /* TaggedDirectory.swift */; };
 		DC94CA44299583EF007E64A2 /* MobileNetV2.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = DC94CA43299583EF007E64A2 /* MobileNetV2.mlmodel */; };
 		DC94CA45299590CF007E64A2 /* MobileNetV2.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = DC94CA43299583EF007E64A2 /* MobileNetV2.mlmodel */; };
@@ -85,6 +83,21 @@
 		DCCB4F332985BC6A00C55E15 /* FileWriterError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCB4F2F2985B8F000C55E15 /* FileWriterError.swift */; };
 		DCDFF2342984413F00A2B6CF /* Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D265A297EE79F009D3868 /* Format.swift */; };
 		DCDFF2352984414000A2B6CF /* Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D265A297EE79F009D3868 /* Format.swift */; };
+		DCE458B9299EEE0B00BD3685 /* FileUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE458B8299EEE0B00BD3685 /* FileUtilities.swift */; };
+		DCE458BB299EEE3F00BD3685 /* ArrayUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE458BA299EEE3F00BD3685 /* ArrayUtilities.swift */; };
+		DCE458BC299EEE8F00BD3685 /* ArrayUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE458BA299EEE3F00BD3685 /* ArrayUtilities.swift */; };
+		DCE458BD299EEE8F00BD3685 /* ArrayUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE458BA299EEE3F00BD3685 /* ArrayUtilities.swift */; };
+		DCE458BE299EEE8F00BD3685 /* ArrayUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE458BA299EEE3F00BD3685 /* ArrayUtilities.swift */; };
+		DCE458BF299EEE9200BD3685 /* FileUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE458B8299EEE0B00BD3685 /* FileUtilities.swift */; };
+		DCE458C0299EEE9200BD3685 /* FileUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE458B8299EEE0B00BD3685 /* FileUtilities.swift */; };
+		DCE458C1299EEE9300BD3685 /* FileUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE458B8299EEE0B00BD3685 /* FileUtilities.swift */; };
+		DCE458C2299EEEDB00BD3685 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09FE3A297DB5F600BD51D9 /* Utility.swift */; };
+		DCE458C3299EEEDC00BD3685 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09FE3A297DB5F600BD51D9 /* Utility.swift */; };
+		DCE458C4299EEEDC00BD3685 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09FE3A297DB5F600BD51D9 /* Utility.swift */; };
+		DCE458C6299EEEE400BD3685 /* TimerUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE458C5299EEEE400BD3685 /* TimerUtilities.swift */; };
+		DCE458C7299EEEF700BD3685 /* TimerUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE458C5299EEEE400BD3685 /* TimerUtilities.swift */; };
+		DCE458C8299EEEF800BD3685 /* TimerUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE458C5299EEEE400BD3685 /* TimerUtilities.swift */; };
+		DCE458C9299EEEF800BD3685 /* TimerUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE458C5299EEEE400BD3685 /* TimerUtilities.swift */; };
 		DCEAB19E296A018A00843BE4 /* FileTagBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAB19D296A018A00843BE4 /* FileTagBackend.swift */; };
 		DCEAB1A3296A056B00843BE4 /* FileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEAB1A2296A056B00843BE4 /* FileWriter.swift */; };
 		DCEBB74329998276003BF709 /* JSONFileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC25CB6F2998B3D000C2EF27 /* JSONFileWriter.swift */; };
@@ -183,6 +196,7 @@
 		DC5D265A297EE79F009D3868 /* Format.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Format.swift; sourceTree = "<group>"; };
 		DC5FA2F12975032800084CB2 /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
 		DC5FA2F32975091500084CB2 /* TagStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagStore.swift; sourceTree = "<group>"; };
+		DC851DB929A0714D00A9A90D /* TagCharts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagCharts.swift; sourceTree = "<group>"; };
 		DC8E14622963EAE0002E1788 /* TaggedDirectory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaggedDirectory.swift; sourceTree = "<group>"; };
 		DC94CA43299583EF007E64A2 /* MobileNetV2.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = MobileNetV2.mlmodel; sourceTree = "<group>"; };
 		DC94CA482995E2F0007E64A2 /* ImageSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSelector.swift; sourceTree = "<group>"; };
@@ -193,6 +207,9 @@
 		DC9CCB462980ED4700A2D622 /* GraffitiRemoveTagsFromFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraffitiRemoveTagsFromFile.swift; sourceTree = "<group>"; };
 		DCBE181429926CCE0005AEC9 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		DCCB4F2F2985B8F000C55E15 /* FileWriterError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileWriterError.swift; sourceTree = "<group>"; };
+		DCE458B8299EEE0B00BD3685 /* FileUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileUtilities.swift; sourceTree = "<group>"; };
+		DCE458BA299EEE3F00BD3685 /* ArrayUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayUtilities.swift; sourceTree = "<group>"; };
+		DCE458C5299EEEE400BD3685 /* TimerUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerUtilities.swift; sourceTree = "<group>"; };
 		DCEAB19D296A018A00843BE4 /* FileTagBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileTagBackend.swift; sourceTree = "<group>"; };
 		DCEAB1A2296A056B00843BE4 /* FileWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileWriter.swift; sourceTree = "<group>"; };
 		DCEBB746299994C8003BF709 /* ConvertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertView.swift; sourceTree = "<group>"; };
@@ -291,7 +308,7 @@
 				DC5244902960ACB300821407 /* Assets.xcassets */,
 				DC5244952960ACB300821407 /* Graffiti.entitlements */,
 				DC5244922960ACB300821407 /* Preview Content */,
-				DC09FE3A297DB5F600BD51D9 /* Utility.swift */,
+				DCE458B7299EEDF500BD3685 /* Utilities */,
 			);
 			path = Graffiti;
 			sourceTree = "<group>";
@@ -326,6 +343,17 @@
 			path = OptimizationProfiles;
 			sourceTree = "<group>";
 		};
+		DCE458B7299EEDF500BD3685 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				DC09FE3A297DB5F600BD51D9 /* Utility.swift */,
+				DCE458C5299EEEE400BD3685 /* TimerUtilities.swift */,
+				DCE458B8299EEE0B00BD3685 /* FileUtilities.swift */,
+				DCE458BA299EEE3F00BD3685 /* ArrayUtilities.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
 		DCE579CB2996684300D1134B /* Components */ = {
 			isa = PBXGroup;
 			children = (
@@ -343,6 +371,7 @@
 				DCEBB746299994C8003BF709 /* ConvertView.swift */,
 				DCFA39C9296604740002690A /* MainView.swift */,
 				DCFA39BF2965DCC20002690A /* TagView.swift */,
+				DC851DB929A0714D00A9A90D /* TagCharts.swift */,
 				DC2809B12967722F003915A5 /* FilesEditingInspectorView.swift */,
 				DCBE181429926CCE0005AEC9 /* SettingsView.swift */,
 			);
@@ -568,19 +597,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DCE458C3299EEEDC00BD3685 /* Utility.swift in Sources */,
+				DCE458BD299EEE8F00BD3685 /* ArrayUtilities.swift in Sources */,
 				DC94CA46299590DB007E64A2 /* MobileNetV2.mlmodel in Sources */,
 				DC4E79AD297DF3AC003AEE68 /* XattrBridge.m in Sources */,
 				DCDFF2352984414000A2B6CF /* Format.swift in Sources */,
+				DCE458C8299EEEF800BD3685 /* TimerUtilities.swift in Sources */,
 				DC4E79A8297DF2E3003AEE68 /* FileWriter.swift in Sources */,
 				DC4E799E297DF2E3003AEE68 /* Tag.swift in Sources */,
 				DC14E749297DCBE8001B00AC /* ThumbnailProvider.swift in Sources */,
 				DCCB4F322985BC6A00C55E15 /* FileWriterError.swift in Sources */,
 				DC4E79A7297DF2E3003AEE68 /* CompressedCustomTagStoreWriter.swift in Sources */,
 				DC4E79A9297DF2E3003AEE68 /* TagBackend.swift in Sources */,
+				DCE458C0299EEE9200BD3685 /* FileUtilities.swift in Sources */,
 				DC4E79A5297DF2E3003AEE68 /* FileTagBackend.swift in Sources */,
 				DC4E79A0297DF2E3003AEE68 /* TaggedFile.swift in Sources */,
 				DC4E79A6297DF2E3003AEE68 /* Version.swift in Sources */,
-				DC4E79AC297DF372003AEE68 /* Utility.swift in Sources */,
 				DC4E79A2297DF2E3003AEE68 /* TaggedDirectory.swift in Sources */,
 				DC4E79A3297DF2E3003AEE68 /* TagStore.swift in Sources */,
 				DC9BBD1D2985C54D0035543D /* TagTransaction.swift in Sources */,
@@ -599,11 +631,14 @@
 				DC1B7BC52962066200DEED22 /* XattrBridge.m in Sources */,
 				DC1B7BCA296229C600DEED22 /* TagBackend.swift in Sources */,
 				DC52448F2960ACB200821407 /* ContentView.swift in Sources */,
+				DCE458BB299EEE3F00BD3685 /* ArrayUtilities.swift in Sources */,
 				DC25CB702998B3D000C2EF27 /* JSONFileWriter.swift in Sources */,
 				DC4F4CD12985EB060001CCD9 /* ApplicationState.swift in Sources */,
 				DC52448D2960ACB200821407 /* GraffitiApp.swift in Sources */,
 				DC9BBD1B2985C0720035543D /* TagTransaction.swift in Sources */,
 				DCEBB747299994C8003BF709 /* ConvertView.swift in Sources */,
+				DCE458C6299EEEE400BD3685 /* TimerUtilities.swift in Sources */,
+				DC851DBA29A0714D00A9A90D /* TagCharts.swift in Sources */,
 				DCCB4F302985B8F000C55E15 /* FileWriterError.swift in Sources */,
 				DCEAB19E296A018A00843BE4 /* FileTagBackend.swift in Sources */,
 				DC5FA2F42975091500084CB2 /* TagStore.swift in Sources */,
@@ -613,6 +648,7 @@
 				DCFA39CA296604740002690A /* MainView.swift in Sources */,
 				DC09FE3B297DB5F600BD51D9 /* Utility.swift in Sources */,
 				DC94CA492995E2F0007E64A2 /* ImageSelector.swift in Sources */,
+				DCE458B9299EEE0B00BD3685 /* FileUtilities.swift in Sources */,
 				DC21D4D32979ED910024E644 /* CompressedCustomTagStoreWriter.swift in Sources */,
 				DCBE181529926CCE0005AEC9 /* SettingsView.swift in Sources */,
 				DCFA39C02965DCC20002690A /* TagView.swift in Sources */,
@@ -628,11 +664,12 @@
 			files = (
 				DC5D2669297EE93D009D3868 /* Tag.swift in Sources */,
 				DC5D2650297EE699009D3868 /* GraffitiAddTagsToFile.swift in Sources */,
-				DC5D266B297EE981009D3868 /* Utility.swift in Sources */,
 				DC5D265D297EE8D2009D3868 /* CompressedCustomTagStoreWriter.swift in Sources */,
 				DC5D2664297EE8D2009D3868 /* FileTagBackend.swift in Sources */,
 				DC5D2663297EE8D2009D3868 /* FileWriter.swift in Sources */,
 				DC5D2667297EE93D009D3868 /* Version.swift in Sources */,
+				DCE458BF299EEE9200BD3685 /* FileUtilities.swift in Sources */,
+				DCE458BC299EEE8F00BD3685 /* ArrayUtilities.swift in Sources */,
 				DC5D266A297EE93D009D3868 /* TagStore.swift in Sources */,
 				DC5D264E297EE699009D3868 /* GraffitiTagFileExtension.swift in Sources */,
 				DC9BBD1E2985C54E0035543D /* TagTransaction.swift in Sources */,
@@ -641,9 +678,11 @@
 				DCCB4F332985BC6A00C55E15 /* FileWriterError.swift in Sources */,
 				DC5D265F297EE8D2009D3868 /* TagBackend.swift in Sources */,
 				DC5D2668297EE93D009D3868 /* TaggedFile.swift in Sources */,
+				DCE458C4299EEEDC00BD3685 /* Utility.swift in Sources */,
 				DC9CCB432980ECC000A2D622 /* GraffitiGetTagsOfFile.swift in Sources */,
 				DC5D265C297EE7B5009D3868 /* Format.swift in Sources */,
 				DC94CA45299590CF007E64A2 /* MobileNetV2.mlmodel in Sources */,
+				DCE458C7299EEEF700BD3685 /* TimerUtilities.swift in Sources */,
 				DC5D266C297EEA83009D3868 /* XattrBridge.m in Sources */,
 				DC9CCB472980ED4700A2D622 /* GraffitiRemoveTagsFromFile.swift in Sources */,
 				DC5D2666297EE93D009D3868 /* TaggedDirectory.swift in Sources */,
@@ -654,19 +693,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DCE458C2299EEEDB00BD3685 /* Utility.swift in Sources */,
+				DCE458BE299EEE8F00BD3685 /* ArrayUtilities.swift in Sources */,
 				DC94CA47299590DC007E64A2 /* MobileNetV2.mlmodel in Sources */,
 				DC09FE42297DB66700BD51D9 /* TaggedDirectory.swift in Sources */,
 				DCDFF2342984413F00A2B6CF /* Format.swift in Sources */,
+				DCE458C9299EEEF800BD3685 /* TimerUtilities.swift in Sources */,
 				DC09FE40297DB64000BD51D9 /* XattrBridge.m in Sources */,
 				DC09FE3E297DB62E00BD51D9 /* TagBackend.swift in Sources */,
 				DC09FE3D297DB60E00BD51D9 /* FileTagBackend.swift in Sources */,
 				DCCB4F312985BC6A00C55E15 /* FileWriterError.swift in Sources */,
 				DC09FE36297DB41E00BD51D9 /* TaggedFile.swift in Sources */,
 				DC09FE37297DB41E00BD51D9 /* Tag.swift in Sources */,
+				DCE458C1299EEE9300BD3685 /* FileUtilities.swift in Sources */,
 				DC09FE38297DB41E00BD51D9 /* Version.swift in Sources */,
 				DC09FE39297DB41E00BD51D9 /* TagStore.swift in Sources */,
 				DC09FE32297DB3E400BD51D9 /* FileWriter.swift in Sources */,
-				DC09FE3C297DB5F600BD51D9 /* Utility.swift in Sources */,
 				DC09FE35297DB3E400BD51D9 /* CompressedCustomTagStoreWriter.swift in Sources */,
 				DC9BBD1C2985C54D0035543D /* TagTransaction.swift in Sources */,
 				DCFAEC71297AFD3400F8A80F /* PreviewViewController.swift in Sources */,
@@ -714,7 +756,7 @@
 				CODE_SIGN_ENTITLEMENTS = CCTSThumbnailProvider/CCTSThumbnailProvider.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23FE10A;
+				CURRENT_PROJECT_VERSION = 23FE18A;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -729,7 +771,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 14.1.0;
+				MARKETING_VERSION = 14.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.CCTSThumbnailProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -745,7 +787,7 @@
 				CODE_SIGN_ENTITLEMENTS = CCTSThumbnailProvider/CCTSThumbnailProvider.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23FE10A;
+				CURRENT_PROJECT_VERSION = 23FE18A;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -760,7 +802,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 14.1.0;
+				MARKETING_VERSION = 14.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.CCTSThumbnailProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -904,7 +946,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 23FE10A;
+				CURRENT_PROJECT_VERSION = 23FE18A;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Graffiti/Preview Content\"";
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
@@ -919,7 +961,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 14.1.0;
+				MARKETING_VERSION = 14.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -941,7 +983,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 23FE10A;
+				CURRENT_PROJECT_VERSION = 23FE18A;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Graffiti/Preview Content\"";
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
@@ -956,7 +998,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 14.1.0;
+				MARKETING_VERSION = 14.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -972,7 +1014,7 @@
 				CODE_SIGN_ENTITLEMENTS = GraffitiTagFile/GraffitiTagFile.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23FE10A;
+				CURRENT_PROJECT_VERSION = 23FE18A;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -987,7 +1029,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 14.1.0;
+				MARKETING_VERSION = 14.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.GraffitiTagFile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1003,7 +1045,7 @@
 				CODE_SIGN_ENTITLEMENTS = GraffitiTagFile/GraffitiTagFile.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23FE10A;
+				CURRENT_PROJECT_VERSION = 23FE18A;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1018,7 +1060,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 14.1.0;
+				MARKETING_VERSION = 14.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.GraffitiTagFile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1034,7 +1076,7 @@
 				CODE_SIGN_ENTITLEMENTS = CCTSQLPlugin/CCTSQLPlugin.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23FE10A;
+				CURRENT_PROJECT_VERSION = 23FE18A;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1049,7 +1091,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 14.1.0;
+				MARKETING_VERSION = 14.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.CCTSQLPlugin;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1065,7 +1107,7 @@
 				CODE_SIGN_ENTITLEMENTS = CCTSQLPlugin/CCTSQLPlugin.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 23FE10A;
+				CURRENT_PROJECT_VERSION = 23FE18A;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1080,7 +1122,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 14.1.0;
+				MARKETING_VERSION = 14.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.CCTSQLPlugin;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

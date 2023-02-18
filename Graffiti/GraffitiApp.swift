@@ -111,8 +111,14 @@ struct GraffitiApp: App {
             ConvertView()
         }).keyboardShortcut("1")
         
+        
+        Window("Statistics", id: "statisticswindow") {
+            TagCharts().environmentObject(taggedDirectory)
+        }.keyboardShortcut("9")
+    
         Settings {
-            SettingsView().environmentObject(appState)
+            
+            SettingsView().environmentObject(appState).environmentObject(taggedDirectory)
         }
     }
     

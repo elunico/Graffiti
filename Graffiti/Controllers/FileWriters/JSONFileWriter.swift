@@ -13,7 +13,7 @@ func jsonify(tag: Tag) throws -> [String: Any] {
             "type": "IU",
             "uuid": tag.id.uuidString,
             "url": image.absolutePath,
-            "strings": tag.imageTextContent.content,
+            "strings": tag.imageTextContent,
             "recognitionState": tag.recoginitionState.rawValue,
             "refCount": tag.refCount
         ] as [String: Any]
@@ -23,7 +23,7 @@ func jsonify(tag: Tag) throws -> [String: Any] {
             "type": "BD",
             "uuid": tag.id.uuidString,
             "dataSrc": try Data(contentsOf: image).base64EncodedString(),
-            "strings": tag.imageTextContent.content,
+            "strings": tag.imageTextContent,
             "recognitionState": tag.recoginitionState.rawValue,
             "refCount": tag.refCount
         ] as [String : Any]
@@ -115,7 +115,7 @@ class JSONFileWriter: FileWriter {
                 }
                 guard let state = Tag.RecognitionState(rawValue: state) else { throw FileWriterError.InvalidFileFormat }
                 t.recoginitionState = state
-                t.imageTextContent.content = strings
+                t.imageTextContent = strings
             case "BD":
                 guard let s = tag["dataSrc"] as? String else {
                     print("No data")
@@ -142,7 +142,7 @@ class JSONFileWriter: FileWriter {
 //                var t = Tag.tag(imageURL: name, format: .content)
                 guard let state = Tag.RecognitionState(rawValue: state) else { throw FileWriterError.InvalidFileFormat }
                 t.recoginitionState = state
-                t.imageTextContent.content = strings
+                t.imageTextContent = strings
             default:
                 fatalError("Unknown type \(type!)")
             }

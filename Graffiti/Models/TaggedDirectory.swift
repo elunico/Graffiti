@@ -23,18 +23,21 @@ class Sorter: SortComparator {
     }
     
     var order: SortOrder = .forward
-    var keypath: KeyPath<TaggedFile, String>
+    var transform: (TaggedFile) -> String
     
     init(keypath: KeyPath<TaggedFile, String>) {
-        self.keypath = keypath
+        self.transform = { $0[keyPath: keypath] }
+    }
+    
+    init(transform: @escaping (TaggedFile) -> String)  {
+        self.transform = transform
     }
     
     func compare(_ lhs: TaggedFile, _ rhs: TaggedFile) -> ComparisonResult {
         if order == .forward {
-            return lhs[keyPath: self.keypath].localizedCaseInsensitiveCompare(rhs[keyPath: self.keypath])
+            return transform(lhs).localizedCaseInsensitiveCompare(transform(rhs))
         } else {
-            return rhs[keyPath: self.keypath].localizedCaseInsensitiveCompare(lhs[keyPath: self.keypath])
-
+            return transform(rhs).localizedCaseInsensitiveCompare(transform(lhs))
         }
     }
 }
@@ -55,6 +58,8 @@ class TaggedDirectory: ObservableObject {
     @Published private(set) var transactions: [TagTransaction] = []
     @Published private(set) var redoStack: [TagTransaction] = []
     
+    private var queue = DispatchQueue(label: "imageProcessor", qos: .userInitiated, attributes: .concurrent, autoreleaseFrequency: .workItem, target: DispatchQueue.global(qos: .userInitiated))
+
     @Published var doImageVision: Bool = true {
         didSet {
             if doImageVision {
@@ -135,7 +140,6 @@ class TaggedDirectory: ObservableObject {
     }
     
     func addTag(_ tag: Tag, to file: TaggedFile) {
-//        backend.addTag(tag, to: file)
         if let backend {
             transactions.append(AddTagTransaction(backend: backend, tag: tag, file: file))
         }
@@ -145,8 +149,7 @@ class TaggedDirectory: ObservableObject {
     }
     
     func removeTag(withString string: String, from file: TaggedFile) {
-//        backend.removeTag(withID: id, from: file)
-        let tag = Tag.tag(withString: string) 
+        let tag = Tag.tag(withString: string)
         if let backend {
             transactions.append(RemoveTagTransaction(backend: backend, tag: tag, file: file))
         }
@@ -155,7 +158,6 @@ class TaggedDirectory: ObservableObject {
     }
     
     func removeTag(withID id: Tag.ID, from file: TaggedFile) {
-//        backend.removeTag(withID: id, from: file)
         guard let tag = Tag.tag(fromID: id) else { return }
         if let backend {
             transactions.append(RemoveTagTransaction(backend: backend, tag: tag, file: file))
@@ -166,7 +168,6 @@ class TaggedDirectory: ObservableObject {
     
     
     func removeTag(withID id: Tag.ID, fromAll files: [TaggedFile]) {
-//        backend.removeTag(withID: id, from: file)
         guard let tag = Tag.tag(fromID: id) else { return }
         if let backend {
             transactions.append(RemoveTagFromManyFilesTransaction(backend: backend, tag: tag, files: files))
@@ -280,7 +281,7 @@ extension TaggedDirectory {
         let observations = results[0..<5].filter{ (!$0.hasPrecisionRecallCurve) || ($0.hasPrecisionRecallCurve && $0.hasMinimumPrecision(0.8, forRecall: 0.8)) }.map { $0.identifier }
         
         
-        tag.imageTextContent.content.append(contentsOf: observations)
+        tag.imageTextContent.append(contentsOf: observations)
         
     }
     
@@ -305,7 +306,7 @@ extension TaggedDirectory {
             }
             
             // Process the recognized strings.
-            tag.imageTextContent.content.append(contentsOf: recognizedStrings)
+            tag.imageTextContent.append(contentsOf: recognizedStrings)
             print("Recognized strings: \(recognizedStrings)")
         })
         
@@ -323,7 +324,7 @@ extension TaggedDirectory {
     
     func performVisionActions() {
         if !doImageVision { return }
-        DispatchQueue.global(qos: .background).async { [self] in
+        queue.async { [self] in
             for file in self.files {
                 for tag in file.tags where tag.recoginitionState == .uninitialized {
                     tag.recoginitionState = .started

@@ -6,19 +6,7 @@
 //
 
 import Foundation
-//import os
-
-enum Log {
-    case `default`
-}
-
-enum `Type` {
-    case error
-}
-
-func os_log(_ fmt: String, log: Log, type: `Type`, _ message: String) {
-    print(message)
-}
+import os
 
 extension Int {
     var bigEndianBytes: Data {

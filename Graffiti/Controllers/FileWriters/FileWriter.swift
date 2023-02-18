@@ -7,15 +7,22 @@
 
 import Foundation
 
-
+/// Provides a mechanism for saving and loading ``TagStore`` data to and from a file
+///
+/// This protocol requires conformants to implement the methods necessary to read and write files of a particular type to disk. ``JSONFileWriter`` and ``CompressedCustomTagStoreWriter`` are the only two working examples currently in this program. The protocol provides the main functions ``loadFrom(path:)`` and ``saveTo(path:store:)`` for general file saving and loading. It also other important fields relating to the writing and reading of files such as a valid ``fileExtension``, how to obtain a correct name for a certain directory with ``writePath(in:named:)-7ie4h`` as well as providing callers with a way of validating input using ``fileProhibitedCharacters``
 protocol FileWriter {
     /// any implementation defined characters that cannot appear in tags
     /// This is completely implementation defined. For instance
     /// JSON files could store each tag in its own string so it may prohibit "
     /// from appearing in tags. A JSON implementation could also true to store
     /// all tags in a single string thereby prohibiting " and some other tag
-    /// deliminating character. There is no way to say what these characters will be
+    /// deliminating character. There is no way to see what these characters will be
     /// therefore, without checking this property
+    ///
+    /// **Important implementation detail** The conforming class/struct is **not**
+    /// required to check this property before writing or reading. It is
+    /// up to the **call site** of ``loadFrom(path:)`` and ``saveTo(path:store:)``
+    /// to check this property and prevent prohibited characters from entering the data
     var fileProhibitedCharacters: Set<Character> { get }
     
     /// The String keys of the return value are file paths

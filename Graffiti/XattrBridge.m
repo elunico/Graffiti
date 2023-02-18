@@ -26,7 +26,7 @@
         if (error != nil) {
             *error = [NSError errorWithDomain:@"file not found" code:200 userInfo:nil];
         }
-        return nil;
+        return @"";
     } else {
         char * cstr = (char *)buffer;
         cstr[bytes] = '\0';
