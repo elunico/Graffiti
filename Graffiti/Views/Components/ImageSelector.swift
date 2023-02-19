@@ -39,11 +39,12 @@ fileprivate var thumbnailCache : NSCache<URLHolder, NSImage> = NSCache(countLimi
 
 struct ImageSelector: View {
     
-    public static let size = CGSize(width: 200, height: 150)
+    public static let size = CGSize(width: 250, height: 100)
     public static let hoverScale = 1.08
     
     private var w: Double { Double(ImageSelector.size.width) }
     private var h: Double { Double(ImageSelector.size.height) }
+    private var min: Double { Double(Swift.min(ImageSelector.size.width, ImageSelector.size.height))}
     
     @Binding var selectedImage: URL?
     
@@ -60,24 +61,24 @@ struct ImageSelector: View {
                     .resizable()
                     .scaledToFit()
                     .scaleEffect(CGSize(width: 0.5, height: 0.5))
-                    .frame(idealWidth: w, maxWidth: w, idealHeight: h, maxHeight: h, alignment: .center)
-                    .shadow(radius: 10.0)
+                    .frame(idealWidth: min, maxWidth: min, idealHeight: min, maxHeight: min, alignment: .center)
                     .offset(x: 0, y: 0)
                     .onHover(perform: {
-                        
                         scaleFactor = $0 ? ImageSelector.hoverScale : 1
                     })
                     .zIndex(2)
+                    .shadow(color: .gray, radius: 25.0)
+
                 
-                RoundedRectangle(cornerRadius: 18.0)
-                    .padding()
-                    .frame(idealWidth: w, maxWidth: w, idealHeight: h, maxHeight: h)
-                    .foregroundColor(Color(.systemGray))
-                    .offset(x: 0, y: 0)
-                    .shadow(radius: 10)
-                    .onHover(perform: {
-                        scaleFactor = $0 ? ImageSelector.hoverScale : 1
-                    })
+//                RoundedRectangle(cornerRadius: 18.0)
+//                    .padding()
+//                    .frame(idealWidth: min, maxWidth: min, idealHeight: min, maxHeight: min)
+//                    .foregroundColor(Color(.systemGray))
+//                    .offset(x: 0, y: 0)
+//                    .shadow(radius: 10)
+//                    .onHover(perform: {
+//                        scaleFactor = $0 ? ImageSelector.hoverScale : 1
+//                    })
             }
             .scaleEffect(x: scaleFactor, y: scaleFactor)
             .animation(.easeInOut(duration: 0.1))
@@ -122,12 +123,10 @@ struct ImageSelector: View {
         if let url {
             let holder = URLHolder.for(url: url)
             if let image = thumbnailCache.object(forKey: holder) {
-                display(message: "Cache hit for \(url)")
                 return Image(nsImage: image)
             } else {
                 let nsImage = NSImage(byReferencing: url)
                 thumbnailCache.setObject(nsImage, forKey: holder)
-                display(message: "Load from disk for \(url)")
                 return Image(nsImage:  nsImage)
             }
         } else {

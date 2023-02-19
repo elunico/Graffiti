@@ -8,7 +8,12 @@
 import Foundation
 import SwiftUI
 
-infix operator =>
+precedencegroup FoldPrecedence {
+    lowerThan: AdditionPrecedence
+    associativity: left
+}
+
+infix operator =>: FoldPrecedence
 
 func => <A, B>(_ lhs: A, _ rhs: B) -> B {
     return rhs
@@ -26,7 +31,7 @@ struct TagView: View {
     @EnvironmentObject var directory: TaggedDirectory
     @EnvironmentObject var appState: ApplicationState
     
-    @State var chosenFormat: Tag.ImageFormat = .url
+    @State var chosenFormat: Tag.ImageFormat = .none
     @State var tags: Array<Tag> = []
     
     var prohibitedCharacters: Set<Character>
@@ -51,7 +56,63 @@ struct TagView: View {
         tagImage = url
         tagImageThumbnail = thumbnailURL
     }
-        
+    
+    var buttonBar: some View {
+        HStack {
+            HStack {
+                Button("Undo") {
+                    directory.undo()
+                }.disabled(directory.transactions.isEmpty)
+                    .keyboardShortcut("z", modifiers: [.command])
+                Button("Redo") {
+                    directory.redo()
+                }.disabled(directory.redoStack.isEmpty)
+                    .keyboardShortcut("z", modifiers: [.shift, .command])
+            }
+            Spacer()
+            HStack {
+                Button("Delete Tag") {
+                    self.performDelete()
+                }.disabled(selected.isEmpty)
+                Button("Add Tag") {
+                    self.addCurrentTag()
+                }.disabled(currentTag == "" && tagImage == nil)
+            }
+        }
+    }
+    
+    var addTextView: some View {
+        HStack {
+            Spacer()
+            
+            TextField("Add Tag", text: $currentTag, prompt: Text("Tag"))
+                .onChange(of: currentTag) { _ in
+                    currentTag.removeAll(where: { prohibitedCharacters.contains($0) })
+                }.onSubmit {
+                    self.addCurrentTag()
+                }
+            Spacer()
+            
+        }
+    }
+    
+    var addImageView: some View {
+        Group {
+            ImageSelector(selectedImage: $tagImage, onClick: { _ in
+                DispatchQueue.main.async {
+                    selectFile(ofTypes: [.image]) { urls in
+                        guard let originalURL = urls.first else { return }
+                        let (url, thumbnailURL) = try! acquireImage(at: originalURL)
+                        setImage(url: url, thumbnail: thumbnailURL)
+                    }
+                }
+            }, onDroppedFile: { (_, providers) in
+                return receiveDroppedImage(from: providers)
+            })
+         
+        }
+    }
+    
     var body: some View {
         GeometryReader { geometry in
             VStack {
@@ -110,68 +171,24 @@ struct TagView: View {
                     )
                     Spacer().frame(width: 20.0)
                     Button("Change Formats") {
-                        selected.forEach { Tag.tag(fromID: $0)?.imageFormat = chosenFormat }
-                    }.disabled(chosenFormat != .none)
+                        selected.forEach { Tag.tag(fromID: $0)!.imageFormat = chosenFormat }
+                    }.disabled(chosenFormat == .none)
                 }
                
                 
                 TabView(selection: $selectedView) {
-                    HStack {
-                        Spacer()
-                        
-                        TextField("Add Tag", text: $currentTag, prompt: Text("Tag"))
-                            .onChange(of: currentTag) { _ in
-                                currentTag.removeAll(where: { prohibitedCharacters.contains($0) })
-                            }.onSubmit {
-                                self.addCurrentTag()
-                            }
-                        Spacer()
-                        
-                    }.tabItem({
+                    addTextView.tabItem({
                         Text("Text")
                     }).tag(ViewSelection.text)
                     
-                    Group {
-                        ImageSelector(selectedImage: $tagImage, onClick: { _ in
-                            DispatchQueue.main.async {
-                                selectFile(ofTypes: [.image]) { urls in
-                                    guard let originalURL = urls.first else { return }
-                                    let (url, thumbnailURL) = try! acquireImage(at: originalURL)
-                                    setImage(url: url, thumbnail: thumbnailURL)
-                                }
-                            }
-                        }, onDroppedFile: { (_, providers) in
-                            return receiveDroppedImage(from: providers)
-                        })
-                     
-                    }.tabItem({
+                    addImageView.tabItem({
                         Text("Image")
                     }).tag(ViewSelection.image)
                 }.frame(width: ImageSelector.size.width + 50, height: ImageSelector.size.height + 50)
                 
                 
                 
-                HStack {
-                    HStack {
-                        Button("Undo") {
-                            directory.undo()
-                        }.disabled(directory.transactions.isEmpty)
-                            .keyboardShortcut("z", modifiers: [.command])
-                        Button("Redo") {
-                            directory.redo()
-                        }.disabled(directory.redoStack.isEmpty)
-                            .keyboardShortcut("z", modifiers: [.shift, .command])
-                    }
-                    Spacer()
-                    HStack {
-                        Button("Delete Tag") {
-                            self.performDelete()
-                        }.disabled(selected.isEmpty)
-                        Button("Add Tag") {
-                            self.addCurrentTag()
-                        }.disabled(currentTag == "" && tagImage == nil)
-                    }
-                }
+                buttonBar
                 Button("Close") {
                     done(files)
                 }.keyboardShortcut(.return, modifiers: [])
@@ -186,9 +203,9 @@ struct TagView: View {
             }
             .onChange(of: selected, perform: { _ in
                 appState.select(only: selected)
-                let f = selected.compactMap({ tag in Tag.tag(fromID: tag)?.imageFormat }).unique()
-                if f.allSame() {
-                    chosenFormat = f.first ?? .none
+                let f = selected.compactMap({ tag in Tag.tag(fromID: tag) })
+                if f.allSatisfy({ $0.image != nil }) && f.map({ $0.imageFormat }).allSame() {
+                    chosenFormat = f.first?.imageFormat ?? .none
                 } else {
                     chosenFormat = .none 
                 }
@@ -203,6 +220,11 @@ struct TagView: View {
                     files.insert($0)
                 }, files: files)
             })
+            .sheet(isPresented: $appState.showingImageImportError, content: {
+                Text("Could not import image").font(.title)
+                Text("Only files in the following formats are supported")
+                Text("\(TagView.validImageExtensions.joined(separator: ", "))")
+            })
     }
     
     static let validImageExtensions: Set<String> = ["bmp", "tiff", "png", "jpeg", "jpg", "gif", "dng"]
@@ -216,7 +238,7 @@ struct TagView: View {
                     let (url, thumb) = try!  acquireImage(at: originalURL)
                     setImage(url: url, thumbnail: thumb)
                 } else {
-                    // TODO: alert user
+                    appState.showingImageImportError = true
                 }
                 
             }

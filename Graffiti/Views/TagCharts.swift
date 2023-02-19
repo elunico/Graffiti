@@ -8,33 +8,22 @@
 import SwiftUI
 import Charts
 
-extension Array {
-    func windowed(into groups: Int) -> Array<Array<Element>> {
-        if count < groups {
-            return map { [$0] }
-        }
-        var result = [[Element]]()
-        var elementsPerGroup = count / groups
-        var extra = count % groups
+func windows(from min: Int, to high: Int, count: Int) -> [(Int, Int)] {
+    var max = high + (count - ((high - min) % count))
+    var elementsPerWindow = Int(Double(max - min) / Double(count))
+    var windows = [(Int, Int)]()
+    
+    var current = min
+    for _ in 0..<(count - 1) {
+        windows.append((current, current + elementsPerWindow - 1))
+        current += elementsPerWindow
         
-        var currentGroup = [Element]()
-        for elt in self {
-            currentGroup.append(elt)
-            if currentGroup.count == elementsPerGroup {
-                result.append(currentGroup)
-                currentGroup.removeAll(keepingCapacity: true)
-            }
-        }
-        var a = result[result.endIndex - 1]
-        a.append(contentsOf: Array(self[self.endIndex-1 - extra..<self.endIndex-1]))
-        result[result.endIndex - 1] = a
-        
-        //        return (result, extra == 0 ? [] : Array(self[self.endIndex-1 - extra..<self.endIndex-1]))
-        return result
     }
+    windows.append((current, max))
+    return windows
 }
 
-func fileCount(files: [TaggedFile], inRange range: Range<Int>) -> Int {
+func fileCount(files: [TaggedFile], inRange range: ClosedRange<Int>) -> Int {
     files.map { range.contains($0.tags.count) ? 1 : 0 }.reduce(0, +)
 }
 
@@ -56,7 +45,7 @@ struct TagCharts: View {
         
         let maxTags = printing(directory.files.map { $0.tags.count }.max() ?? 0)
         
-        let ranges = printing(Array(0...maxTags).windowed(into: 10).map { ($0.first ?? 0, ($0.last ?? 0) + 1) })
+        let ranges = printing(windows(from: 0, to: maxTags, count: 10))
         
         
         TabView(selection: $tabSelection) {
@@ -71,7 +60,7 @@ struct TagCharts: View {
               
             Chart {
                 ForEach(ranges, id: \.0) { item in
-                    BarMark(x: .value("Count", "\(item.0)-\(item.1)"), y: .value("Files with Tags", fileCount(files: directory.files, inRange: item.0..<item.1)))
+                    BarMark(x: .value("Count", "\(item.0)-\(item.1)"), y: .value("Files with Tags", fileCount(files: directory.files, inRange: item.0...item.1)))
                 }
             }.padding()
                 .tag(2)
