@@ -27,7 +27,7 @@ class ThumbnailProvider: QLThumbnailProvider {
         tagImage.size.width = 15
         
         
-        let store = try?  CompressedCustomTagStoreWriter().loadFrom(path: request.fileURL.absolutePath)
+        let store = try? CompressedCustomTagStoreWriter().loadFrom(path: request.fileURL.absolutePath)
         let fileCount = store?.tagData.count.description ?? "???"
         let tagCount = store?.tagData.map { (key, value) in value.count }.reduce(0, +).description ?? "???"
         

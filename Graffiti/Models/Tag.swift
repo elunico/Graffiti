@@ -199,7 +199,7 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
         self.value = imageURL.absolutePath
         self.imageFormat = format
         if thumbnail == nil {
-            self.thumbnail = try? makeThumbnail(of: imageURL)
+            self.thumbnail = try? tryGetThumbnail(for: imageURL)
         } else {
             self.thumbnail = thumbnail
         }
@@ -218,7 +218,7 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
     @discardableResult
     func acquire() -> Tag {
         refCount += 1
-        print("Tag \(id) now has rc: \(refCount)")
+//        print("Tag \(id) now has rc: \(refCount)")
         return self
     }
     
@@ -227,9 +227,9 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
     /// This method is called on Tags when they are removed from a file. It decrements the `refCount` and, if necessary, removes the `Tag` from the registry that the `Tag` class keeps and, if necessary, removes the associated image file that the `Tag` has. Since this method removes filesystem resources, this method should be called whenever an entity is sure that a tag will not be needed again for the remaining lifetime of the program.
     func relieve() {
         refCount -= 1
-        print("Tag \(id) now has rc: \(refCount)")
+        //        print("Tag \(id) now has rc: \(refCount)")
         if refCount == 0 {
-            print("Tag \(self.id) is no longer needed by any file.")
+            //            print("Tag \(self.id) is no longer needed by any file.")
             Tag.registry.removeValue(forKey: self.id)
             Tag.stringRegistry.removeValue(forKey: self.value)
             Tag.imageRegistry.removeValue(forMaybeKey: self.image)
@@ -240,10 +240,6 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
                 try? FileManager.default.removeItem(at: thumbnail)
             }
         }
-    }
-    
-    deinit {
-        print("Deinit of \(String(describing: self))")
     }
     
     func hash(into hasher: inout Hasher) {
@@ -342,7 +338,7 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
         // if thumbnail is nil because no thumbnail exists, one will be created in the init
         var t = Tag(imageURL: imageURL, format: .url, thumbnail: thumbnail, id: id)
         t.imageFormat = .url 
-        print("Deserializing \(String(reflecting: t))")
+//        print("Deserializing \(String(reflecting: t))")
         if t.recoginitionState == .uninitialized {
             try deserilizeRecognizedStrings(count: stringCount, fromIterator: &iter, to: &t)
             
@@ -425,22 +421,6 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
     
     
 }
-
-//extension Tag {
-//
-//        var serializedContentString: String {
-//        if image == nil {
-//            return "SV\(value)"
-//        } else if image != nil && imageFormat == .url {
-//            return "IU\(image!)"
-//        } else if image != nil && imageFormat == .content {
-//            return "BD\(try! Data(contentsOf: image!).base64EncodedString())"
-//        } else {
-//            fatalError("Unidentifiable tag")
-//        }
-//
-//    }
-//}
 
 extension Tag: CustomStringConvertible {
     var description: String {

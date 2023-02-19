@@ -111,6 +111,9 @@ struct GraffitiApp: App {
             ConvertView()
         }).keyboardShortcut("1")
         
+        Window("Resize an Image", id: "imageresizewindow") {
+            FileResizeView()
+        }.keyboardShortcut("2")
         
         Window("Statistics", id: "statisticswindow") {
             TagCharts().environmentObject(taggedDirectory)

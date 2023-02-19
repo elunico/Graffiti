@@ -14,7 +14,9 @@ func getContentsOfDirectory(atPath directory: String)  throws -> [String] {
 }
 
 func TPData(contentsOf url: URL) throws -> Data {
-    try getSandboxedAccess(to: url.absolutePath) { try Data(contentsOf: URL(fileURLWithPath: $0)) }
+//    try getSandboxedAccess(to: url.absolutePath) {
+    try Data(contentsOf: URL(fileURLWithPath: url.absolutePath))
+//    }
 }
 
 func createOwnedImageURL(in directory: String = "ownedImages")  throws -> URL {
@@ -85,17 +87,27 @@ func tryGetThumbnail(for imageURL: URL) throws -> URL? {
     let imageDirectory = URL(fileURLWithPath: path).appending(path: "ownedImages-tiny")
     let filename = imageURL.lastPathComponent
     
-    return try getSandboxedAccess(to: imageDirectory.absolutePath, thenPerform: { imageDirectoryString in
-        let imageDirectory = URL(fileURLWithPath: imageDirectoryString)
-        let path = imageDirectory.appending(path: filename)
-        if FileManager.default.fileExists(atPath: path.absolutePath) {
-            return path
+//    return try getSandboxedAccess(to: imageDirectory.absolutePath, thenPerform: { imageDirectoryString in
+//        let imageDirectory = URL(fileURLWithPath: imageDirectoryString)
+        let thumbnail = imageDirectory.appending(path: filename)
+        print(thumbnail)
+        if FileManager.default.fileExists(atPath: thumbnail.absolutePath) {
+            return thumbnail
         } else {
             return nil
         }
-    })
+//    })
 }
 
+func resizeImage(source: NSImage, newSize: NSSize) -> NSImage {
+    let smallImage = NSImage(size: newSize)
+    smallImage.lockFocus()
+    source.size = newSize
+    NSGraphicsContext.current?.imageInterpolation = .high
+    source.draw(at: .zero, from: NSRect(origin: .zero, size: newSize), operation: .copy, fraction: 1.0)
+    smallImage.unlockFocus()
+    return smallImage
+}
 
 func makeThumbnail(of file: URL, longestSize: CGFloat = 200.0) throws -> URL {
     let path = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.applicationSupportDirectory, .userDomainMask, true).first!
@@ -109,12 +121,7 @@ func makeThumbnail(of file: URL, longestSize: CGFloat = 200.0) throws -> URL {
         guard let i = NSImage(contentsOf: file) else { print("makeThumbnail(of:) failed to load NSImage from \(file)"); throw FileError.couldNotRead  }
         
         let newSize = resize(size: i.size, toLongest: longestSize)
-        let smallImage = NSImage(size: newSize)
-        smallImage.lockFocus()
-        i.size = newSize
-        NSGraphicsContext.current?.imageInterpolation = .high
-        i.draw(at: .zero, from: NSRect(origin: .zero, size: newSize), operation: .copy, fraction: 1.0)
-        smallImage.unlockFocus()
+        let smallImage = resizeImage(source: i, newSize: newSize)
         
         
         let url = imageDirectory.appending(path: filename) // try createOwnedImageURL(in: "ownedImages-tiny")
