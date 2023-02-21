@@ -137,11 +137,12 @@ struct FileResizeView: View {
                 guard let sourceURL, let sourceWidth, let sourceHeight, let destinationWidth, let destinationHeight else { return }
                 let newSize = resize(size: NSSize(width: sourceWidth, height: sourceHeight), toLongest: max(destinationWidth, destinationHeight))
                 guard let oldImage = NSImage(contentsOf: sourceURL) else { return }
-                let image = resizeImage(source: oldImage, newSize: newSize)
-                
-                let rep = NSBitmapImageRep(data: image.tiffRepresentation!)
-                let png = rep?.representation(using: .png, properties: [:])
-                try! png?.write(to: destinationURL ?? sourceURL)
+                resizeImage(source: oldImage, newSize: newSize) { newImage in
+                    
+                    let rep = NSBitmapImageRep(data: newImage.tiffRepresentation!)
+                    let png = rep?.representation(using: .png, properties: [:])
+                    try! png?.write(to: destinationURL ?? sourceURL)
+                }
                 
                 
             }.disabled(

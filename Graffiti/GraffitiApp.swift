@@ -67,6 +67,7 @@ struct GraffitiApp: App {
             ContentView().environmentObject(appState).environmentObject(taggedDirectory)
                 .onAppear {
                     NSWindow.allowsAutomaticWindowTabbing = false
+                    loadDefaultSettings(to: appState)
                 }
         }
         

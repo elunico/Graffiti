@@ -15,6 +15,7 @@ struct SettingsView: View {
     static let copyOwnedImagesDefaultsKey = "com.tom.graffiti-copyOwnedImages"
     static let saveImageURLsDefaultsKey = "com.tom.graffiti-saveImageURLs"
     static let doTextRecognition = "com.tom.graffiti-doTextRecognition"
+    static let showSpotlightKinds = "com.tom.graffiti-showSpotlightKinds"
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10.0) {
@@ -23,16 +24,17 @@ struct SettingsView: View {
                 Text("File Control").font(.headline)
                 Section {
                     Text("Change image save format of all tags")
-                    Text("Save Tag Images as")
                     Picker("", selection: $appState.imageSaveFormat, content: {
-                        Text("Links to local image files (faster; less space)").tag(Tag.ImageFormat.url)
-                        Text("Inline full image data (portable; larger files)").tag(Tag.ImageFormat.content)
+                        Text("Save Images as Links to local image files (faster; less space)").tag(Tag.ImageFormat.url)
+                        Text("Save Images as Inline full image data (portable; larger files)").tag(Tag.ImageFormat.content)
                     }).disabled(!AppState.tagChangeableStates.contains(appState.currentState))
                     Button("Change All Tags") {
                         taggedDirectory.convertTagStorage(to: appState.imageSaveFormat)
                         UserDefaults.thisAppDomain?.set(appState.imageSaveFormat == .url, forKey: SettingsView.saveImageURLsDefaultsKey)
                     }.disabled(!AppState.tagChangeableStates.contains(appState.currentState))
                 }
+                Divider()
+                Text("Image Thumbnail Cache").font(.subheadline)
                 Button("Clear Thumbnail Cache") {
                     try? pruneThumbnailCache()
                 }
@@ -44,6 +46,11 @@ struct SettingsView: View {
                     .onChange(of: appState.doImageVision, perform: {
                         UserDefaults.thisAppDomain?.set($0, forKey: SettingsView.doTextRecognition)
                     }).disabled(!AppState.tagChangeableStates.contains(appState.currentState))
+                Divider()
+                Toggle("Show Spotlight File Kinds", isOn: $appState.showSpotlightKinds)
+                    .onChange(of: appState.showSpotlightKinds, perform: {
+                        UserDefaults.thisAppDomain?.set($0, forKey: SettingsView.showSpotlightKinds)
+                    })
             }
             
             
@@ -58,6 +65,7 @@ struct SettingsView: View {
 func loadDefaultSettings(to appState: ApplicationState) {
     appState.imageSaveFormat = (UserDefaults.thisAppDomain?.bool(forKey: SettingsView.saveImageURLsDefaultsKey) ?? true)  ? Tag.ImageFormat.url : Tag.ImageFormat.content
     appState.doImageVision = UserDefaults.thisAppDomain?.bool(forKey: SettingsView.doTextRecognition) ?? true
+    appState.showSpotlightKinds = UserDefaults.thisAppDomain?.bool(forKey: SettingsView.showSpotlightKinds) ?? false
 }
 
 struct SettingsView_Previews: PreviewProvider {

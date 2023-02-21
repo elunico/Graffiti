@@ -99,14 +99,18 @@ func tryGetThumbnail(for imageURL: URL) throws -> URL? {
 //    })
 }
 
-func resizeImage(source: NSImage, newSize: NSSize) -> NSImage {
-    let smallImage = NSImage(size: newSize)
-    smallImage.lockFocus()
-    source.size = newSize
-    NSGraphicsContext.current?.imageInterpolation = .high
-    source.draw(at: .zero, from: NSRect(origin: .zero, size: newSize), operation: .copy, fraction: 1.0)
-    smallImage.unlockFocus()
-    return smallImage
+func resizeImage(source: NSImage, newSize: NSSize, callback: @MainActor @escaping (_ newImage: NSImage) -> ()) {
+    DispatchQueue.global(qos: .userInitiated).async {
+        let smallImage = NSImage(size: newSize)
+        smallImage.lockFocus()
+        source.size = newSize
+        NSGraphicsContext.current?.imageInterpolation = .high
+        source.draw(at: .zero, from: NSRect(origin: .zero, size: newSize), operation: .copy, fraction: 1.0)
+        smallImage.unlockFocus()
+        DispatchQueue.main.async {
+            callback(smallImage)
+        }
+    }
 }
 
 func makeThumbnail(of file: URL, longestSize: CGFloat = 200.0) throws -> URL {
@@ -119,14 +123,13 @@ func makeThumbnail(of file: URL, longestSize: CGFloat = 200.0) throws -> URL {
         try ensureExistance(ofDirectory: imageDirectory)
         
         guard let i = NSImage(contentsOf: file) else { print("makeThumbnail(of:) failed to load NSImage from \(file)"); throw FileError.couldNotRead  }
+        let url = imageDirectory.appending(path: filename) // try createOwnedImageURL(in: "ownedImages-tiny")
+
         
         let newSize = resize(size: i.size, toLongest: longestSize)
-        let smallImage = resizeImage(source: i, newSize: newSize)
-        
-        
-        let url = imageDirectory.appending(path: filename) // try createOwnedImageURL(in: "ownedImages-tiny")
-        FileManager.default.createFile(atPath: url.absolutePath, contents: smallImage.tiffRepresentation)
-        
+        resizeImage(source: i, newSize: newSize) { smallImage in
+            FileManager.default.createFile(atPath: url.absolutePath, contents: smallImage.tiffRepresentation)
+        }
         return url
     })
 }

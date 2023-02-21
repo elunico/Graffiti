@@ -32,7 +32,7 @@ enum AppState : Equatable, Hashable {
 class ApplicationState: ObservableObject {
     
     @Published var currentState: AppState = .StartScreen
-    
+    @Published var showSpotlightKinds: Bool = false 
     @Published var isImporting: Bool = false
     @Published var isConverting: Bool = false
     @Published var isLoading: Bool = false {

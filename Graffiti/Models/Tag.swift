@@ -168,7 +168,7 @@ final class Tag : Equatable, Hashable, Codable, Identifiable {
     /// Obtain an existing `Tag` instance from its known `URL` to an Image if it exists or create it if it doesn't
     ///
     /// Warning! Using this method comes with serious caveats see the documentation on the ``Tag`` class for more information
-    static func tag(imageURL url: URL, thumbnail: URL) -> Tag {
+    static func tag(imageURL url: URL, thumbnail: URL? = nil) -> Tag {
         
         if let id = imageRegistry[url], let tag = registry[id] {
             return tag

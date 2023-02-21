@@ -23,12 +23,10 @@ struct MainView: View {
     
     @State private var selectedFileURLs: [URL] = []
     @State private var selectedFileURL: URL? = nil
-    @State private var richKind: Bool = false
     @State private var sorter: [Sorter] = []
-    @State private var showOnlyUntagged: Bool = false
+    @State private var showOnlyUntagged: TaggedDirectory.TaggedState = .all
     
     @State private var currentFileList: [TaggedFile] = []
-    
     
     var name: String {
         let affectedFiles = files.getFiles(withIDs: selected)
@@ -44,8 +42,8 @@ struct MainView: View {
                         Text(item.filename)
                     }.width(ideal: tableGeometry.size.width * 5 / 15)
                     
-                    TableColumn(richKind  ? "Kind" : "Extension") { item in
-                        if richKind  {
+                    TableColumn(appState.showSpotlightKinds  ? "Kind" : "Extension") { item in
+                        if appState.showSpotlightKinds  {
                             Text(getMDKind(ofFileAtPath: item.id) ?? "<unknown>")
                         } else {
                             Text("\(URL(fileURLWithPath: item.id).pathExtension)")
@@ -120,7 +118,7 @@ struct MainView: View {
                     }
                     appState.select(only: selected)
                 }).onAppear {
-                    _ = launch(after: .minutes(5).and(.seconds(30)), repeats: true) { action in
+                    _ = launch(after: .minutes(5) + .seconds(30), repeats: true) { action in
                         display(message: "Timer activated", log: .default, type: .error)
                         mdCache.removeAll()
                     }
@@ -251,7 +249,7 @@ struct MainView: View {
             TextField("Search", text: $query)
                 .onChange(of: query, perform: { [unowned files] _ in
                     
-                    currentFileList = files.filter(by: query, onlyUntagged: showOnlyUntagged)
+                    currentFileList = files.filter(by: query, within: showOnlyUntagged)
                     var noLongerSeen = selected
                     currentFileList.forEach { noLongerSeen.remove($0.id) }
                     selected.subtract(noLongerSeen)
@@ -278,16 +276,23 @@ struct MainView: View {
                             })
                             Spacer()
                             VStack {
-                                Toggle("Spotlight File Kinds", isOn: $richKind)
-                                    .onChange(of: richKind, perform: { _ in
-                                        UserDefaults.thisAppDomain?.set(richKind, forKey: MainView.kUserDefaultsRichKindKey)
-                                    })
-                                Toggle("Show Only Untagged", isOn: $showOnlyUntagged)
-                                    .onChange(of: showOnlyUntagged, perform: { showOnly in
-                                        currentFileList = files.filter(by: query, onlyUntagged: showOnly)
-                                    })
+//                                Toggle("Spotlight File Kinds", isOn: $richKind)
+//                                    .onChange(of: richKind, perform: { _ in
+//                                        UserDefaults.thisAppDomain?.set(richKind, forKey: MainView.kUserDefaultsRichKindKey)
+//                                    })
+                                //                                Toggle("Show Only Untagged", isOn: $showOnlyUntagged)
+                                //                                    .onChange(of: showOnlyUntagged, perform: { showOnly in
+                                //                                        currentFileList = files.filter(by: query, onlyUntagged: showOnly)
+                                //                                    })
+                                Picker("Show: ", selection: $showOnlyUntagged, content: {
+                                    Text("All Files").tag(TaggedDirectory.TaggedState.all)
+                                    Text("Only Untagged").tag(TaggedDirectory.TaggedState.untagged)
+                                    Text("Only Tagged").tag(TaggedDirectory.TaggedState.tagged)
+                                }).onChange(of: showOnlyUntagged, perform: {
+                                        currentFileList = files.filter(by: query, within: $0)
+                                    }).frame(width: 200, alignment: .bottomTrailing)
                             }
-                                
+                            
                             
                         }
                         if appState.showingMoreInfo {
@@ -304,15 +309,15 @@ struct MainView: View {
                         appState.showingOptions = true
                     }
                     Spacer()
-                    Text("\(files.files.count) files")
+                    Text("Showing \(currentFileList.count) of \(files.files.count) files")
                     Divider().frame(height: 20)
-                    Text("\(files.files.map { $0.tags.count }.reduce(0, +)) tags")
+                    Text("Showing \(currentFileList.map { $0.tags.count }.reduce(0, +)) of \(files.files.map { $0.tags.count }.reduce(0, +)) tags")
                 }
                 
             }
             .onClearAll(message: (selected.count == 0 ? "This will remove EVERY tag from EVERY file currently in view in the table" : "This will remove EVERY tag from every SELECTED file in the table") + "\nYou cannot undo this action", isPresented: $appState.isPresentingConfirm, clearAction: { [unowned files] in
                 if selected.count == 0 {
-                    for file in files.filter(by: query, onlyUntagged: showOnlyUntagged) {
+                    for file in files.filter(by: query, within: showOnlyUntagged) {
                         files.clearTags(of: file)
                     }
                     
@@ -344,9 +349,8 @@ struct MainView: View {
             
             try! self.files.load(directory: path, format: choice)
             files.convertTagStorage(to: appState.imageSaveFormat)
-            currentFileList = files.filter(by: query, onlyUntagged: showOnlyUntagged)
+            currentFileList = files.filter(by: query, within: showOnlyUntagged)
             
-            richKind = UserDefaults.thisAppDomain?.bool(forKey: MainView.kUserDefaultsRichKindKey) ?? false
             appState.createSelectionModel()
         }
     }

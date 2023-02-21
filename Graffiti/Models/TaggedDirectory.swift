@@ -13,6 +13,10 @@ import CoreImage
 
 
 class TaggedDirectory: ObservableObject {
+    enum TaggedState {
+        case all, tagged, untagged
+    }
+    
     static let empty: TaggedDirectory = TaggedDirectory()
     private static let alwaysTrue: (TaggedFile) -> Bool = { _ in true }
     
@@ -207,7 +211,7 @@ class TaggedDirectory: ObservableObject {
 // Functions for filtering
 extension TaggedDirectory {
 
-    func filter(by query: String, onlyUntagged: Bool = false) -> [TaggedFile] {
+    func filter(by query: String, within state: TaggedState = .all) -> [TaggedFile] {
         self.query = query
         if query.isEmpty {
             filterPredicate = TaggedDirectory.alwaysTrue
@@ -223,10 +227,13 @@ extension TaggedDirectory {
                 }
             }
         }
-        if onlyUntagged {
-            return files.filter { $0.tags.isEmpty && filterPredicate($0) }
-        } else {
+        switch state {
+        case .all:
             return files.filter(filterPredicate)
+        case .untagged:
+            return files.filter { $0.tags.count == 0 && filterPredicate($0) }
+        case .tagged:
+            return files.filter { $0.tags.count > 0 && filterPredicate($0) }
         }
     }
 }
