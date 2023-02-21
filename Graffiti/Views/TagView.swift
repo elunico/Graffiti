@@ -8,17 +8,6 @@
 import Foundation
 import SwiftUI
 
-precedencegroup FoldPrecedence {
-    lowerThan: AdditionPrecedence
-    associativity: left
-}
-
-infix operator =>: FoldPrecedence
-
-func => <A, B>(_ lhs: A, _ rhs: B) -> B {
-    return rhs
-}
-
 struct TagView: View {
     @State var files: Set<TaggedFile>
     @State var selected: Set<Tag.ID> = []
@@ -133,6 +122,7 @@ struct TagView: View {
                     TableColumn("Tag") { item in
                         if item.image != nil {
                             HStack {
+                                try? item.ensureThumbnail() =>
                                 ImageSelector.imageOfFile(item.thumbnail)
                                     .resizable()
                                     .scaledToFit()

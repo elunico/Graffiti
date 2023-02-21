@@ -27,11 +27,6 @@ func fileCount(files: [TaggedFile], inRange range: ClosedRange<Int>) -> Int {
     files.map { range.contains($0.tags.count) ? 1 : 0 }.reduce(0, +)
 }
 
-func printing<T>(_ t: T) -> T {
-    print(t)
-    return t
-}
-
 struct TagCharts: View {
     
     @EnvironmentObject var directory: TaggedDirectory

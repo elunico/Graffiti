@@ -28,18 +28,7 @@ struct MainView: View {
     @State private var showOnlyUntagged: Bool = false
     
     @State private var currentFileList: [TaggedFile] = []
-        
-    enum Orientation {
-        case horizontally, vertically
-    }
     
-    func divider(forLayoutOrientation orientation: Orientation, measure: CGFloat) -> some View {
-        if (orientation == .horizontally) {
-            return Divider().frame(height: measure)
-        } else {
-            return Divider().frame(width: measure)
-        }
-    }
     
     var name: String {
         let affectedFiles = files.getFiles(withIDs: selected)

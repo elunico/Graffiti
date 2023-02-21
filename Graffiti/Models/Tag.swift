@@ -42,7 +42,7 @@ extension String {
 /// 3) The ``Tag/tag(withString:)`` or ``Tag/tag(imageURL:)`` static methods. These methods are the safest way to construct new tags because they check for existing tags with that data and only if they are not present do they then construct and return new tags. Prefer these methods as long as they are possible
 ///
 /// 4) The last method has already been mentioned and is ``Tag/tag(fromID:)``. This method does not construct a `Tag` instance at all, but only returns an existing `Tag` with the given ID, if it exists. This is the ideal method to call and can always be called without breaking any aspect of the Tag class, but it does return an `Optional<Tag>` so other methods are, at least in principle, necessary.
-class Tag : Equatable, Hashable, Codable, Identifiable {
+final class Tag : Equatable, Hashable, Codable, Identifiable {
     static let valueFieldName: String = "value"
     private static var registry: [Tag.ID: Tag] = [:]
     private static var stringRegistry: [String: Tag.ID] = [:]
@@ -241,6 +241,15 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
             }
         }
     }
+        
+    func ensureThumbnail() throws {
+        if let image, try tryGetThumbnail(for: image) != nil {
+            return
+        }
+        if let image {
+            self.thumbnail = try makeThumbnail(of: image)
+        }
+    }
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
@@ -299,10 +308,7 @@ class Tag : Equatable, Hashable, Codable, Identifiable {
             return data
         }
     }
-    
-    
-    
-    
+
     private static func deserilizeRecognizedStrings(count stringCount: Int, fromIterator iter: inout Data.Iterator, to tag: inout Tag) throws {
         for _ in 0..<stringCount {
             guard let stringLength = iter.nextBEInt() else { throw DeserializeTagError.noStringLength }

@@ -9,20 +9,6 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 
-
-extension View {
-    func onClearAll(message: String, isPresented: Binding<Bool>, clearAction: @escaping () -> ()) -> some View {
-        self.confirmationDialog("Are you sure you want to clear all?",
-                                isPresented: isPresented) {
-            Button("Clear All") {
-                clearAction()
-            }
-        } message: {
-            Text(message)
-        }
-    }
-}
-
 struct ContentView: View {
     
     
@@ -30,20 +16,11 @@ struct ContentView: View {
     @EnvironmentObject var appState: ApplicationState
     @State var formatChoice: Format = .none
     @State var lazyChoice: Bool = false
-    //    @State var showingOptions: Bool = true
+
     @State var showingError: Bool = false
     @State var loadedFile: URL? = nil
     @State var directory: URL? = nil
-    //    @State var isImporting: Bool = false
-    //    @State var isConverting: Bool = false
-    //    @State var isLoading: Bool = false {
-    //        didSet {
-    //            if !isLoading {
-    //                NSApplication.shared.requestUserAttention(.informationalRequest)
-    //            }
-    //        }
-    //    }
-    
+
     @State var targeted: Bool = false
     @State var errorString: String = ""
     
@@ -272,46 +249,6 @@ struct ContentView: View {
     }
 }
 
-func selectFolder(callback: @escaping ([URL]) -> ()) {
-    
-    let folderChooserPoint = CGPoint(x: 0, y: 0)
-    let folderChooserSize = CGSize(width: 500, height: 600)
-    let folderChooserRectangle = CGRect(origin: folderChooserPoint, size: folderChooserSize)
-    let folderPicker = NSOpenPanel(contentRect: folderChooserRectangle, styleMask: .utilityWindow, backing: .buffered, defer: true)
-    
-    folderPicker.canChooseDirectories = true
-    folderPicker.canChooseFiles = false
-    folderPicker.allowsMultipleSelection = false
-    folderPicker.canDownloadUbiquitousContents = true
-    folderPicker.canResolveUbiquitousConflicts = true
-    
-    folderPicker.begin { response in
-        if response == .OK {
-            callback(folderPicker.urls)
-        }
-    }
-}
-
-func selectFile(ofTypes types: [UTType], callback: @escaping ([URL]) -> ()) {
-    
-    let folderChooserPoint = CGPoint(x: 0, y: 0)
-    let folderChooserSize = CGSize(width: 500, height: 600)
-    let folderChooserRectangle = CGRect(origin: folderChooserPoint, size: folderChooserSize)
-    let filePicker = NSOpenPanel(contentRect: folderChooserRectangle, styleMask: .utilityWindow, backing: .buffered, defer: true)
-    
-    filePicker.canChooseDirectories = false
-    filePicker.canChooseFiles = true
-    filePicker.allowsMultipleSelection = false
-    filePicker.canDownloadUbiquitousContents = true
-    filePicker.canResolveUbiquitousConflicts = true
-    filePicker.allowedContentTypes = types
-    
-    filePicker.begin { response in
-        if response == .OK {
-            callback(filePicker.urls)
-        }
-    }
-}
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {

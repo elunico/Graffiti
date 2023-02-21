@@ -253,3 +253,44 @@ func getSandboxedAccess<R>(to directory: String, thenPerform action: (String)  t
         throw error
     }
 }
+
+func selectFolder(callback: @escaping ([URL]) -> ()) {
+    
+    let folderChooserPoint = CGPoint(x: 0, y: 0)
+    let folderChooserSize = CGSize(width: 500, height: 600)
+    let folderChooserRectangle = CGRect(origin: folderChooserPoint, size: folderChooserSize)
+    let folderPicker = NSOpenPanel(contentRect: folderChooserRectangle, styleMask: .utilityWindow, backing: .buffered, defer: true)
+    
+    folderPicker.canChooseDirectories = true
+    folderPicker.canChooseFiles = false
+    folderPicker.allowsMultipleSelection = false
+    folderPicker.canDownloadUbiquitousContents = true
+    folderPicker.canResolveUbiquitousConflicts = true
+    
+    folderPicker.begin { response in
+        if response == .OK {
+            callback(folderPicker.urls)
+        }
+    }
+}
+
+func selectFile(ofTypes types: [UTType], callback: @escaping ([URL]) -> ()) {
+    
+    let folderChooserPoint = CGPoint(x: 0, y: 0)
+    let folderChooserSize = CGSize(width: 500, height: 600)
+    let folderChooserRectangle = CGRect(origin: folderChooserPoint, size: folderChooserSize)
+    let filePicker = NSOpenPanel(contentRect: folderChooserRectangle, styleMask: .utilityWindow, backing: .buffered, defer: true)
+    
+    filePicker.canChooseDirectories = false
+    filePicker.canChooseFiles = true
+    filePicker.allowsMultipleSelection = false
+    filePicker.canDownloadUbiquitousContents = true
+    filePicker.canResolveUbiquitousConflicts = true
+    filePicker.allowedContentTypes = types
+    
+    filePicker.begin { response in
+        if response == .OK {
+            callback(filePicker.urls)
+        }
+    }
+}

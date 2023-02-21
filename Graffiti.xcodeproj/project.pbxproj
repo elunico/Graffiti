@@ -78,6 +78,28 @@
 		DC9CCB452980ECE600A2D622 /* GraffitiIntentShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9CCB442980ECE600A2D622 /* GraffitiIntentShortcuts.swift */; };
 		DC9CCB472980ED4700A2D622 /* GraffitiRemoveTagsFromFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9CCB462980ED4700A2D622 /* GraffitiRemoveTagsFromFile.swift */; };
 		DCBE181529926CCE0005AEC9 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBE181429926CCE0005AEC9 /* SettingsView.swift */; };
+		DCC2A5D029A4750E00028437 /* ViewUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC2A5CF29A4750E00028437 /* ViewUtilities.swift */; };
+		DCC2A5D229A475ED00028437 /* Sorter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC2A5D129A475ED00028437 /* Sorter.swift */; };
+		DCC2A5D429A4761200028437 /* AnySelectionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC2A5D329A4761200028437 /* AnySelectionModel.swift */; };
+		DCC2A5DA29A476AA00028437 /* RemoveTagFromManyFilesTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC2A5D629A476AA00028437 /* RemoveTagFromManyFilesTransaction.swift */; };
+		DCC2A5DB29A476AA00028437 /* RemoveTagFromManyFilesTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC2A5D629A476AA00028437 /* RemoveTagFromManyFilesTransaction.swift */; };
+		DCC2A5DC29A476AA00028437 /* RemoveTagFromManyFilesTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC2A5D629A476AA00028437 /* RemoveTagFromManyFilesTransaction.swift */; };
+		DCC2A5DD29A476AA00028437 /* RemoveTagFromManyFilesTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC2A5D629A476AA00028437 /* RemoveTagFromManyFilesTransaction.swift */; };
+		DCC2A5DE29A476AA00028437 /* AddTagTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC2A5D729A476AA00028437 /* AddTagTransaction.swift */; };
+		DCC2A5DF29A476AA00028437 /* AddTagTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC2A5D729A476AA00028437 /* AddTagTransaction.swift */; };
+		DCC2A5E029A476AA00028437 /* AddTagTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC2A5D729A476AA00028437 /* AddTagTransaction.swift */; };
+		DCC2A5E129A476AA00028437 /* AddTagTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC2A5D729A476AA00028437 /* AddTagTransaction.swift */; };
+		DCC2A5E229A476AA00028437 /* AddTagToManyFilesTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC2A5D829A476AA00028437 /* AddTagToManyFilesTransaction.swift */; };
+		DCC2A5E329A476AA00028437 /* AddTagToManyFilesTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC2A5D829A476AA00028437 /* AddTagToManyFilesTransaction.swift */; };
+		DCC2A5E429A476AA00028437 /* AddTagToManyFilesTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC2A5D829A476AA00028437 /* AddTagToManyFilesTransaction.swift */; };
+		DCC2A5E529A476AA00028437 /* AddTagToManyFilesTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC2A5D829A476AA00028437 /* AddTagToManyFilesTransaction.swift */; };
+		DCC2A5E629A476AA00028437 /* RemoveTagTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC2A5D929A476AA00028437 /* RemoveTagTransaction.swift */; };
+		DCC2A5E729A476AA00028437 /* RemoveTagTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC2A5D929A476AA00028437 /* RemoveTagTransaction.swift */; };
+		DCC2A5E829A476AA00028437 /* RemoveTagTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC2A5D929A476AA00028437 /* RemoveTagTransaction.swift */; };
+		DCC2A5E929A476AA00028437 /* RemoveTagTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC2A5D929A476AA00028437 /* RemoveTagTransaction.swift */; };
+		DCC2A5EA29A4775100028437 /* Sorter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC2A5D129A475ED00028437 /* Sorter.swift */; };
+		DCC2A5EB29A4775100028437 /* Sorter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC2A5D129A475ED00028437 /* Sorter.swift */; };
+		DCC2A5EC29A4775100028437 /* Sorter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC2A5D129A475ED00028437 /* Sorter.swift */; };
 		DCCB4F302985B8F000C55E15 /* FileWriterError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCB4F2F2985B8F000C55E15 /* FileWriterError.swift */; };
 		DCCB4F312985BC6A00C55E15 /* FileWriterError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCB4F2F2985B8F000C55E15 /* FileWriterError.swift */; };
 		DCCB4F322985BC6A00C55E15 /* FileWriterError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCB4F2F2985B8F000C55E15 /* FileWriterError.swift */; };
@@ -208,6 +230,13 @@
 		DC9CCB442980ECE600A2D622 /* GraffitiIntentShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraffitiIntentShortcuts.swift; sourceTree = "<group>"; };
 		DC9CCB462980ED4700A2D622 /* GraffitiRemoveTagsFromFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraffitiRemoveTagsFromFile.swift; sourceTree = "<group>"; };
 		DCBE181429926CCE0005AEC9 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		DCC2A5CF29A4750E00028437 /* ViewUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewUtilities.swift; sourceTree = "<group>"; };
+		DCC2A5D129A475ED00028437 /* Sorter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sorter.swift; sourceTree = "<group>"; };
+		DCC2A5D329A4761200028437 /* AnySelectionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnySelectionModel.swift; sourceTree = "<group>"; };
+		DCC2A5D629A476AA00028437 /* RemoveTagFromManyFilesTransaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoveTagFromManyFilesTransaction.swift; sourceTree = "<group>"; };
+		DCC2A5D729A476AA00028437 /* AddTagTransaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddTagTransaction.swift; sourceTree = "<group>"; };
+		DCC2A5D829A476AA00028437 /* AddTagToManyFilesTransaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddTagToManyFilesTransaction.swift; sourceTree = "<group>"; };
+		DCC2A5D929A476AA00028437 /* RemoveTagTransaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoveTagTransaction.swift; sourceTree = "<group>"; };
 		DCCB4F2F2985B8F000C55E15 /* FileWriterError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileWriterError.swift; sourceTree = "<group>"; };
 		DCE458B8299EEE0B00BD3685 /* FileUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileUtilities.swift; sourceTree = "<group>"; };
 		DCE458BA299EEE3F00BD3685 /* ArrayUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayUtilities.swift; sourceTree = "<group>"; };
@@ -345,6 +374,18 @@
 			path = OptimizationProfiles;
 			sourceTree = "<group>";
 		};
+		DCC2A5D529A4762F00028437 /* TagTransactions */ = {
+			isa = PBXGroup;
+			children = (
+				DCC2A5D829A476AA00028437 /* AddTagToManyFilesTransaction.swift */,
+				DCC2A5D729A476AA00028437 /* AddTagTransaction.swift */,
+				DCC2A5D629A476AA00028437 /* RemoveTagFromManyFilesTransaction.swift */,
+				DCC2A5D929A476AA00028437 /* RemoveTagTransaction.swift */,
+				DC9BBD1A2985C0720035543D /* TagTransaction.swift */,
+			);
+			path = TagTransactions;
+			sourceTree = "<group>";
+		};
 		DCE458B7299EEDF500BD3685 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
@@ -352,6 +393,7 @@
 				DCE458C5299EEEE400BD3685 /* TimerUtilities.swift */,
 				DCE458B8299EEE0B00BD3685 /* FileUtilities.swift */,
 				DCE458BA299EEE3F00BD3685 /* ArrayUtilities.swift */,
+				DCC2A5CF29A4750E00028437 /* ViewUtilities.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -399,11 +441,13 @@
 				DC1B7BC72962299B00DEED22 /* TaggedFile.swift */,
 				DCFA39C22965DD1C0002690A /* Tag.swift */,
 				DC8E14622963EAE0002E1788 /* TaggedDirectory.swift */,
+				DCC2A5D129A475ED00028437 /* Sorter.swift */,
 				DC5FA2F12975032800084CB2 /* Version.swift */,
 				DC5FA2F32975091500084CB2 /* TagStore.swift */,
 				DC5D265A297EE79F009D3868 /* Format.swift */,
-				DC9BBD1A2985C0720035543D /* TagTransaction.swift */,
+				DCC2A5D529A4762F00028437 /* TagTransactions */,
 				DC4F4CD02985EB060001CCD9 /* ApplicationState.swift */,
+				DCC2A5D329A4761200028437 /* AnySelectionModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -600,12 +644,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DCC2A5DC29A476AA00028437 /* RemoveTagFromManyFilesTransaction.swift in Sources */,
 				DCE458C3299EEEDC00BD3685 /* Utility.swift in Sources */,
 				DCE458BD299EEE8F00BD3685 /* ArrayUtilities.swift in Sources */,
 				DC94CA46299590DB007E64A2 /* MobileNetV2.mlmodel in Sources */,
 				DC4E79AD297DF3AC003AEE68 /* XattrBridge.m in Sources */,
 				DCDFF2352984414000A2B6CF /* Format.swift in Sources */,
 				DCE458C8299EEEF800BD3685 /* TimerUtilities.swift in Sources */,
+				DCC2A5E029A476AA00028437 /* AddTagTransaction.swift in Sources */,
+				DCC2A5E829A476AA00028437 /* RemoveTagTransaction.swift in Sources */,
 				DC4E79A8297DF2E3003AEE68 /* FileWriter.swift in Sources */,
 				DC4E799E297DF2E3003AEE68 /* Tag.swift in Sources */,
 				DC14E749297DCBE8001B00AC /* ThumbnailProvider.swift in Sources */,
@@ -613,6 +660,8 @@
 				DC4E79A7297DF2E3003AEE68 /* CompressedCustomTagStoreWriter.swift in Sources */,
 				DC4E79A9297DF2E3003AEE68 /* TagBackend.swift in Sources */,
 				DCE458C0299EEE9200BD3685 /* FileUtilities.swift in Sources */,
+				DCC2A5EB29A4775100028437 /* Sorter.swift in Sources */,
+				DCC2A5E429A476AA00028437 /* AddTagToManyFilesTransaction.swift in Sources */,
 				DC4E79A5297DF2E3003AEE68 /* FileTagBackend.swift in Sources */,
 				DC4E79A0297DF2E3003AEE68 /* TaggedFile.swift in Sources */,
 				DC4E79A6297DF2E3003AEE68 /* Version.swift in Sources */,
@@ -629,10 +678,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				DC5D265B297EE79F009D3868 /* Format.swift in Sources */,
+				DCC2A5E629A476AA00028437 /* RemoveTagTransaction.swift in Sources */,
 				DC341E2629814D8F003B5153 /* FormatSelector.swift in Sources */,
 				DCFA39C32965DD1C0002690A /* Tag.swift in Sources */,
 				DC1B7BC52962066200DEED22 /* XattrBridge.m in Sources */,
+				DCC2A5DA29A476AA00028437 /* RemoveTagFromManyFilesTransaction.swift in Sources */,
 				DC1B7BCA296229C600DEED22 /* TagBackend.swift in Sources */,
+				DCC2A5D029A4750E00028437 /* ViewUtilities.swift in Sources */,
 				DC52448F2960ACB200821407 /* ContentView.swift in Sources */,
 				DCE458BB299EEE3F00BD3685 /* ArrayUtilities.swift in Sources */,
 				DC25CB702998B3D000C2EF27 /* JSONFileWriter.swift in Sources */,
@@ -645,11 +697,14 @@
 				DC851DBA29A0714D00A9A90D /* TagCharts.swift in Sources */,
 				DCCB4F302985B8F000C55E15 /* FileWriterError.swift in Sources */,
 				DCEAB19E296A018A00843BE4 /* FileTagBackend.swift in Sources */,
+				DCC2A5E229A476AA00028437 /* AddTagToManyFilesTransaction.swift in Sources */,
 				DC5FA2F42975091500084CB2 /* TagStore.swift in Sources */,
 				DC94CA44299583EF007E64A2 /* MobileNetV2.mlmodel in Sources */,
 				DC2809B22967722F003915A5 /* FilesEditingInspectorView.swift in Sources */,
 				DC5FA2F22975032800084CB2 /* Version.swift in Sources */,
 				DCFA39CA296604740002690A /* MainView.swift in Sources */,
+				DCC2A5D429A4761200028437 /* AnySelectionModel.swift in Sources */,
+				DCC2A5DE29A476AA00028437 /* AddTagTransaction.swift in Sources */,
 				DC09FE3B297DB5F600BD51D9 /* Utility.swift in Sources */,
 				DC94CA492995E2F0007E64A2 /* ImageSelector.swift in Sources */,
 				DCE458B9299EEE0B00BD3685 /* FileUtilities.swift in Sources */,
@@ -657,6 +712,7 @@
 				DCBE181529926CCE0005AEC9 /* SettingsView.swift in Sources */,
 				DCFA39C02965DCC20002690A /* TagView.swift in Sources */,
 				DC1B7BC82962299B00DEED22 /* TaggedFile.swift in Sources */,
+				DCC2A5D229A475ED00028437 /* Sorter.swift in Sources */,
 				DCEAB1A3296A056B00843BE4 /* FileWriter.swift in Sources */,
 				DC8E14632963EAE0002E1788 /* TaggedDirectory.swift in Sources */,
 			);
@@ -670,24 +726,29 @@
 				DC5D2650297EE699009D3868 /* GraffitiAddTagsToFile.swift in Sources */,
 				DC5D265D297EE8D2009D3868 /* CompressedCustomTagStoreWriter.swift in Sources */,
 				DC5D2664297EE8D2009D3868 /* FileTagBackend.swift in Sources */,
+				DCC2A5EC29A4775100028437 /* Sorter.swift in Sources */,
 				DC5D2663297EE8D2009D3868 /* FileWriter.swift in Sources */,
 				DC5D2667297EE93D009D3868 /* Version.swift in Sources */,
 				DCE458BF299EEE9200BD3685 /* FileUtilities.swift in Sources */,
 				DCE458BC299EEE8F00BD3685 /* ArrayUtilities.swift in Sources */,
 				DC5D266A297EE93D009D3868 /* TagStore.swift in Sources */,
+				DCC2A5E129A476AA00028437 /* AddTagTransaction.swift in Sources */,
 				DC5D264E297EE699009D3868 /* GraffitiTagFileExtension.swift in Sources */,
 				DC9BBD1E2985C54E0035543D /* TagTransaction.swift in Sources */,
 				DCEBB74529998277003BF709 /* JSONFileWriter.swift in Sources */,
 				DC9CCB452980ECE600A2D622 /* GraffitiIntentShortcuts.swift in Sources */,
 				DCCB4F332985BC6A00C55E15 /* FileWriterError.swift in Sources */,
+				DCC2A5DD29A476AA00028437 /* RemoveTagFromManyFilesTransaction.swift in Sources */,
 				DC5D265F297EE8D2009D3868 /* TagBackend.swift in Sources */,
 				DC5D2668297EE93D009D3868 /* TaggedFile.swift in Sources */,
 				DCE458C4299EEEDC00BD3685 /* Utility.swift in Sources */,
 				DC9CCB432980ECC000A2D622 /* GraffitiGetTagsOfFile.swift in Sources */,
 				DC5D265C297EE7B5009D3868 /* Format.swift in Sources */,
+				DCC2A5E529A476AA00028437 /* AddTagToManyFilesTransaction.swift in Sources */,
 				DC94CA45299590CF007E64A2 /* MobileNetV2.mlmodel in Sources */,
 				DCE458C7299EEEF700BD3685 /* TimerUtilities.swift in Sources */,
 				DC5D266C297EEA83009D3868 /* XattrBridge.m in Sources */,
+				DCC2A5E929A476AA00028437 /* RemoveTagTransaction.swift in Sources */,
 				DC9CCB472980ED4700A2D622 /* GraffitiRemoveTagsFromFile.swift in Sources */,
 				DC5D2666297EE93D009D3868 /* TaggedDirectory.swift in Sources */,
 			);
@@ -697,12 +758,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DCC2A5DB29A476AA00028437 /* RemoveTagFromManyFilesTransaction.swift in Sources */,
 				DCE458C2299EEEDB00BD3685 /* Utility.swift in Sources */,
 				DCE458BE299EEE8F00BD3685 /* ArrayUtilities.swift in Sources */,
 				DC94CA47299590DC007E64A2 /* MobileNetV2.mlmodel in Sources */,
 				DC09FE42297DB66700BD51D9 /* TaggedDirectory.swift in Sources */,
 				DCDFF2342984413F00A2B6CF /* Format.swift in Sources */,
 				DCE458C9299EEEF800BD3685 /* TimerUtilities.swift in Sources */,
+				DCC2A5DF29A476AA00028437 /* AddTagTransaction.swift in Sources */,
+				DCC2A5E729A476AA00028437 /* RemoveTagTransaction.swift in Sources */,
 				DC09FE40297DB64000BD51D9 /* XattrBridge.m in Sources */,
 				DC09FE3E297DB62E00BD51D9 /* TagBackend.swift in Sources */,
 				DC09FE3D297DB60E00BD51D9 /* FileTagBackend.swift in Sources */,
@@ -710,6 +774,8 @@
 				DC09FE36297DB41E00BD51D9 /* TaggedFile.swift in Sources */,
 				DC09FE37297DB41E00BD51D9 /* Tag.swift in Sources */,
 				DCE458C1299EEE9300BD3685 /* FileUtilities.swift in Sources */,
+				DCC2A5EA29A4775100028437 /* Sorter.swift in Sources */,
+				DCC2A5E329A476AA00028437 /* AddTagToManyFilesTransaction.swift in Sources */,
 				DC09FE38297DB41E00BD51D9 /* Version.swift in Sources */,
 				DC09FE39297DB41E00BD51D9 /* TagStore.swift in Sources */,
 				DC09FE32297DB3E400BD51D9 /* FileWriter.swift in Sources */,

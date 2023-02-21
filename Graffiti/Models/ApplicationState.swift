@@ -27,10 +27,6 @@ enum AppState : Equatable, Hashable {
     }
 }
 
-class AnySelectionModel: ObservableObject {
-    @Published var selectedItems: [Any] = []
-    var isSingleSelected: Bool = false
-}
 
 
 class ApplicationState: ObservableObject {

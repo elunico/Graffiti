@@ -17,6 +17,11 @@ func display(message: String, log: OSLog = .default, type: OSLogType = .error) {
     #endif 
 }
 
+func printing<T>(_ t: T) -> T {
+    print(t)
+    return t
+}
+
 extension Dictionary {
     @discardableResult
     mutating func removeValue(forMaybeKey key: Key?) -> Value? {

@@ -11,37 +11,6 @@ import AppKit
 import CoreML
 import CoreImage
 
-class Sorter: SortComparator {
-    typealias Compared = TaggedFile
-    
-    static func == (lhs: Sorter, rhs: Sorter) -> Bool {
-        lhs.order == rhs.order
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(order)
-    }
-    
-    var order: SortOrder = .forward
-    var transform: (TaggedFile) -> String
-    
-    init(keypath: KeyPath<TaggedFile, String>) {
-        self.transform = { $0[keyPath: keypath] }
-    }
-    
-    init(transform: @escaping (TaggedFile) -> String)  {
-        self.transform = transform
-    }
-    
-    func compare(_ lhs: TaggedFile, _ rhs: TaggedFile) -> ComparisonResult {
-        if order == .forward {
-            return transform(lhs).localizedCaseInsensitiveCompare(transform(rhs))
-        } else {
-            return transform(rhs).localizedCaseInsensitiveCompare(transform(lhs))
-        }
-    }
-}
-
 
 class TaggedDirectory: ObservableObject {
     static let empty: TaggedDirectory = TaggedDirectory()
