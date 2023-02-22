@@ -72,8 +72,12 @@ struct ContentView: View {
                 }.disabled(directory == nil || formatChoice == .none)
                 Spacer().frame(height: 50.0)
                 Divider().frame(width: geometry.size.width / 2)
+                Text("Other Options").font(.title)
                 Button("Convert an existing tag store") {
                     openWindow(id: "convertwindow")
+                }
+                Button("Resize an image") {
+                    openWindow(id: "imageresizewindow")
                 }
             }
             .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
@@ -158,7 +162,7 @@ struct ContentView: View {
     func loadUserSelection(onDone completed: @escaping (_ success: Bool) -> Void) {
         appState.isLoading = true
                 
-        DispatchQueue.main.async {
+        DispatchQueue.main.async {  
             guard let dir = self.directory else { return completed(false) }
             let filename = loadedFile == nil ? nil : NSString(string: loadedFile!.lastPathComponent).deletingPathExtension
             

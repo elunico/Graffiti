@@ -120,7 +120,7 @@ struct MainView: View {
                 }).onAppear {
                     _ = launch(after: .minutes(5) + .seconds(30), repeats: true) { action in
                         display(message: "Timer activated", log: .default, type: .error)
-                        mdCache.removeAll()
+                        mdCache.removeAllObjects()
                     }
                 }
                 

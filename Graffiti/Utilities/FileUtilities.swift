@@ -189,18 +189,18 @@ fileprivate var didRequestPermission: Set<String> = []
 fileprivate var bookmarks: [URL: Data] = [:]
 var bookmarksPath = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.applicationSupportDirectory, .userDomainMask, true).first!
 
-var mdCache: [String: String] = [:]
+var mdCache: NSCache<NSString, NSString> = NSCache(countLimit: 400, delegate: LoggingCacheDelegate())
 
 func getMDKind(ofFileAtPath path: String) -> String? {
-    if let existing = mdCache[path] {
+    if let existing = mdCache.object(forKey: path as NSString) {
 //        print("Cache hit for \(path): \(existing)")
-        return existing
+        return existing as String
     }
     if let mditem = MDItemCreate(nil, path as CFString),
        let mdnames = MDItemCopyAttributeNames(mditem),
        let mdattrs = MDItemCopyAttributes(mditem, mdnames) as? [String:Any],
        let mdkind = mdattrs[kMDItemKind as String] as? String {
-        mdCache[path] = mdkind
+        mdCache.setObject(mdkind as NSString, forKey: path as NSString)
         return mdkind
     } else {
         return nil
@@ -295,5 +295,21 @@ func selectFile(ofTypes types: [UTType], callback: @escaping ([URL]) -> ()) {
         if response == .OK {
             callback(filePicker.urls)
         }
+    }
+}
+
+
+
+extension NSCache {
+    @objc convenience init(countLimit: Int, delegate: NSCacheDelegate? = nil) {
+        self.init()
+        self.countLimit = countLimit
+        self.delegate = delegate
+    }
+}
+
+class LoggingCacheDelegate: NSObject, NSCacheDelegate {
+    func cache(_ cache: NSCache<AnyObject, AnyObject>, willEvictObject obj: Any) {
+        print("Evicting \(obj) from \(cache)")
     }
 }

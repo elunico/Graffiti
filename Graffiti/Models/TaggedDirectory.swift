@@ -297,18 +297,20 @@ extension TaggedDirectory {
     
     
     
-    
     func performVisionActions() {
         if !doImageVision { return }
-        queue.async { [self] in
-            for file in self.files {
+        // TODO: taggedDirectory acts as a singleton in the application so there is only one instance of it active in normal use
+        // but this is called in AddTag and could be called many times before completion
+        queue.async { [weak self] in
+            for file in self?.files ?? [] {
                 for tag in file.tags where tag.recoginitionState == .uninitialized {
                     tag.recoginitionState = .started
-                    recognizeText(in: tag)
-                    recognizeObjects(in: tag)
+                    self?.recognizeText(in: tag)
+                    self?.recognizeObjects(in: tag)
                     tag.recoginitionState = .recognized
                 }
             }
+            
         }
         
     }

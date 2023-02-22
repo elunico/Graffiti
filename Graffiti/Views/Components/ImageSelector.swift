@@ -7,35 +7,7 @@
 
 import SwiftUI
 
-
-extension NSCache {
-    @objc convenience init(countLimit: Int) {
-        self.init()
-        self.countLimit = countLimit
-    }
-}
-
-class URLHolder: NSObject {
-    let url: URL
-    
-    init(url: URL) {
-        self.url = url
-    }
-    
-    private static var cache: [Int: URLHolder] = [:]
-    
-    static func `for`(url: URL) -> URLHolder {
-        if let u = cache[url.hashValue] {
-            return u
-        } else {
-            let v = URLHolder(url: url)
-            cache[url.hashValue] = v
-            return v
-        }
-    }
-}
-
-fileprivate var thumbnailCache : NSCache<URLHolder, NSImage> = NSCache(countLimit: 25)
+fileprivate var thumbnailCache : NSCache<NSURL, NSImage> = NSCache(countLimit: 25)
 
 struct ImageSelector: View {
     
@@ -121,12 +93,11 @@ struct ImageSelector: View {
     static func imageOfFile(_ url: URL?) -> Image {
         
         if let url {
-            let holder = URLHolder.for(url: url)
-            if let image = thumbnailCache.object(forKey: holder) {
+            if let image = thumbnailCache.object(forKey: url as NSURL) {
                 return Image(nsImage: image)
             } else {
                 let nsImage = NSImage(byReferencing: url)
-                thumbnailCache.setObject(nsImage, forKey: holder)
+                thumbnailCache.setObject(nsImage, forKey: url as NSURL)
                 return Image(nsImage:  nsImage)
             }
         } else {

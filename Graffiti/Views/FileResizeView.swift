@@ -7,6 +7,56 @@
 
 import SwiftUI
 
+extension CGFloat {
+    func coercing(_ values: Set<CGFloat>, to newValue: CGFloat) -> CGFloat {
+        if values.contains(self) {
+            return newValue
+        }
+        return self
+    }
+}
+
+extension Optional: CustomStringConvertible where Wrapped: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .none:
+            return "Optional<\(Wrapped.self)>(nil)"
+        case .some(let wrapped):
+            return "Optional<\(Wrapped.self) [\(type(of: wrapped))]>(\(wrapped))"
+        }
+    }
+}
+
+extension String.StringInterpolation {
+    mutating func appendInterpolation<W>(_ o: Optional<W>) where W: CustomStringConvertible {
+        appendLiteral(o.description)
+    }
+}
+
+class CGFloatFormatter: NumberFormatter {
+    override var zeroSymbol: String? {
+        get { "0" }
+        set { print("Discarding set of \(newValue)") }
+    }
+    override var nilSymbol: String {
+        get { "0" }
+        set { print("Discarding set of \(newValue)") }
+    }
+    override var positiveInfinitySymbol: String {
+        get { "0" }
+        set { print("Discarding set of \(newValue)") }
+    }
+    override var notANumberSymbol: String? {
+        get { "0" }
+        set { print("Discarding set of \(newValue)") }
+    }
+    override var negativeInfinitySymbol: String {
+        get { "0" }
+        set { print("Discarding set of \(newValue)") }
+    }
+
+}
+
 struct FileResizeView: View {
     
     @State var sourceURL: URL? = nil
@@ -73,13 +123,14 @@ struct FileResizeView: View {
                     })
                 }
                 
-                if !overwriteOriginal {
-                    Divider().frame(width: 200)
-                }
+                
+                Divider().frame(width: 200)
+                
                 
                 VStack {
+                    
+                    Text("Destination").font(.title)
                     if !overwriteOriginal {
-                        Text("Destination").font(.title)
                         Text("Choose a place to save")
                         Text(destinationURL?.absolutePath ?? "<none>")
                         Button("Choose") {
@@ -93,6 +144,8 @@ struct FileResizeView: View {
                                 }
                             }
                         }
+                    } else {
+                        Text("Overwriting original!").font(.body.bold()).foregroundColor(.red)
                     }
                 }
                 
@@ -100,28 +153,33 @@ struct FileResizeView: View {
             }
             Divider()
             Group {
+                Button("Reset Dimensions") {
+                    destinationHeight = sourceHeight
+                    destinationWidth = sourceWidth
+                }
                 HStack {
                     Spacer()
                     Text("New Width:")
                     
-                    TextField("Width", value: $destinationWidth, formatter: NumberFormatter())
+                    TextField("Width", value: $destinationWidth, formatter: CGFloatFormatter())
                         .onChange(of: destinationWidth, perform: { _ in
                             guard let sourceWidth, let sourceHeight, let destinationWidth else { return }
                             if lockAspect {
-                                var finalHeight = (sourceHeight / sourceWidth) * destinationWidth
+                                let finalHeight = (sourceHeight / sourceWidth).coercing([CGFloat.infinity, CGFloat.nan], to: 0) * destinationWidth
                                 destinationHeight = finalHeight
                             }
+                            
                         })
                     Spacer()
                 }
                 HStack {
                     Spacer()
                     Text("New Height: ")
-                    TextField("Height", value: $destinationHeight, formatter: NumberFormatter())
+                    TextField("Height", value: $destinationHeight, formatter: CGFloatFormatter())
                         .onChange(of: destinationHeight, perform: { _ in
                             guard let sourceWidth, let sourceHeight, let destinationHeight else { return }
                             if lockAspect {
-                                var finalWidth = (sourceWidth / sourceHeight) * destinationHeight
+                                let finalWidth = (sourceWidth / sourceHeight).coercing([CGFloat.infinity, CGFloat.nan], to: 0) * destinationHeight
                                 destinationWidth = finalWidth
                             }
                         })
@@ -130,6 +188,12 @@ struct FileResizeView: View {
                 
                 Toggle(isOn: $lockAspect, label: {
                     Text("Lock aspect ratio")
+                }).onChange(of: lockAspect, perform: {
+                    if ($0) {
+                        guard let sourceWidth, let sourceHeight, let destinationWidth else { return }
+                        let finalHeight = (sourceHeight / sourceWidth).coercing([CGFloat.infinity, CGFloat.nan], to: 0) * destinationWidth
+                        destinationHeight = finalHeight
+                    }
                 })
             }
             
@@ -149,7 +213,7 @@ struct FileResizeView: View {
                 sourceWidth == nil || sourceHeight == nil || sourceURL == nil || destinationHeight == nil || destinationWidth == nil
             )
         }
-            .frame(width: 600, height: 600, alignment: .center)
+//            .frame(width: 600, height: 600, alignment: .center)
             .padding()
     }
 }
