@@ -358,7 +358,7 @@ struct MainView: View {
     func teardown() {
         self.files.commit()
         self.appState.releaseSelectionModel()
-        try! pruneThumbnailCache(maxCount: 200)
+        try? pruneThumbnailCache(maxCount: 200)
         
     }
 }
