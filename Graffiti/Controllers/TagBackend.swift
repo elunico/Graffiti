@@ -36,7 +36,7 @@ protocol TagBackend: NSCopying {
     
     /// this method should overwrite existing data with the data found in the autosave file
     /// can be a NOP if backend does not support autosave
-    func restoreFromAutosave(suffixedWith: String) -> Bool
+    func restoreFromAutosave(suffixedWith: String)
     
     /// special characters used by the Tag backend that are
     /// prohibited from being used in Tags themselves

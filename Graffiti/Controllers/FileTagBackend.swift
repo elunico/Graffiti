@@ -8,6 +8,7 @@
 import Foundation
 
 class FileTagBackend: TagBackend {
+
     private static func appending(s1: String?, s2: String?) -> String? {
         if let left = s1, let right = s2 {
             return left + right
@@ -126,8 +127,11 @@ class FileTagBackend: TagBackend {
     
     /// this method should overwrite existing data with the data found in the autosave file
     /// can be a NOP if backend does not support autosave
-    func restoreFromAutosave(suffixedWith: String) -> Bool {
-        FileManager.default.moveItem(at: autosaveFile, to: saveFile)
+    func restoreFromAutosave(suffixedWith: String)  {
+        let autosaveURL = URL(fileURLWithPath: autosaveFile)
+        let saveURL = URL(fileURLWithPath: saveFile)
+        try! FileManager.default.removeItem(at: saveURL)
+        try! FileManager.default.moveItem(at: autosaveURL, to: saveURL)
     }
     
     func hasTemporaryAutosave(suffixedWith suffix: String) -> Bool {
@@ -144,7 +148,7 @@ class FileTagBackend: TagBackend {
     }
     
     var autosaveFile: String {
-        type(of: writer).writePath(in: directory, named: FileTagBackend.appending(s1: filename ?? "UKNTMP", s2: suffix))
+        type(of: writer).writePath(in: directory, named: FileTagBackend.appending(s1: filename ?? "UKNTMP", s2: ".tmpstore"))
     }
     
 }

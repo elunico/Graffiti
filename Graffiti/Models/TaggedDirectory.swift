@@ -78,23 +78,34 @@ class TaggedDirectory: ObservableObject {
     }
     
 
-    func loadAutosave(directory: String, filename: String? = nil, format: Format, doTextRecognition: Bool = true, ignoreAutosave: Bool = false)  throws {
-        backend.restoreFromAutosave(suffixedWith: ".tmpstore")
+    func loadAutosave(directory: String, filename: String? = nil, format: Format, doTextRecognition: Bool = true)  throws {
+        setBackend(directory: directory, filename: filename, format: format)
+        backend!.restoreFromAutosave(suffixedWith: ".tmpstore")
+        try load(directory: directory, filename: filename, format: format, doTextRecognition: doTextRecognition)
     }
     
+    func setBackend(directory: String, filename: String? = nil, format: Format) {
+        if backend != nil { return }
+        guard let backend = try? format.implementation(in: URL(fileURLWithPath: directory), withFileName: filename) else { return }
+        self.backend = backend
+    }
     
-    func load(directory: String, filename: String? = nil, format: Format, doTextRecognition: Bool = true, ignoreAutosave: Bool = false)  throws {
+    func hasTemporaryAutosave() -> Bool {
+        let result = backend?.hasTemporaryAutosave(suffixedWith: ".tmpstore")
+        return result != nil && result!
+    }
+    
+    func removeAutosave() {
+        backend?.removeTemporaryAutosave(suffix: ".tmpstore")
+    }
+    
+    func load(directory: String, filename: String? = nil, format: Format, doTextRecognition: Bool = true)  throws {
 //        print("In directory filename is \(filename)")
         self.indexMap.removeAll()
         self.files.removeAll()
         self.directory = directory
         self.doImageVision = doTextRecognition
-        guard let backend = try format.implementation(in: URL(fileURLWithPath: directory), withFileName: filename) else { return }
-        self.backend = backend
-        if !ignoreAutosave && backend.hasTemporaryAutosave(suffixedWith: ".tmpstore") {
-            throw LoadResult.ExistingAutosave
-        }
-        backend.removeTemporaryAutosave(suffix: ".tmpstore")
+        setBackend(directory: directory, filename: filename, format: format)
         let content = try  getContentsOfDirectory(atPath: directory)
         var idx = 0
         for file in content {

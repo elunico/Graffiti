@@ -16,15 +16,16 @@ struct ContentView: View {
     @EnvironmentObject var appState: ApplicationState
     @State var formatChoice: Format = .none
     @State var lazyChoice: Bool = false
-
+    
     @State var showingError: Bool = false
     @State var loadedFile: URL? = nil
     @State var directory: URL? = nil
-
+    
     @State var targeted: Bool = false
     @State var errorString: String = ""
     
     @State var promptAutosaveRestore: Bool = false
+    @State var doLoadFromAutosave: Bool = false
     
     @Environment(\.openWindow) private var openWindow
     
@@ -67,7 +68,12 @@ struct ContentView: View {
                     if directory != nil && formatChoice != .none {
                         self.loadUserSelection { [unowned appState] in
                             appState.showingOptions = !$0
+                            
                         }
+                        
+                        //                        self.loadUserSelection { [unowned appState] in
+                        //                            appState.showingOptions = !$0
+                        //                        }
                     }
                 } label: {
                     Label("Go!", systemImage: "arrowshape.forward")
@@ -122,6 +128,39 @@ struct ContentView: View {
         if appState.isLoading {
             ProgressView().progressViewStyle(CircularProgressViewStyle()).onAppear {
                 loadDefaultSettings(to: appState)            }
+            .sheet(isPresented: $promptAutosaveRestore, content: {
+                VStack {
+                    Text("There is an autosave file present. Would you like to restore this autosave? Previous data will be removed.")
+                    Button(action: {
+                        doLoadFromAutosave = true
+                        self.finishLoadUserSelection { [unowned appState] success in
+                            if success {
+                                appState.showingOptions = false
+                                showingError = false
+                            } else {
+                                appState.showingOptions = true
+                                showingError = true
+                            }
+                        }
+                    }, label: {
+                        Text("Load autosaved data")
+                    })
+                    Button(action: {
+                        doLoadFromAutosave = false
+                        self.finishLoadUserSelection { [unowned appState] success in
+                            if success {
+                                appState.showingOptions = false
+                                showingError = false
+                            } else {
+                                appState.showingOptions = true
+                                showingError = true
+                            }
+                        }
+                    }, label: {
+                        Text("Remove autosave data and continue with prior data")
+                    })
+                }.padding()
+            })
         } else if appState.showingOptions {
             selectionView
                 .fileImporter(
@@ -148,28 +187,14 @@ struct ContentView: View {
                     
                 }).onAppear {
                     loadDefaultSettings(to: appState)
-                }.sheet(isPresented: $promptAutosaveRestore, content: {
-                    guard let dir = self.directory else { return }
-                    let filename = loadedFile == nil ? ContentView.defaultFilename : NSString(string: loadedFile!.lastPathComponent).deletingPathExtension
-                    Text("There is an autosave file present. Would you like to restore this autosave? Previous data will be removed.")
-                    Button(action: {
-                        taggedDirectory.loadAutosave(directory: dir.absolutePath, filename: filename, format: formatChoice)
-                    }, label: {
-                        Text("Load autosaved data")
-                    })
-                    Button(action: {
-                        taggedDirectory.load(directory: dir.absolutePath, filename: filename, format: formatChoice, ignoreAutosave: true)
-                    }, label: {
-                        Text("Remove autosave data and continue with prior data")
-                    })
-                })
+                }
         } else {
             MainView(choice: formatChoice, directory: self.directory)
-            .onAppear {
-                loadDefaultSettings(to: appState)
-            }.onDisappear {
-                formatChoice = .none
-            }
+                .onAppear {
+                    loadDefaultSettings(to: appState)
+                }.onDisappear {
+                    formatChoice = .none
+                }
             
         }
         
@@ -179,57 +204,72 @@ struct ContentView: View {
         "com-tom-graffiti.tagfile"
     }
     
+    func finishLoadUserSelection(onDone completed: @escaping (_ success: Bool) -> Void) {
+        let dir = self.directory!
+        let filename = loadedFile == nil ? ContentView.defaultFilename : NSString(string: loadedFile!.lastPathComponent).deletingPathExtension
+        do {
+            if doLoadFromAutosave {
+                try taggedDirectory.loadAutosave(directory: dir.absolutePath, filename: filename, format: formatChoice)
+            } else {
+                taggedDirectory.removeAutosave()
+                try taggedDirectory.load(directory: dir.absolutePath, filename: filename, format: formatChoice)
+            }
+            appState.isLoading = false
+            showingError = false
+            appState.currentState = .MainView(hasSelection: false)
+            completed(true)
+        }
+        catch FileWriterError.IsADirectory {
+            appState.isLoading = false
+            errorString = "The path \(dir.absolutePath) is a directory not a file"
+            showingError = true
+            appState.currentState = .ShowingFileError
+            completed(false)
+        } catch FileWriterError.DeniedFileAccess {
+            appState.isLoading = false
+            errorString = "Graffiti does not have permission to open the chosen file or directory"
+            showingError = true
+            appState.currentState = .ShowingFileError
+            completed(false)
+        } catch FileWriterError.InvalidFileFormat {
+            appState.isLoading = false
+            errorString = "The file chosen has an invalid format."
+            showingError = true
+            appState.currentState = .ShowingFileError
+            completed(false)
+        } catch FileWriterError.VersionMismatch {
+            errorString = "The file chosen is from an old version of Graffiti and cannot be opened"
+            showingError = true
+            appState.isLoading = false
+            appState.currentState = .ShowingFileError
+            completed(false)
+        } catch let error {
+            print(error)
+            errorString = "An unknown error occurred"
+            showingError = true
+            appState.isLoading = false
+            appState.currentState = .ShowingFileError
+            completed(false)
+        }
+    }
+    
     func loadUserSelection(onDone completed: @escaping (_ success: Bool) -> Void) {
         appState.isLoading = true
-                
-        DispatchQueue.main.async {  
+        
+        DispatchQueue.main.async {
             guard let dir = self.directory else { return completed(false) }
             let filename = loadedFile == nil ? ContentView.defaultFilename : NSString(string: loadedFile!.lastPathComponent).deletingPathExtension
             print("Load user selection filename is \(filename)")
             
-            do {
-                try  taggedDirectory.load(directory: dir.absolutePath, filename: filename, format: formatChoice)
-                appState.isLoading = false
-                showingError = false
-                appState.currentState = .MainView(hasSelection: false)
-                completed(true)
-            } catch LoadResult.ExistingAutosave {
-                print("Attempting to prompt load autosave")
-                // TODO: Handle asking user to restore form temporary autosave
+            taggedDirectory.setBackend(directory: dir.absolutePath, filename: filename, format: formatChoice)
+            
+            if taggedDirectory.hasTemporaryAutosave() {
                 promptAutosaveRestore = true
+            } else {
+                self.finishLoadUserSelection(onDone: completed)
             }
-            catch FileWriterError.IsADirectory {
-                appState.isLoading = false
-                errorString = "The path \(dir.absolutePath) is a directory not a file"
-                showingError = true
-                appState.currentState = .ShowingFileError
-                completed(false)
-            } catch FileWriterError.DeniedFileAccess {
-                appState.isLoading = false
-                errorString = "Graffiti does not have permission to open the chosen file or directory"
-                showingError = true
-                appState.currentState = .ShowingFileError
-                completed(false)
-            } catch FileWriterError.InvalidFileFormat {
-                appState.isLoading = false
-                errorString = "The file chosen has an invalid format."
-                showingError = true
-                appState.currentState = .ShowingFileError
-                completed(false)
-            } catch FileWriterError.VersionMismatch {
-                errorString = "The file chosen is from an old version of Graffiti and cannot be opened"
-                showingError = true
-                appState.isLoading = false
-                appState.currentState = .ShowingFileError
-                completed(false)
-            } catch let error {
-                print(error)
-                errorString = "An unknown error occurred"
-                showingError = true
-                appState.isLoading = false
-                appState.currentState = .ShowingFileError
-                completed(false)
-            }
+            
+            
         }
     }
     
@@ -248,7 +288,8 @@ struct ContentView: View {
                         directory = url.deletingLastPathComponent()
                         formatChoice = format
                         print("before loadUserSelection loadedFile \(loadedFile)")
-                        self.loadUserSelection { [unowned appState] success in
+                        self.loadUserSelection{
+                            [unowned appState] success in
                             if success {
                                 appState.showingOptions = false
                                 showingError = false
@@ -257,6 +298,9 @@ struct ContentView: View {
                                 showingError = true
                             }
                         }
+                        
+                        
+                        
                         matchedImport = true
                         break
                     }
