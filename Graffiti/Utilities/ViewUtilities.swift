@@ -48,7 +48,7 @@ enum Orientation {
     case horizontally, vertically
 }
 
-func divider(forLayoutOrientation orientation: Orientation, measure: CGFloat) -> some View {
+func divider(oriented orientation: Orientation, measure: CGFloat) -> some View {
     if (orientation == .horizontally) {
         return Divider().frame(height: measure)
     } else {

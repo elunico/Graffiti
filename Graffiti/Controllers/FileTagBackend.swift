@@ -8,6 +8,12 @@
 import Foundation
 
 class FileTagBackend: TagBackend {
+    private static func appending(s1: String?, s2: String?) -> String? {
+        if let left = s1, let right = s2 {
+            return left + right
+        }
+        return nil
+    }
     
     func copy(with zone: NSZone? = nil) -> Any {
         do {
@@ -15,7 +21,7 @@ class FileTagBackend: TagBackend {
             f.dirty = dirty
             return f
         } catch let error {
-            print(error)
+//            print(error)
             fatalError()
         }
     }
@@ -97,8 +103,8 @@ class FileTagBackend: TagBackend {
         writer.fileProhibitedCharacters
     }
     
-    func commit(files: [TaggedFile]) {
-        if dirty {
+    func commit(files: [TaggedFile], force: Bool = false) {
+        if dirty || force {
             let path = saveFile
             let tags = Dictionary(uniqueKeysWithValues: files.map { ($0.id, $0.tags) })
             writer.saveTo(path: path, store: TagStore(tagData: tags))
@@ -106,9 +112,39 @@ class FileTagBackend: TagBackend {
         }
     }
     
+    func temporaryAutosaveCommit(files: [TaggedFile], suffix: String) {
+        if let filename {
+            let path = autosaveFile
+            let tags = Dictionary(uniqueKeysWithValues: files.map{ ($0.id, $0.tags) })
+            writer.saveTo(path: path, store: TagStore(tagData: tags))
+        }
+    }
+    
+    func removeTemporaryAutosave(suffix: String) {
+        try? FileManager.default.removeItem(atPath: autosaveFile)
+    }
+    
+    /// this method should overwrite existing data with the data found in the autosave file
+    /// can be a NOP if backend does not support autosave
+    func restoreFromAutosave(suffixedWith: String) -> Bool {
+        FileManager.default.moveItem(at: autosaveFile, to: saveFile)
+    }
+    
+    func hasTemporaryAutosave(suffixedWith suffix: String) -> Bool {
+        let name = FileTagBackend.appending(s1: filename, s2: suffix)
+        print("The name is \(name)")
+        let path = type(of: writer).writePath(in: directory, named: name)
+        print("Checking for path \(path)")
+        return FileManager.default.fileExists(atPath: path)
+    }
+    
     static let filePrefix = "com-tom-graffiti.tagfile";
     var saveFile: String {
         type(of: writer).writePath(in: directory, named: filename)
+    }
+    
+    var autosaveFile: String {
+        type(of: writer).writePath(in: directory, named: FileTagBackend.appending(s1: filename ?? "UKNTMP", s2: suffix))
     }
     
 }

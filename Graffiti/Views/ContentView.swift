@@ -24,6 +24,8 @@ struct ContentView: View {
     @State var targeted: Bool = false
     @State var errorString: String = ""
     
+    @State var promptAutosaveRestore: Bool = false
+    
     @Environment(\.openWindow) private var openWindow
     
     var optionArea: some View {
@@ -146,7 +148,21 @@ struct ContentView: View {
                     
                 }).onAppear {
                     loadDefaultSettings(to: appState)
-                }
+                }.sheet(isPresented: $promptAutosaveRestore, content: {
+                    guard let dir = self.directory else { return }
+                    let filename = loadedFile == nil ? ContentView.defaultFilename : NSString(string: loadedFile!.lastPathComponent).deletingPathExtension
+                    Text("There is an autosave file present. Would you like to restore this autosave? Previous data will be removed.")
+                    Button(action: {
+                        taggedDirectory.loadAutosave(directory: dir.absolutePath, filename: filename, format: formatChoice)
+                    }, label: {
+                        Text("Load autosaved data")
+                    })
+                    Button(action: {
+                        taggedDirectory.load(directory: dir.absolutePath, filename: filename, format: formatChoice, ignoreAutosave: true)
+                    }, label: {
+                        Text("Remove autosave data and continue with prior data")
+                    })
+                })
         } else {
             MainView(choice: formatChoice, directory: self.directory)
             .onAppear {
@@ -159,12 +175,17 @@ struct ContentView: View {
         
     }
     
+    static var defaultFilename: String {
+        "com-tom-graffiti.tagfile"
+    }
+    
     func loadUserSelection(onDone completed: @escaping (_ success: Bool) -> Void) {
         appState.isLoading = true
                 
         DispatchQueue.main.async {  
             guard let dir = self.directory else { return completed(false) }
-            let filename = loadedFile == nil ? nil : NSString(string: loadedFile!.lastPathComponent).deletingPathExtension
+            let filename = loadedFile == nil ? ContentView.defaultFilename : NSString(string: loadedFile!.lastPathComponent).deletingPathExtension
+            print("Load user selection filename is \(filename)")
             
             do {
                 try  taggedDirectory.load(directory: dir.absolutePath, filename: filename, format: formatChoice)
@@ -172,7 +193,12 @@ struct ContentView: View {
                 showingError = false
                 appState.currentState = .MainView(hasSelection: false)
                 completed(true)
-            } catch FileWriterError.IsADirectory {
+            } catch LoadResult.ExistingAutosave {
+                print("Attempting to prompt load autosave")
+                // TODO: Handle asking user to restore form temporary autosave
+                promptAutosaveRestore = true
+            }
+            catch FileWriterError.IsADirectory {
                 appState.isLoading = false
                 errorString = "The path \(dir.absolutePath) is a directory not a file"
                 showingError = true
@@ -221,6 +247,7 @@ struct ContentView: View {
                     if let f = format.fileExtension, url.pathExtension == f {
                         directory = url.deletingLastPathComponent()
                         formatChoice = format
+                        print("before loadUserSelection loadedFile \(loadedFile)")
                         self.loadUserSelection { [unowned appState] success in
                             if success {
                                 appState.showingOptions = false

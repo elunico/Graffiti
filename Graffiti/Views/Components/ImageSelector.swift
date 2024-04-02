@@ -53,7 +53,7 @@ struct ImageSelector: View {
 //                    })
             }
             .scaleEffect(x: scaleFactor, y: scaleFactor)
-            .animation(.easeInOut(duration: 0.1))
+            .animation(.easeInOut(duration: 0.1), value: scaleFactor)
             .onHover(perform: {
                 scaleFactor = $0 ? ImageSelector.hoverScale : 1
             })

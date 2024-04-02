@@ -28,6 +28,7 @@ struct MainView: View {
     
     @State private var currentFileList: [TaggedFile] = []
     
+    
     var name: String {
         let affectedFiles = files.getFiles(withIDs: selected)
         let name = affectedFiles.count == 1 ? affectedFiles.first!.filename : "\(affectedFiles.count) files"
@@ -41,7 +42,6 @@ struct MainView: View {
                     TableColumn("File", sortUsing: Sorter(keypath: \TaggedFile.filename)) { item in
                         Text(item.filename)
                     }.width(ideal: tableGeometry.size.width * 5 / 15)
-                    
                     TableColumn(appState.showSpotlightKinds  ? "Kind" : "Extension") { item in
                         if appState.showSpotlightKinds  {
                             Text(getMDKind(ofFileAtPath: item.id) ?? "<unknown>")
@@ -85,7 +85,7 @@ struct MainView: View {
                                         
                                     }, label: { Label("Open \((selected.contains(item.id) && selected.count > 1) ? "\(selected.count) items" : item.filename)" , systemImage: "doc.viewfinder") })
                                     
-                                    divider(forLayoutOrientation: .horizontally, measure: 25.0)
+                                    divider(oriented: .horizontally, measure: 25.0)
                                     
                                     Button(action:  { [unowned appState] in
                                         if !selected.contains(item.id) {
@@ -95,7 +95,7 @@ struct MainView: View {
                                         appState.currentState = .ShowingConfirm
                                     }, label: { Label("Clear All Tags for \((selected.contains(item.id) && selected.count > 1) ? "\(selected.count) items" : item.filename)", systemImage: "clear") })
                                     
-                                    divider(forLayoutOrientation: .horizontally, measure: 25.0)
+                                    divider(oriented: .horizontally, measure: 25.0)
                                     
                                     Button {
                                         guard selected.count > 0 else { return }
@@ -122,6 +122,7 @@ struct MainView: View {
                         display(message: "Timer activated", log: .default, type: .error)
                         mdCache.removeAllObjects()
                     }
+                    
                 }
                 
             }
@@ -192,7 +193,7 @@ struct MainView: View {
                             .help("Redo")
                     }
                     
-                    divider(forLayoutOrientation: .horizontally, measure: 25.0)
+                    divider(oriented: .horizontally, measure: 25.0)
                     
                     Button(action: { [unowned appState] in
                         appState.editing = true
@@ -224,7 +225,7 @@ struct MainView: View {
                     .disabled(selected.count == 0)
                     .help("Open \(name)")
                     
-                    divider(forLayoutOrientation: .horizontally, measure: 25.0)
+                    divider(oriented: .horizontally, measure: 25.0)
                     
                     Button(action:  { [unowned appState] in
                         appState.isPresentingConfirm = true
@@ -233,7 +234,7 @@ struct MainView: View {
                     .disabled(selected.count == 0)
                     .help("Clear All Tags for \(name)")
                     
-                    divider(forLayoutOrientation: .horizontally, measure: 25.0)
+                    divider(oriented: .horizontally, measure: 25.0)
                     
                     Button { [unowned files] in
                         guard selected.count > 0 else { return }
@@ -347,7 +348,7 @@ struct MainView: View {
         .onAppear { [unowned files] in
             guard let path = self.directory?.absolutePath else { return }
             
-            try! self.files.load(directory: path, format: choice)
+            try! self.files.load(directory: path, filename: FileTagBackend.filePrefix, format: choice)
             files.convertTagStorage(to: appState.imageSaveFormat)
             currentFileList = files.filter(by: query, within: showOnlyUntagged)
             

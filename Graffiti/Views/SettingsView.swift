@@ -23,15 +23,14 @@ struct SettingsView: View {
                 
                 Text("File Control").font(.headline)
                 Section {
-                    Text("Change image save format of all tags")
-                    Picker("", selection: $appState.imageSaveFormat, content: {
-                        Text("Save Images as Links to local image files (faster; less space)").tag(Tag.ImageFormat.url)
-                        Text("Save Images as Inline full image data (portable; larger files)").tag(Tag.ImageFormat.content)
-                    }).disabled(!AppState.tagChangeableStates.contains(appState.currentState))
-                    Button("Change All Tags") {
-                        taggedDirectory.convertTagStorage(to: appState.imageSaveFormat)
-                        UserDefaults.thisAppDomain?.set(appState.imageSaveFormat == .url, forKey: SettingsView.saveImageURLsDefaultsKey)
-                    }.disabled(!AppState.tagChangeableStates.contains(appState.currentState))
+                    VStack {
+                        Text("Change image save format of all tags")
+                        Picker("", selection: $appState.imageSaveFormat, content: {
+                            Text("Save Images as Links to local image files (faster; less space)").tag(Tag.ImageFormat.url)
+                            Text("Save Images as Inline full image data (portable; larger files)").tag(Tag.ImageFormat.content)
+                        }).disabled(!AppState.tagChangeableStates.contains(appState.currentState))
+                            
+                    }
                 }
                 Divider()
                 Text("Image Thumbnail Cache").font(.subheadline)
@@ -56,9 +55,13 @@ struct SettingsView: View {
             
         }.padding()
             .onAppear {
-                loadDefaultSettings(to: appState)
-                
+                loadDefaultSettings(to: appState)   
             }
+            .onChange(of: appState.imageSaveFormat, perform: { val in
+                print("Changing format")
+                taggedDirectory.convertTagStorage(to: appState.imageSaveFormat)
+                UserDefaults.thisAppDomain?.set(appState.imageSaveFormat == .url, forKey: SettingsView.saveImageURLsDefaultsKey)
+            })
     }
 }
 

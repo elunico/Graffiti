@@ -87,7 +87,7 @@ class JSONFileWriter: FileWriter {
                     throw FileWriterError.InvalidFileFormat }
                 
                 
-                if let tag = Tag.tag(fromID: UUID(uuidString: uuid)!) {
+                if Tag.tag(fromID: UUID(uuidString: uuid)!) != nil {
                     // tag already exists take no action
                 } else {
                     guard let value = tag["value"] as? String else {

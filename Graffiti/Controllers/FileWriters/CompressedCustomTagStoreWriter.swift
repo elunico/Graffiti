@@ -63,7 +63,7 @@ extension Data.Iterator {
     }
     
     mutating func nextUUID() -> UUID? {
-        var bytes = next(16)
+        let bytes = next(16)
         return (bytes?.withUnsafeBytes {
             ptr in
             return NSUUID(uuidBytes: ptr)
@@ -152,7 +152,7 @@ class CompressedCustomTagStoreWriter: FileWriter {
             }
             for _ in 0..<tagCount {
                 // TODO: store the recognized text and flag
-                guard let tagLen = iter.nextBEInt(), let id = iter.nextUUID() else {
+                guard iter.nextBEInt() != nil, let id = iter.nextUUID() else {
                     os_log("%s", log: .default, type: .error, "Invalid tag length")
                     throw FileWriterError.InvalidFileFormat
                 }

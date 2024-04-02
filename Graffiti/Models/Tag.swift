@@ -339,7 +339,7 @@ final class Tag : Equatable, Hashable, Codable, Identifiable {
         let imageURL = URL(fileURLWithPath: path)
 
         // if the thumbnail exists for this image, use it, otherwise the Tag.init method will create one from the provided image
-        var thumbnail: URL? = try tryGetThumbnail(for: imageURL)
+        let thumbnail: URL? = try tryGetThumbnail(for: imageURL)
         
         // if thumbnail is nil because no thumbnail exists, one will be created in the init
         var t = Tag(imageURL: imageURL, format: .url, thumbnail: thumbnail, id: id)

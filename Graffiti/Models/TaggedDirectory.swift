@@ -11,6 +11,9 @@ import AppKit
 import CoreML
 import CoreImage
 
+enum LoadResult: Error {
+    case ExistingAutosave
+}
 
 class TaggedDirectory: ObservableObject {
     enum TaggedState {
@@ -46,6 +49,11 @@ class TaggedDirectory: ObservableObject {
         }
     }
     
+    func didMutate() {
+        print("Performing autosave commmit")
+        self.temporaryAutosaveCommit()
+    }
+    
     func reset() {
         directory = ""
         files = []
@@ -69,14 +77,24 @@ class TaggedDirectory: ObservableObject {
         objectWillChange.send()
     }
     
+
+    func loadAutosave(directory: String, filename: String? = nil, format: Format, doTextRecognition: Bool = true, ignoreAutosave: Bool = false)  throws {
+        backend.restoreFromAutosave(suffixedWith: ".tmpstore")
+    }
     
-    func load(directory: String, filename: String? = nil, format: Format, doTextRecognition: Bool = true)  throws {
+    
+    func load(directory: String, filename: String? = nil, format: Format, doTextRecognition: Bool = true, ignoreAutosave: Bool = false)  throws {
+//        print("In directory filename is \(filename)")
         self.indexMap.removeAll()
         self.files.removeAll()
         self.directory = directory
         self.doImageVision = doTextRecognition
         guard let backend = try format.implementation(in: URL(fileURLWithPath: directory), withFileName: filename) else { return }
         self.backend = backend
+        if !ignoreAutosave && backend.hasTemporaryAutosave(suffixedWith: ".tmpstore") {
+            throw LoadResult.ExistingAutosave
+        }
+        backend.removeTemporaryAutosave(suffix: ".tmpstore")
         let content = try  getContentsOfDirectory(atPath: directory)
         var idx = 0
         for file in content {
@@ -104,12 +122,14 @@ class TaggedDirectory: ObservableObject {
     }
     
     func addTags(_ tag: Tag, toAll files: [TaggedFile]) {
+//        print("adding tags method")
         if let backend {
             transactions.append(AddTagToManyFilesTransaction(backend: backend, tag: tag, files: files))
         }
         transactions.last?.perform()
         invalidateRedo()
         performVisionActions()
+        didMutate()
     }
     
     func addTag(_ tag: Tag, to file: TaggedFile) {
@@ -119,6 +139,7 @@ class TaggedDirectory: ObservableObject {
         transactions.last?.perform()
         invalidateRedo()
         performVisionActions()
+        didMutate()
     }
     
     func removeTag(withString string: String, from file: TaggedFile) {
@@ -128,6 +149,7 @@ class TaggedDirectory: ObservableObject {
         }
         transactions.last?.perform()
         invalidateRedo()
+        didMutate()
     }
     
     func removeTag(withID id: Tag.ID, from file: TaggedFile) {
@@ -137,6 +159,7 @@ class TaggedDirectory: ObservableObject {
         }
         transactions.last?.perform()
         invalidateRedo()
+        didMutate()
     }
     
     
@@ -147,6 +170,7 @@ class TaggedDirectory: ObservableObject {
         }
         transactions.last?.perform()
         invalidateRedo()
+        didMutate()
     }
     
     func invalidateRedo() {
@@ -161,17 +185,20 @@ class TaggedDirectory: ObservableObject {
         guard let t = transactions.popLast() else { print("Nothing to undo"); return }
         t.undo()
         redoStack.append(t)
+        didMutate()
     }
     
     func redo() {
         guard let t = redoStack.popLast() else { print("Nothing to redo"); return }
         t.redo()
         transactions.append(t)
+        didMutate()
     }
     
     func loadTags(at path: String) -> Set<Tag> {
         let t = backend?.loadTags(at: path) ?? []
         invalidateUndo()
+        didMutate()
         return t
     }
     
@@ -180,6 +207,15 @@ class TaggedDirectory: ObservableObject {
         backend?.clearTags(of: file)
         invalidateUndo()
         invalidateRedo()
+        didMutate()
+    }
+    
+    func temporaryAutosaveCommit() {
+        backend?.temporaryAutosaveCommit(files: self.files, suffix: ".tmpstore")
+    }
+    
+    func persist() {
+        backend?.commit(files: files, force: true)
     }
     
     func commit() {
@@ -187,10 +223,13 @@ class TaggedDirectory: ObservableObject {
     }
     
     func commit(files: [TaggedFile]) {
-        backend?.commit(files: files)
+        persist()
         self.indexMap.removeAll()
         self.files.removeAll(keepingCapacity: true)
         invalidateUndo()
+        invalidateRedo()
+        print("Removing autosave temporary file")
+        backend?.removeTemporaryAutosave(suffix: ".tmpstore")
     }
     
     /// special characters used by the Tag backend that are
@@ -203,7 +242,13 @@ class TaggedDirectory: ObservableObject {
     }
     
     func convertTagStorage(to format: Tag.ImageFormat) {
-        files.forEach { file in file.tags.forEach { tag in tag.imageFormat = format } }
+        for file in files {
+            for tag in file.tags {
+                tag.imageFormat = format
+//                print(tag.imageFormat)
+            }
+        }
+        persist()
     }
 
 }
@@ -283,14 +328,14 @@ extension TaggedDirectory {
             
             // Process the recognized strings.
             tag.imageTextContent.append(contentsOf: recognizedStrings)
-            print("Recognized strings: \(recognizedStrings)")
+//            print("Recognized strings: \(recognizedStrings)")
         })
         
         do {
             // Perform the text-recognition request.
             try requestHandler.perform([request])
         } catch {
-            print("Unable to perform the requests: \(error).")
+//            print("Unable to perform the requests: \(error).")
         }
     }
     

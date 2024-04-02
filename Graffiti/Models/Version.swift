@@ -46,7 +46,7 @@ struct Version: Equatable, Hashable, Comparable, Codable, Identifiable, CustomSt
     }
     
     init?(fromDescription description: String) {
-        if description.count < 1 || description[description.startIndex] != "v" {
+        if description.count < 1 || description.first != "v" {
             return nil
         }
         let parts = description[description.index(after: description.startIndex)...].components(separatedBy: ".").map({ Int($0) })

@@ -30,7 +30,7 @@ class PreviewProvider: QLPreviewProvider, QLPreviewingController {
      - Implement providePreview(for:)
      */
     
-    func providePreview(for request: QLFilePreviewRequest)  throws -> QLPreviewReply {
+    func providePreview(for request: QLFilePreviewRequest) async throws -> QLPreviewReply {
     
         //You can create a QLPreviewReply in several ways, depending on the format of the data you want to return.
         //To return Data of a supported content type:

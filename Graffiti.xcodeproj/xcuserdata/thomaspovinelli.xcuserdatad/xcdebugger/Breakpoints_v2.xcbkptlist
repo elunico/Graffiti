@@ -14,72 +14,10 @@
             filePath = "Graffiti/Controllers/FileTagBackend.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "27"
-            endingLineNumber = "27"
+            startingLineNumber = "33"
+            endingLineNumber = "33"
             landmarkName = "reloadData()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "1BA2675D-C6E0-4201-BCEA-62475CAAB27C - 1962dbb8071d4548"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(1) suspend resume partial function for Graffiti.FileTagBackend.reloadData() async throws -&gt; ()"
-                  moduleName = "Graffiti"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/thomaspovinelli/Coding/Graffiti/Graffiti/Controllers/FileTagBackend.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "23"
-                  endingLineNumber = "23"
-                  offsetFromSymbolStart = "91">
-               </Location>
-               <Location
-                  uuid = "1BA2675D-C6E0-4201-BCEA-62475CAAB27C - 1895c6c1743c3665"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(2) await resume partial function for Graffiti.FileTagBackend.reloadData() async throws -&gt; ()"
-                  moduleName = "Graffiti"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/thomaspovinelli/Coding/Graffiti/Graffiti/Controllers/FileTagBackend.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "23"
-                  endingLineNumber = "23"
-                  offsetFromSymbolStart = "41">
-               </Location>
-               <Location
-                  uuid = "1BA2675D-C6E0-4201-BCEA-62475CAAB27C - aa79bd2bb706a75"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(4) suspend resume partial function for Graffiti.FileTagBackend.reloadData() async throws -&gt; ()"
-                  moduleName = "Graffiti"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/thomaspovinelli/Coding/Graffiti/Graffiti/Controllers/FileTagBackend.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "23"
-                  endingLineNumber = "23"
-                  offsetFromSymbolStart = "55">
-               </Location>
-               <Location
-                  uuid = "1BA2675D-C6E0-4201-BCEA-62475CAAB27C - 4cbf0a19a85236a7"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Swift.String) async throws -&gt; () in Graffiti.FileTagBackend.reloadData() async throws -&gt; ()"
-                  moduleName = "Graffiti"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/thomaspovinelli/Coding/Graffiti/Graffiti/Controllers/FileTagBackend.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "23"
-                  endingLineNumber = "23"
-                  offsetFromSymbolStart = "0">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -92,72 +30,10 @@
             filePath = "Graffiti/Controllers/FileTagBackend.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "28"
-            endingLineNumber = "28"
+            startingLineNumber = "34"
+            endingLineNumber = "34"
             landmarkName = "reloadData()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "92650B87-618D-4B06-85A2-7DF413B8803E - 1962dbb8071d4548"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(1) suspend resume partial function for Graffiti.FileTagBackend.reloadData() async throws -&gt; ()"
-                  moduleName = "Graffiti"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/thomaspovinelli/Coding/Graffiti/Graffiti/Controllers/FileTagBackend.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "23"
-                  endingLineNumber = "23"
-                  offsetFromSymbolStart = "91">
-               </Location>
-               <Location
-                  uuid = "92650B87-618D-4B06-85A2-7DF413B8803E - 1895c6c1743c3665"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(2) await resume partial function for Graffiti.FileTagBackend.reloadData() async throws -&gt; ()"
-                  moduleName = "Graffiti"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/thomaspovinelli/Coding/Graffiti/Graffiti/Controllers/FileTagBackend.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "23"
-                  endingLineNumber = "23"
-                  offsetFromSymbolStart = "41">
-               </Location>
-               <Location
-                  uuid = "92650B87-618D-4B06-85A2-7DF413B8803E - aa79bd2bb706a75"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(4) suspend resume partial function for Graffiti.FileTagBackend.reloadData() async throws -&gt; ()"
-                  moduleName = "Graffiti"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/thomaspovinelli/Coding/Graffiti/Graffiti/Controllers/FileTagBackend.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "23"
-                  endingLineNumber = "23"
-                  offsetFromSymbolStart = "55">
-               </Location>
-               <Location
-                  uuid = "92650B87-618D-4B06-85A2-7DF413B8803E - 4cbf0a19a85236a7"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Swift.String) async throws -&gt; () in Graffiti.FileTagBackend.reloadData() async throws -&gt; ()"
-                  moduleName = "Graffiti"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/thomaspovinelli/Coding/Graffiti/Graffiti/Controllers/FileTagBackend.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "23"
-                  endingLineNumber = "23"
-                  offsetFromSymbolStart = "0">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -170,72 +46,10 @@
             filePath = "Graffiti/Controllers/FileTagBackend.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "29"
-            endingLineNumber = "29"
+            startingLineNumber = "35"
+            endingLineNumber = "35"
             landmarkName = "reloadData()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "C70ED94D-E7F3-4564-8153-95A9D16FAABE - 1fc81d4292a46fb4"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(1) suspend resume partial function for closure #1 (Swift.String) async throws -&gt; () in Graffiti.FileTagBackend.reloadData() async throws -&gt; ()"
-                  moduleName = "Graffiti"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/thomaspovinelli/Coding/Graffiti/Graffiti/Controllers/FileTagBackend.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "24"
-                  endingLineNumber = "24"
-                  offsetFromSymbolStart = "99">
-               </Location>
-               <Location
-                  uuid = "C70ED94D-E7F3-4564-8153-95A9D16FAABE - c1cbc0010408f411"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(2) await resume partial function for closure #1 (Swift.String) async throws -&gt; () in Graffiti.FileTagBackend.reloadData() async throws -&gt; ()"
-                  moduleName = "Graffiti"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/thomaspovinelli/Coding/Graffiti/Graffiti/Controllers/FileTagBackend.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "24"
-                  endingLineNumber = "24"
-                  offsetFromSymbolStart = "51">
-               </Location>
-               <Location
-                  uuid = "C70ED94D-E7F3-4564-8153-95A9D16FAABE - f92dc63bdafc2bb2"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(3) suspend resume partial function for closure #1 (Swift.String) async throws -&gt; () in Graffiti.FileTagBackend.reloadData() async throws -&gt; ()"
-                  moduleName = "Graffiti"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/thomaspovinelli/Coding/Graffiti/Graffiti/Controllers/FileTagBackend.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "24"
-                  endingLineNumber = "24"
-                  offsetFromSymbolStart = "177">
-               </Location>
-               <Location
-                  uuid = "C70ED94D-E7F3-4564-8153-95A9D16FAABE - 440129066e009b3"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(4) suspend resume partial function for closure #1 (Swift.String) async throws -&gt; () in Graffiti.FileTagBackend.reloadData() async throws -&gt; ()"
-                  moduleName = "Graffiti"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/thomaspovinelli/Coding/Graffiti/Graffiti/Controllers/FileTagBackend.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "24"
-                  endingLineNumber = "24"
-                  offsetFromSymbolStart = "59">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -249,8 +63,8 @@
             filePath = "Graffiti/Controllers/FileTagBackend.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "32"
-            endingLineNumber = "32"
+            startingLineNumber = "38"
+            endingLineNumber = "38"
             landmarkName = "reloadData()"
             landmarkType = "7">
          </BreakpointContent>
@@ -265,10 +79,10 @@
             filePath = "Graffiti/Models/TaggedDirectory.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "117"
-            endingLineNumber = "117"
-            landmarkName = "addTag(_:to:)"
-            landmarkType = "7">
+            startingLineNumber = "137"
+            endingLineNumber = "137"
+            landmarkName = "TaggedDirectory"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -281,8 +95,8 @@
             filePath = "Graffiti/Models/TaggedDirectory.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "110"
-            endingLineNumber = "110"
+            startingLineNumber = "129"
+            endingLineNumber = "129"
             landmarkName = "addTags(_:toAll:)"
             landmarkType = "7">
          </BreakpointContent>
