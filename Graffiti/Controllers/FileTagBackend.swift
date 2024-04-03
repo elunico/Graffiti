@@ -18,7 +18,7 @@ class FileTagBackend: TagBackend {
     
     func copy(with zone: NSZone? = nil) -> Any {
         do {
-            let f = try FileTagBackend( withFileName: filename, forFilesIn: directory, writer: writer)
+            let f = try FileTagBackend(withFileName: filename, forFilesIn: directory, writer: writer)
             f.dirty = dirty
             return f
         } catch let error {
@@ -113,7 +113,7 @@ class FileTagBackend: TagBackend {
         }
     }
     
-    func temporaryAutosaveCommit(files: [TaggedFile], suffix: String) {
+    func performAutosave(files: [TaggedFile], suffix: String) {
         if let filename {
             let path = autosaveFile
             let tags = Dictionary(uniqueKeysWithValues: files.map{ ($0.id, $0.tags) })
@@ -121,7 +121,7 @@ class FileTagBackend: TagBackend {
         }
     }
     
-    func removeTemporaryAutosave(suffix: String) {
+    func removeAutosave(suffix: String) {
         try? FileManager.default.removeItem(atPath: autosaveFile)
     }
     
@@ -134,7 +134,7 @@ class FileTagBackend: TagBackend {
         try! FileManager.default.moveItem(at: autosaveURL, to: saveURL)
     }
     
-    func hasTemporaryAutosave(suffixedWith suffix: String) -> Bool {
+    func hasAutosave(suffixedWith suffix: String) -> Bool {
         let name = FileTagBackend.appending(s1: filename, s2: suffix)
         print("The name is \(name)")
         let path = type(of: writer).writePath(in: directory, named: name)

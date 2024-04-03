@@ -22,25 +22,26 @@ protocol TagBackend: NSCopying {
     /// format. This can be void
     func commit(files: [TaggedFile], force: Bool)
     
+    /// special characters used by the Tag backend that are
+    /// prohibited from being used in Tags themselves
+    var implementationProhibitedCharacters: Set<Character> { get }
+
     /// save current data to a temporary save suffixed with `suffix`
     /// the implementer may not support temporary autosaves which would make this a NOP method
-    func temporaryAutosaveCommit(files: [TaggedFile], suffix: String)
+    func performAutosave(files: [TaggedFile], suffix: String)
     
     /// remove the temporary save data
     /// the implementer may not support temporary autosaves which would make this a NOP method
-    func removeTemporaryAutosave(suffix: String)
+    func removeAutosave(suffix: String)
     
     /// should return true if a temporary autosave data exists and can be read/restored
     /// may always return false if the implemented does not support autosave
-    func hasTemporaryAutosave(suffixedWith: String) -> Bool
+    func hasAutosave(suffixedWith: String) -> Bool
     
     /// this method should overwrite existing data with the data found in the autosave file
     /// can be a NOP if backend does not support autosave
     func restoreFromAutosave(suffixedWith: String)
     
-    /// special characters used by the Tag backend that are
-    /// prohibited from being used in Tags themselves
-    var implementationProhibitedCharacters: Set<Character> { get }
 }
 
 extension TagBackend {

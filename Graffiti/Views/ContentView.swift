@@ -133,29 +133,13 @@ struct ContentView: View {
                     Text("There is an autosave file present. Would you like to restore this autosave? Previous data will be removed.")
                     Button(action: {
                         doLoadFromAutosave = true
-                        self.finishLoadUserSelection { [unowned appState] success in
-                            if success {
-                                appState.showingOptions = false
-                                showingError = false
-                            } else {
-                                appState.showingOptions = true
-                                showingError = true
-                            }
-                        }
+                        self.finishLoadUserSelection(onDone: completeLoadOfFile)
                     }, label: {
                         Text("Load autosaved data")
                     })
                     Button(action: {
                         doLoadFromAutosave = false
-                        self.finishLoadUserSelection { [unowned appState] success in
-                            if success {
-                                appState.showingOptions = false
-                                showingError = false
-                            } else {
-                                appState.showingOptions = true
-                                showingError = true
-                            }
-                        }
+                        self.finishLoadUserSelection(onDone: completeLoadOfFile)
                     }, label: {
                         Text("Remove autosave data and continue with prior data")
                     })
@@ -268,8 +252,16 @@ struct ContentView: View {
             } else {
                 self.finishLoadUserSelection(onDone: completed)
             }
-            
-            
+        }
+    }
+    
+    func completeLoadOfFile(success: Bool) {
+        if success {
+            appState.showingOptions = false
+            showingError = false
+        } else {
+            appState.showingOptions = true
+            showingError = true
         }
     }
     
@@ -288,19 +280,7 @@ struct ContentView: View {
                         directory = url.deletingLastPathComponent()
                         formatChoice = format
                         print("before loadUserSelection loadedFile \(loadedFile)")
-                        self.loadUserSelection{
-                            [unowned appState] success in
-                            if success {
-                                appState.showingOptions = false
-                                showingError = false
-                            } else {
-                                appState.showingOptions = true
-                                showingError = true
-                            }
-                        }
-                        
-                        
-                        
+                        self.loadUserSelection(onDone: completeLoadOfFile)
                         matchedImport = true
                         break
                     }

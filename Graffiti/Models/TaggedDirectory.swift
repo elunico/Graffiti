@@ -51,7 +51,7 @@ class TaggedDirectory: ObservableObject {
     
     func didMutate() {
         print("Performing autosave commmit")
-        self.temporaryAutosaveCommit()
+        self.performAutosave()
     }
     
     func reset() {
@@ -91,12 +91,12 @@ class TaggedDirectory: ObservableObject {
     }
     
     func hasTemporaryAutosave() -> Bool {
-        let result = backend?.hasTemporaryAutosave(suffixedWith: ".tmpstore")
+        let result = backend?.hasAutosave(suffixedWith: ".tmpstore")
         return result != nil && result!
     }
     
     func removeAutosave() {
-        backend?.removeTemporaryAutosave(suffix: ".tmpstore")
+        backend?.removeAutosave(suffix: ".tmpstore")
     }
     
     func load(directory: String, filename: String? = nil, format: Format, doTextRecognition: Bool = true)  throws {
@@ -221,8 +221,8 @@ class TaggedDirectory: ObservableObject {
         didMutate()
     }
     
-    func temporaryAutosaveCommit() {
-        backend?.temporaryAutosaveCommit(files: self.files, suffix: ".tmpstore")
+    func performAutosave() {
+        backend?.performAutosave(files: self.files, suffix: ".tmpstore")
     }
     
     func persist() {
@@ -240,7 +240,7 @@ class TaggedDirectory: ObservableObject {
         invalidateUndo()
         invalidateRedo()
         print("Removing autosave temporary file")
-        backend?.removeTemporaryAutosave(suffix: ".tmpstore")
+        backend?.removeAutosave(suffix: ".tmpstore")
     }
     
     /// special characters used by the Tag backend that are
