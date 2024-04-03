@@ -217,7 +217,7 @@ struct TagView: View {
             })
     }
     
-    static let validImageExtensions: Set<String> = ["bmp", "tiff", "png", "jpeg", "jpg", "gif", "dng"]
+    static let validImageExtensions: Set<String> = ["bmp", "tiff", "png", "jpeg", "jpg", "gif", "dng", "heic"]
     
     func receiveDroppedImage(from providers: [NSItemProvider]) -> Bool {
         guard let provider = providers.first else { return false }

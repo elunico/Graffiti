@@ -106,12 +106,18 @@ struct FileResizeView: View {
     @State var success: Bool = false
     @State var done: Bool = false
     
+    @State var wFocused: Bool = false
+    @State var hFocused: Bool = false
+    
+    @State var originalDimensions: (CGFloat, CGFloat)? = nil
+    
     func setSizes(_ url: URL?) {
         guard let url, let image = NSImage(contentsOf: url) else { return }
         sourceWidth = image.size.width
         sourceHeight = image.size.height
         destinationWidth = sourceWidth
         destinationHeight = sourceHeight
+        originalDimensions = (image.size.width, image.size.height)
     }
     
     var body: some View {
@@ -197,11 +203,12 @@ struct FileResizeView: View {
                     Text("New Width:")
                     
                     
-                    TextField("Width", value: $destinationWidth, formatter: CGFloatFormatter())
+                    
+                    TextField("Width", value: $destinationWidth,  formatter: CGFloatFormatter(), onEditingChanged: { focused in wFocused = focused })
                         .onChange(of: destinationWidth, perform: { _ in
-                            guard let sourceWidth, let sourceHeight, let destinationWidth else { return }
+                            guard let destinationWidth, wFocused else { return }
                             if lockAspect {
-                                let finalHeight = (sourceHeight / sourceWidth).coercing([.infinity, .nan, .zero], to: 1, threshold: 1.0) * destinationWidth
+                                let finalHeight = (originalDimensions!.1 / originalDimensions!.0).coercing([CGFloat.infinity, CGFloat.nan], to: 0) * destinationWidth
                                 destinationHeight = finalHeight
                             }
                             
@@ -209,11 +216,11 @@ struct FileResizeView: View {
                 }.padding(.horizontal, 5.0)
                 HStack {
                     Text("New Height: ")
-                    TextField("Height", value: $destinationHeight, formatter: CGFloatFormatter())
+                    TextField("Height", value: $destinationHeight, formatter: CGFloatFormatter(), onEditingChanged: { focused in hFocused = focused })
                         .onChange(of: destinationHeight, perform: { _ in
-                            guard let sourceWidth, let sourceHeight, let destinationHeight else { return }
+                            guard let destinationHeight, hFocused else { return }
                             if lockAspect {
-                                let finalWidth = (sourceWidth / sourceHeight).coercing([.infinity, .nan, .zero], to: 1, threshold: 1.0) * destinationHeight
+                                let finalWidth = (originalDimensions!.0 / originalDimensions!.1).coercing([.infinity, .nan, .zero], to: 1, threshold: 1.0) * destinationHeight
                                 destinationWidth = finalWidth
                             }
                         })
@@ -225,7 +232,8 @@ struct FileResizeView: View {
                 }).onChange(of: lockAspect, perform: {
                     if ($0) {
                         guard let sourceWidth, let sourceHeight, let destinationWidth else { return }
-                        let finalHeight = (sourceHeight / sourceWidth).coercing([CGFloat.infinity, CGFloat.nan], to: 0) * destinationWidth
+                        originalDimensions = (sourceWidth, sourceHeight)
+                        let finalHeight = (originalDimensions!.1 / originalDimensions!.0).coercing([CGFloat.infinity, CGFloat.nan], to: 0) * destinationWidth
                         destinationHeight = finalHeight
                     }
                 })

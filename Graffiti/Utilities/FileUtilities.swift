@@ -223,6 +223,7 @@ func accessBookmark(of url: URL) throws -> URL? {
 }
 
 
+@discardableResult
 func getSandboxedAccess<R>(to directory: String, thenPerform action: (String)  throws -> (R))  throws -> R {
     do {
         let bookmarkedURL = try accessBookmark(of: URL(fileURLWithPath: directory))
