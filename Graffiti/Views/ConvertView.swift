@@ -13,9 +13,7 @@ struct ConvertView: View {
     @State var sourceFile: URL? = nil
     @State var beginFormat: Format = .none
     @State var endFormat: Format = .none
-    
-    @State var lazyChoice: Bool = false
-    
+        
     @State var showingError: Bool = false
     @State var showingSuccess: Bool = false
     @State var showingConfirmOverwrite: Bool = false
@@ -118,6 +116,7 @@ struct ConvertView: View {
             })
             .sheet(isPresented: $showingSuccess, content: {
                 VStack {
+                    // TODO: This also does not work going CCTS to JSON
                     Text("Done!").font(.title)
                     ({() -> Text in return Text("")})()
                     

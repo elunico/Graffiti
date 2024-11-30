@@ -15,7 +15,6 @@ struct ContentView: View {
     @EnvironmentObject var taggedDirectory: TaggedDirectory
     @EnvironmentObject var appState: ApplicationState
     @State var formatChoice: Format = .none
-    @State var lazyChoice: Bool = false
     
     @State var showingError: Bool = false
     @State var loadedFile: URL? = nil
@@ -34,7 +33,7 @@ struct ContentView: View {
             Group {
                 Label("Choose a directory", systemImage: "1.circle")
                     .font(.title)
-                Text("Drag and drop an existing plist or csv tag store \nor drag and a drop a directory, or use the button to get started").font(.subheadline).padding()
+                Text("Drag and drop an existing tag store file \nor drag and a drop a directory\nor use the button to get started").font(.subheadline).padding()
                 Button("Choose Directory") {
                     selectFolder {
                         self.directory = $0[0]
@@ -46,9 +45,6 @@ struct ContentView: View {
             Label("Choose a save format", systemImage: "2.circle")
                 .font(.title)
             FormatSelector(formatChoice: $formatChoice)
-            Toggle(isOn: $lazyChoice, label: {
-                Text("Lazy Writing?")
-            })
             Spacer().frame(height: 25.0)
         }
     }

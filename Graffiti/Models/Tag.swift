@@ -7,6 +7,7 @@
 
 import Cocoa
 import Vision
+import CoreTransferable
 
 extension String {
     var tagIDTypePrefix: Substring {
@@ -19,6 +20,7 @@ extension String {
         return self[self.index(startIndex, offsetBy: 2)...]
     }
 }
+
 
 
 /// The `Tag` class represents a `String` or an `NSImage` that tags a particular file
@@ -43,6 +45,7 @@ extension String {
 ///
 /// 4) The last method has already been mentioned and is ``Tag/tag(fromID:)``. This method does not construct a `Tag` instance at all, but only returns an existing `Tag` with the given ID, if it exists. This is the ideal method to call and can always be called without breaking any aspect of the Tag class, but it does return an `Optional<Tag>` so other methods are, at least in principle, necessary.
 final class Tag : Equatable, Hashable, Codable, Identifiable {
+    
     static let valueFieldName: String = "value"
     private static var registry: [Tag.ID: Tag] = [:]
     private static var stringRegistry: [String: Tag.ID] = [:]

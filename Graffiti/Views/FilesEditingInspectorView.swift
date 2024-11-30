@@ -17,7 +17,6 @@ struct FilesEditingInspectorView: View {
     @EnvironmentObject var appState: ApplicationState
     var externalSelectionModel = AnySelectionModel()
 
-    
     @State var removedFiles: [TaggedFile] = []
     
     var body: some View {

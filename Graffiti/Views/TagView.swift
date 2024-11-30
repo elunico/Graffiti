@@ -187,6 +187,7 @@ struct TagView: View {
             .onAppear {
                 appState.createSelectionModel()
                 tags = files.map { $0.tags }.flatten().unique()
+                chosenFormat = appState.imageSaveFormat
             }
             .onDisappear {
                 appState.releaseSelectionModel()

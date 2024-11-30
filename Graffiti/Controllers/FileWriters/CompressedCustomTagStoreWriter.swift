@@ -8,6 +8,7 @@
 import Foundation
 import os
 
+
 extension Int {
     var bigEndianBytes: Data {
         
@@ -94,7 +95,7 @@ class CompressedCustomTagStoreWriter: FileWriter {
     static let fileExtension: String = ".ccts"
 
     
-    func loadFrom(path: String)  throws -> TagStore {
+    func loadFrom(path: String) throws -> TagStore {
         var retValue: [String: Set<Tag>] = [:]
         var isDir: ObjCBool = false
         
@@ -112,13 +113,11 @@ class CompressedCustomTagStoreWriter: FileWriter {
         
         guard let data = try? Data(NSData(data: contents).decompressed(using: .lzma)) else {
             os_log("%s", log: .default, type: .error, "Error at getting data with path \(path)")
-
             throw FileWriterError.InvalidFileFormat
         }
         
         if data.count < 10 {
             os_log("%s", log: .default, type: .error, "Data formatted incorrectly with \(data.count) bytes")
-
             throw FileWriterError.InvalidFileFormat
         }
         
@@ -127,7 +126,6 @@ class CompressedCustomTagStoreWriter: FileWriter {
         
         if !TagStore.default.version.isReadCompatible(with: version) {
             os_log("%s", log: .default, type: .error, "Bad version \(version)")
-
             throw FileWriterError.VersionMismatch
         }
         
@@ -142,7 +140,6 @@ class CompressedCustomTagStoreWriter: FileWriter {
         for _ in 0..<totalFiles {
             guard let pathLength = iter.nextBEInt(), let pathData = iter.next(Int(pathLength)), let path = String(data: pathData, encoding: .utf8) else {
                 os_log("%s", log: .default, type: .error, "Invalid path length")
-
                 throw FileWriterError.InvalidFileFormat
             }
             retValue[path] = Set()
@@ -177,7 +174,11 @@ class CompressedCustomTagStoreWriter: FileWriter {
         data.append(allTags.count.bigEndianBytes)
         
         for tag in allTags {
-            data.append(try! tag.serializeToData())
+            if let d = try? tag.serializeToData() {
+                data.append(d)
+            } else {
+                fatalError("tag.serializeToData() returned nil")
+            }
         }
         
         data.append(store.tagData.count.bigEndianBytes)
@@ -195,7 +196,7 @@ class CompressedCustomTagStoreWriter: FileWriter {
                 
             }
         }
-                
+        print("The data: \(data)")
         FileManager.default.createFile(atPath: path, contents: try! NSData(data: data).compressed(using: .lzma) as Data)
     }
 }

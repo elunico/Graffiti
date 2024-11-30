@@ -71,8 +71,18 @@ func precondition(_ condition: @autoclosure () -> Bool, _ message: String) {
         fatalError("precondition failed: \(#file):\(#line) \(message)")
     }
 }
+
+func check(_ condition: @autoclosure () -> Bool, _ message: String) {
+    if !condition() {
+        fatalError("Invalid state: \(#file):\(#line) \(message)")
+    }
+}
+
 #else
 @inlinable func precondition(_ condition: @autoclosure () -> Bool, _ message: String) {
+    
+}
+@inlinable func check(_ condition: @autoclosure () -> Bool, _ message: String) {
     
 }
 #endif

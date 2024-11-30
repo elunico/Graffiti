@@ -28,6 +28,8 @@ struct MainView: View {
     
     @State private var currentFileList: [TaggedFile] = []
     
+    @State private var didUndoCount: Int = 0
+    @State private var didRedoCount: Int = 0
     
     var name: String {
         let affectedFiles = files.getFiles(withIDs: selected)
@@ -120,7 +122,7 @@ struct MainView: View {
                 }).onAppear {
                     _ = launch(after: .minutes(5) + .seconds(30), repeats: true) { action in
                         display(message: "Timer activated", log: .default, type: .error)
-                        mdCache.removeAllObjects()
+//                        mdCache.removeAllObjects()
                     }
                     
                 }
@@ -171,31 +173,63 @@ struct MainView: View {
         }
     }
     
+    @available(macOS 14, *)
+    func undoButton() -> some View {
+        fallbackUndoButton()
+            .symbolEffect(.bounce, value: didUndoCount)
+    }
+    
+    func fallbackUndoButton() -> some View {
+        Button(action: { [unowned files] in
+            files.undo()
+            didUndoCount += 1
+        }, label: {
+            Label("Undo", systemImage: "arrow.uturn.backward")
+        }).disabled(files.transactions.isEmpty)
+            .keyboardShortcut("z", modifiers: [.command])
+            .help("Undo")
+    }
+    
+    @available(macOS 14, *)
+    func redoButton() -> some View {
+        fallbackRedoButton()
+            .symbolEffect(.bounce, value: didRedoCount)
+
+    }
+    
+    func fallbackRedoButton() -> some View {
+        Button(action: { [unowned files] in
+            files.redo()
+            didRedoCount += 1
+        }, label: {
+            Label("Redo", systemImage: "arrow.uturn.forward")
+        }).disabled(files.redoStack.isEmpty)
+            .keyboardShortcut("z", modifiers: [.command, .shift])
+            .help("Redo")
+    }
+    
     func MainToolbar() -> some View {
         Group {
             HStack {
                 Group {
                     HStack {
-                        Button(action: { [unowned files] in
-                            files.undo()
-                        }, label: {
-                            Label("Undo", systemImage: "arrow.uturn.backward")
-                        }).disabled(files.transactions.isEmpty)
-                            .keyboardShortcut("z", modifiers: [.command])
-                            .help("Undo")
+                        if #available(macOS 14, *) {
+                            undoButton()
+                        } else {
+                            fallbackUndoButton()
+                        }
                         
-                        Button(action: { [unowned files] in
-                            files.redo()
-                        }, label: {
-                            Label("Redo", systemImage: "arrow.uturn.forward")
-                        }).disabled(files.redoStack.isEmpty)
-                            .keyboardShortcut("z", modifiers: [.command, .shift])
-                            .help("Redo")
+                        if #available(macOS 14, *) {
+                            redoButton()
+                        } else {
+                            fallbackRedoButton()
+                        }
                     }
                     
                     divider(oriented: .horizontally, measure: 25.0)
                     
                     Button(action: { [unowned appState] in
+                        // TODO: Seems like images are also broken
                         appState.editing = true
                         appState.currentState = .EditingTags
                     }, label: {
@@ -273,7 +307,12 @@ struct MainView: View {
                         HStack {
                             Text("Tagging: \(directory?.absolutePath ?? "<none>")")
                             Button(action: {appState.showingMoreInfo.toggle()}, label: {
-                                Text(appState.showingMoreInfo ? "Less" : "More")
+                                if #available(macOS 14.0, *) {
+                                    Label(appState.showingMoreInfo ? "Less" : "More", systemImage: appState.showingMoreInfo ? "arrowshape.up":"arrowshape.down")
+                                        .contentTransition(.symbolEffect(.replace))
+                                } else {
+                                    Label(appState.showingMoreInfo ? "Less" : "More", systemImage: appState.showingMoreInfo ? "arrowshape.up":"arrowshape.down")
+                                }
                             })
                             Spacer()
                             VStack {
@@ -305,6 +344,7 @@ struct MainView: View {
                 tagFileTable
                 HStack {
                     Button("Choose Different Format") { [unowned appState] in
+                        // TODO: CCTS to JSON does not work. Store remains CCTS
                         self.teardown()
                         appState.currentState = .StartScreen
                         appState.showingOptions = true
@@ -340,7 +380,8 @@ struct MainView: View {
         })
         .quickLookPreview($selectedFileURL, in: selectedFileURLs)
         .onDisappear(perform: self.teardown)
-        .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification), perform: {output in self.teardown()})
+        // TODO: causes empty tag store files to be written since data is tied to window, only saving should be necessary on disappear unless the app is quit without shutting the last window 
+//        .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification), perform: {output in self.teardown()})
         .frame(minWidth: 500.0, minHeight: 500.0, alignment: .center)
         .padding()
         .navigationTitle("\(directory!.prettyPrinted) – \(files.files.count) files – \(files.files.map { $0.tags.count }.reduce(0, +)) - tags")
