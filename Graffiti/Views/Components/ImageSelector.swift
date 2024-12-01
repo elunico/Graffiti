@@ -95,11 +95,15 @@ struct ImageSelector: View {
         if let url {
 //            return Image(nsImage: NSImage(byReferencing: url))
             if let image = thumbnailCache.object(forKey: url as NSURL) {
+                print(FileManager.default.fileExists(atPath: url.absoluteString))
                 return Image(nsImage: image)
             } else {
-                let nsImage = NSImage(byReferencing: url)
-                thumbnailCache.setObject(nsImage, forKey: url as NSURL)
-                return Image(nsImage: nsImage)
+                if let nsImage = NSImage(contentsOf: url) {
+                    thumbnailCache.setObject(nsImage, forKey: url as NSURL)
+                    return Image(nsImage: nsImage)
+                } else {
+                    return Image(systemName: "exclamationmark.triangle")
+                }
             }
         } else {
             return Image(systemName: "exclamationmark.triangle")
