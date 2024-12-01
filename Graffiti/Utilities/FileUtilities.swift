@@ -9,6 +9,16 @@ import Foundation
 import CoreSpotlight
 import AppKit
 
+extension NSImage {
+    func writeImage(to url: URL, using representation: NSBitmapImageRep.FileType, properties: [NSBitmapImageRep.PropertyKey:Any]) throws {
+        if let imageData = tiffRepresentation,
+           let imageRep = NSBitmapImageRep(data: imageData),
+           let data = imageRep.representation(using: representation, properties: properties) {
+            try data.write(to: url.absoluteURL)
+        }
+    }
+}
+
 func getContentsOfDirectory(atPath directory: String)  throws -> [String] {
     try  getSandboxedAccess(to: directory) { try FileManager.default.contentsOfDirectory(atPath: $0) }
 }
@@ -19,14 +29,34 @@ func TPData(contentsOf url: URL) throws -> Data {
 //    }
 }
 
-func createOwnedImageURL(in directory: String = "ownedImages")  throws -> URL {
+// TODO: could be combined with createOwnedImageURL so that owned returns existing or new or could at least be factored out
+func retrieveOwnedImage(named name: String, for imageType: UTType? ,in directory: String="owned-images") throws -> URL? {
+    let path = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.applicationSupportDirectory, .userDomainMask, true).first!
+    let imageDirectory = URL(fileURLWithPath: path).appending(path: directory)
+    
+    return try getSandboxedAccess(to: imageDirectory.absolutePath, thenPerform: { imageDirectoryString in
+        let imageDirectory = URL(fileURLWithPath: imageDirectoryString)
+        let ownedURL = imageDirectory.appending(path: name).appendingPathExtension(for: imageType ?? .data)
+        var isdir: ObjCBool = false
+        let exists = FileManager.default.fileExists(atPath: ownedURL.absolutePath, isDirectory: &isdir)
+        if exists {
+            if !isdir.boolValue {
+                return ownedURL
+            }
+        }
+        return nil
+    })
+}
+
+func createOwnedImageURL(for imageType: UTType?, in directory: String="owned-images") throws -> URL {
     let path = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.applicationSupportDirectory, .userDomainMask, true).first!
     let name = UUID()
     let imageDirectory = URL(fileURLWithPath: path).appending(path: directory)
     
     return try  getSandboxedAccess(to: imageDirectory.absolutePath, thenPerform: { imageDirectoryString in
         let imageDirectory = URL(fileURLWithPath: imageDirectoryString)
-        let ownedURL = imageDirectory.appending(path: name.uuidString)
+        
+        let ownedURL = imageDirectory.appending(path: name.uuidString).appendingPathExtension(for: imageType ?? .data)
         
         var isdir: ObjCBool = false
         let exists = FileManager.default.fileExists(atPath: imageDirectory.absolutePath, isDirectory: &isdir)
@@ -40,10 +70,13 @@ func createOwnedImageURL(in directory: String = "ownedImages")  throws -> URL {
         
         return ownedURL
     })
-    
 }
 
-private func ensureExistance(ofDirectory directory: URL) throws {
+func createOwnedImageURL(in directory: String = "owned-images")  throws -> URL {
+    try createOwnedImageURL(for: nil, in: directory)
+}
+
+func ensureExistance(ofDirectory directory: URL) throws {
     var isdir: ObjCBool = false
     let exists = FileManager.default.fileExists(atPath: directory.absolutePath, isDirectory: &isdir)
     if exists {
@@ -82,21 +115,16 @@ func resize(size: NSSize, toLongest longest: CGFloat) -> NSSize {
     }
 }
 
-func tryGetThumbnail(for imageURL: URL) throws -> URL? {
+func retrieveThumbnailURL(for imageURL: URL) throws -> URL? {
     let path = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.applicationSupportDirectory, .userDomainMask, true).first!
-    let imageDirectory = URL(fileURLWithPath: path).appending(path: "ownedImages-tiny")
+    let imageDirectory = URL(fileURLWithPath: path).appending(path: "owned-images-tiny")
     let filename = imageURL.lastPathComponent
-    
-//    return try getSandboxedAccess(to: imageDirectory.absolutePath, thenPerform: { imageDirectoryString in
-//        let imageDirectory = URL(fileURLWithPath: imageDirectoryString)
-        let thumbnail = imageDirectory.appending(path: filename)
-        print(thumbnail)
-        if FileManager.default.fileExists(atPath: thumbnail.absolutePath) {
-            return thumbnail
-        } else {
-            return nil
-        }
-//    })
+    let thumbnail = imageDirectory.appending(path: filename)
+    if FileManager.default.fileExists(atPath: thumbnail.absolutePath) {
+        return thumbnail
+    } else {
+        return nil
+    }
 }
 
 func resizeImage(source: NSImage, newSize: NSSize, callback: @MainActor @escaping (_ newImage: NSImage) -> ()) {
@@ -113,32 +141,38 @@ func resizeImage(source: NSImage, newSize: NSSize, callback: @MainActor @escapin
     }
 }
 
-func makeThumbnail(of file: URL, longestSize: CGFloat = 200.0) throws -> URL {
+func createThumbnailFile(of file: URL, longestSize: CGFloat = 200.0) throws -> URL {
     let path = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.applicationSupportDirectory, .userDomainMask, true).first!
-    let imageDirectory = URL(fileURLWithPath: path).appending(path: "ownedImages-tiny")
-    let filename = file.lastPathComponent
+    let imageDirectory = URL(fileURLWithPath: path).appending(path: "owned-images-tiny")
+    // thumbnails are always stored as JPEG so we can force a .JPEG extension here
+    let filename = file.deletingPathExtension().appendingPathExtension(for: .jpeg).lastPathComponent
     
-    return try  getSandboxedAccess(to: imageDirectory.absolutePath, thenPerform: { imageDirectoryString in
+    return try getSandboxedAccess(to: imageDirectory.absolutePath, thenPerform: { imageDirectoryString in
         let imageDirectory = URL(fileURLWithPath: imageDirectoryString)
         try ensureExistance(ofDirectory: imageDirectory)
         
-        guard let i = NSImage(contentsOf: file) else { print("makeThumbnail(of:) failed to load NSImage from \(file)"); throw FileError.couldNotRead  }
-        let url = imageDirectory.appending(path: filename) // try createOwnedImageURL(in: "ownedImages-tiny")
-
+        guard let i = NSImage(contentsOf: file) else { reportError("makeThumbnail(of:) failed to load NSImage from \(file)"); throw FileError.couldNotRead  }
+        let url = imageDirectory.appending(path: filename) // try createOwnedImageURL(in: "owned-images-tiny")
         
-        let newSize = resize(size: i.size, toLongest: longestSize)
-        resizeImage(source: i, newSize: newSize) { smallImage in
-            FileManager.default.createFile(atPath: url.absolutePath, contents: smallImage.tiffRepresentation)
+        
+        
+        if (max(i.size.width, i.size.height) < longestSize) {
+            try? i.writeImage(to: url, using: .jpeg, properties: [.compressionFactor: 1])
+        } else {
+            let newSize = resize(size: i.size, toLongest: longestSize)
+            resizeImage(source: i, newSize: newSize) { smallImage in
+                try? smallImage.writeImage(to: url, using: .jpeg, properties: [.compressionFactor: 1])
+            }
         }
         return url
     })
 }
 
-func acquireImage(at file: URL) throws -> (imageFile: URL, thumbnailFile: URL) {
+func acquireImage(at file: URL) throws -> URL {
     
     let path = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.applicationSupportDirectory, .userDomainMask, true).first!
     let name = file.lastPathComponent
-    let imageDirectory = URL(fileURLWithPath: path).appending(path: "ownedImages")
+    let imageDirectory = URL(fileURLWithPath: path).appending(path: "owned-images")
     
     return try  getSandboxedAccess(to: imageDirectory.absolutePath, thenPerform: { imageDirectoryString in
         let imageDirectory = URL(fileURLWithPath: imageDirectoryString)
@@ -147,9 +181,9 @@ func acquireImage(at file: URL) throws -> (imageFile: URL, thumbnailFile: URL) {
         var ownedURL = imageDirectory.appending(path: name)
         ownedURL = try copyWithReplacement(at: file, to: ownedURL)
         
-        let thumbnail = try makeThumbnail(of: ownedURL)
         
-        return (ownedURL, thumbnail)
+        
+        return ownedURL
     })
 }
 
@@ -159,7 +193,7 @@ func creationDate(of file: URL) -> Date {
 
 func pruneThumbnailCache(maxCount: Int = 0) throws {
     let path = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.applicationSupportDirectory, .userDomainMask, true).first!
-    let imageDirectory = URL(fileURLWithPath: path).appending(path: "ownedImages-tiny")
+    let imageDirectory = URL(fileURLWithPath: path).appending(path: "owned-images-tiny")
     
     if maxCount > 0 {
         var content = try FileManager.default.contentsOfDirectory(at: imageDirectory, includingPropertiesForKeys: [.creationDateKey, .pathKey])
@@ -224,12 +258,12 @@ func accessBookmark(of url: URL) throws -> URL? {
 
 
 @discardableResult
-func getSandboxedAccess<R>(to directory: String, thenPerform action: (String)  throws -> (R))  throws -> R {
+func getSandboxedAccess<R>(to directory: String, thenPerform action: (String) throws -> (R)) throws -> R {
     do {
         let bookmarkedURL = try accessBookmark(of: URL(fileURLWithPath: directory))
         defer { bookmarkedURL?.stopAccessingSecurityScopedResource() }
         bookmarkedURL?.startAccessingSecurityScopedResource()
-        return try  action(directory)
+        return try action(directory)
     } catch _ where !didRequestPermission.contains(directory) {
         var result: R? = nil
         
@@ -240,7 +274,6 @@ func getSandboxedAccess<R>(to directory: String, thenPerform action: (String)  t
         panel.message = "Select the folder you are targeting to grant Graffiti permission to access it"
         let response = panel.runModal()
         if response == NSApplication.ModalResponse.OK {
-            // TODO: save bookmark so permissions is only requested once
             try saveBookmark(of: panel.url!)
             didRequestPermission.insert(directory)
             result = try  action(panel.url!.absolutePath)
@@ -313,4 +346,9 @@ class LoggingCacheDelegate: NSObject, NSCacheDelegate {
     func cache(_ cache: NSCache<AnyObject, AnyObject>, willEvictObject obj: Any) {
         print("Evicting \(obj) from \(cache)")
     }
+}
+
+func getTypeOfImage(url: URL) -> UTType {
+    let ct = try? url.resourceValues(forKeys: [.contentTypeKey])
+    return ct!.contentType!
 }

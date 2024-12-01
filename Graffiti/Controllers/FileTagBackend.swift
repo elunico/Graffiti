@@ -19,7 +19,6 @@ class FileTagBackend: TagBackend {
     func copy(with zone: NSZone? = nil) -> Any {
         do {
             let f = try FileTagBackend(withFileName: filename, forFilesIn: directory, writer: writer)
-            f.dirty = dirty
             return f
         } catch let error {
 //            print(error)
@@ -30,22 +29,14 @@ class FileTagBackend: TagBackend {
     private var lastAccessTime: Date? = nil
     private var cachedData: [String: Set<Tag>] = [:]
     
-    func reloadData()  throws {
-        
+    func reloadData() throws {
         try getSandboxedAccess(to: directory.absolutePath, thenPerform: { path in
-            do {
-                let intermediate = try writer.loadFrom(path: saveFile)
-                let data = intermediate.tagData
-                for (p, tags) in data {
-                    cachedData[p] = tags
-                }
-            } catch let error {
-                print("reloadData() error \(error)")
-                
+            let intermediate = try writer.loadFrom(path: saveFile)
+            let data = intermediate.tagData
+            for (p, tags) in data {
+                cachedData[p] = tags
             }
         })
-        
-        
     }
     
     func loadTags(at path: String) -> Set<Tag> {
@@ -59,7 +50,6 @@ class FileTagBackend: TagBackend {
     
     var writer: FileWriter
     var directory: URL
-    var dirty: Bool = false
     var format: Tag.ImageFormat
     var filename: String?
     
@@ -80,23 +70,19 @@ class FileTagBackend: TagBackend {
     }
     
     func removeTagText(from file: TaggedFile) {
-        dirty = true 
         file.tags.forEach { $0.imageTextContent.removeAll(); $0.recoginitionState = .uninitialized }
     }
     
     func addTag(_ tag: Tag, to file: TaggedFile) {
-        dirty = true
         file.tags.insert(tag)
     }
     
     func removeTag(withID id: Tag.ID, from file: TaggedFile) {
         guard let t = file.tags.first(where: { $0.id == id }) else { return }
-        dirty = true
         file.tags.remove(t)
     }
     
     func clearTags(of file: TaggedFile) {
-        dirty = true
         file.tags.removeAll()
     }
     
@@ -105,12 +91,10 @@ class FileTagBackend: TagBackend {
     }
     
     func commit(files: [TaggedFile], force: Bool = false) {
-        if dirty || force {
             let path = saveFile
             let tags = Dictionary(uniqueKeysWithValues: files.map { ($0.id, $0.tags) })
             writer.saveTo(path: path, store: TagStore(tagData: tags))
-            dirty = false
-        }
+
     }
     
     func performAutosave(files: [TaggedFile], suffix: String) {
@@ -136,9 +120,7 @@ class FileTagBackend: TagBackend {
     
     func hasAutosave(suffixedWith suffix: String) -> Bool {
         let name = FileTagBackend.appending(s1: filename, s2: suffix)
-        print("The name is \(name)")
         let path = type(of: writer).writePath(in: directory, named: name)
-        print("Checking for path \(path)")
         return FileManager.default.fileExists(atPath: path)
     }
     

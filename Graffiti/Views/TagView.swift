@@ -7,18 +7,88 @@
 
 import Foundation
 import SwiftUI
+import os
+import UniformTypeIdentifiers
+
+enum AddTagError: Error {
+    case generic
+}
+
+struct RetainedImage {
+    var id: UUID?
+    var url: URL?
+    var retainedURL: URL?
+    var type: UTType {
+        getTypeOfImage(url: url!)
+    }
+    
+    var isPresent: Bool {
+        self.url != nil && self.retainedURL != nil
+    }
+    
+    static func getRetainedURL(originalURL: URL, withID id: UUID) throws -> URL {
+        let path = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.applicationSupportDirectory, .userDomainMask, true).first!
+        let name = originalURL.lastPathComponent
+        let imageDirectory = URL(fileURLWithPath: path).appending(path: "retained-images")
+        
+        return try  getSandboxedAccess(to: imageDirectory.absolutePath, thenPerform: { imageDirectoryString in
+            let imageDirectory = URL(fileURLWithPath: imageDirectoryString)
+            try ensureExistance(ofDirectory: imageDirectory)
+            var ownedURL = imageDirectory.appending(path: name)
+            ownedURL = try copyWithReplacement(at: originalURL, to: ownedURL)
+            return ownedURL
+        })
+    }
+    
+    init() {
+    }
+    
+    init(url: URL, withID id: UUID) throws {
+        self.url = url
+        self.id = id
+        self.retainedURL = try RetainedImage.getRetainedURL(originalURL: url, withID: id)
+        try copyWithReplacement(at: url, to: retainedURL!)
+    }
+    
+    func persist() throws -> URL  {
+        if (!isPresent) { fatalError("Do not call persist if !isPresent") }
+        let path = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.applicationSupportDirectory, .userDomainMask, true).first!
+        
+        let imageDirectory = URL(fileURLWithPath: path).appending(path: "owned-images")
+        
+        return try  getSandboxedAccess(to: imageDirectory.absolutePath, thenPerform: { imageDirectoryString in
+            let imageDirectory = URL(fileURLWithPath: imageDirectoryString)
+            try ensureExistance(ofDirectory: imageDirectory)
+            
+            var ownedURL = imageDirectory.appending(path: id!.uuidString).appendingPathExtension(for: type)
+            ownedURL = try copyWithReplacement(at: retainedURL!, to: ownedURL)
+            return ownedURL
+        })
+    }
+    
+    mutating func destroy() throws {
+        try FileManager.default.removeItem(at: retainedURL!)
+        self.url = nil
+        self.id = nil
+        self.retainedURL = nil
+    }
+}
 
 struct TagView: View {
     @State var files: Set<TaggedFile>
     @State var selected: Set<Tag.ID> = []
     @State var currentTag: String = ""
     @State var showingHelp = false
-    @State var tagImage: URL? = nil
-    @State var tagImageThumbnail: URL? = nil
+//    @State var tagImage: URL? = nil
+//    @State var tagImageThumbnail: URL? = nil
+    @State var tagImage: RetainedImage = RetainedImage()
     @State var qlPreviewLink: URL? = nil
     @State var selectedView: ViewSelection = .text
     @EnvironmentObject var directory: TaggedDirectory
     @EnvironmentObject var appState: ApplicationState
+    
+    @State var message: String = ""
+    @State var showingError: Bool = false
     
     @State var chosenFormat: Tag.ImageFormat = .none
     @State var tags: Array<Tag> = []
@@ -41,10 +111,7 @@ struct TagView: View {
         selected = []
     }
     
-    func setImage(url: URL, thumbnail thumbnailURL: URL) {
-        tagImage = url
-        tagImageThumbnail = thumbnailURL
-    }
+   
     
     var buttonBar: some View {
         HStack {
@@ -65,7 +132,7 @@ struct TagView: View {
                 }.disabled(selected.isEmpty)
                 Button("Add Tag") {
                     self.addCurrentTag()
-                }.disabled(currentTag == "" && tagImage == nil)
+                }.disabled(currentTag == "" && tagImage.url == nil)
             }
         }
     }
@@ -87,12 +154,12 @@ struct TagView: View {
     
     var addImageView: some View {
         Group {
-            ImageSelector(selectedImage: $tagImage, onClick: { _ in
+            ImageSelector(selectedImage: $tagImage.retainedURL, onClick: { _ in
                 DispatchQueue.main.async {
                     selectFile(ofTypes: [.image]) { urls in
                         guard let originalURL = urls.first else { return }
-                        let (url, thumbnailURL) = try! acquireImage(at: originalURL)
-                        setImage(url: url, thumbnail: thumbnailURL)
+//                        let url = try! acquireImage(at: originalURL)
+                        tagImage = try! RetainedImage(url: originalURL, withID: UUID())
                     }
                 }
             }, onDroppedFile: { (_, providers) in
@@ -122,6 +189,7 @@ struct TagView: View {
                     TableColumn("Tag") { item in
                         if item.image != nil {
                             HStack {
+                                // TODO: thumbnail is blank in table until application restart. Possibly related to NSCache thumbnailCache
                                 try? item.ensureThumbnail() =>
                                 ImageSelector.imageOfFile(item.thumbnail)
                                     .resizable()
@@ -139,7 +207,6 @@ struct TagView: View {
                                 } label: {
                                     Image(systemName: "eye")
                                 }
-                                
                             }
                         } else {
                             Text(item.value)
@@ -183,10 +250,17 @@ struct TagView: View {
                     done(files)
                 }.keyboardShortcut(.return, modifiers: [])
             }
-        }.padding()
+        }.frame(minWidth: 500.0, maxWidth: .infinity, minHeight: 500.0, maxHeight: .infinity, alignment: Alignment.center)
+            .padding()
             .onAppear {
                 appState.createSelectionModel()
                 tags = files.map { $0.tags }.flatten().unique()
+                let types = tags.map { $0.imageFormat }.unique()
+                if types.count == 1 {
+                    chosenFormat = types.first!
+                } else {
+                    chosenFormat = .none
+                }
             }
             .onDisappear {
                 appState.releaseSelectionModel()
@@ -197,11 +271,10 @@ struct TagView: View {
                 if f.allSatisfy({ $0.image != nil }) && f.map({ $0.imageFormat }).allSame() {
                     chosenFormat = f.first?.imageFormat ?? .none
                 } else {
-                    chosenFormat = .none 
+                    chosenFormat = .none
                 }
             })
             .quickLookPreview($qlPreviewLink)
-            .frame(minWidth: 500.0, minHeight: 500.0,  alignment: Alignment.center)
             .sheet(isPresented: $showingHelp, content: {
                 FilesEditingInspectorView(done: { showingHelp = false }, removeFileWithID: { id in
                     guard let idx = files.firstIndex(where: {$0.id == id}) else { return }
@@ -211,9 +284,15 @@ struct TagView: View {
                 }, files: files)
             })
             .sheet(isPresented: $appState.showingImageImportError, content: {
-                Text("Could not import image").font(.title)
-                Text("Only files in the following formats are supported")
-                Text("\(TagView.validImageExtensions.joined(separator: ", "))")
+                Group {
+                    Text("Could not import image").font(.title)
+                    Text(message)
+                    Text("Only files in the following formats are supported")
+                    Text("\(TagView.validImageExtensions.joined(separator: ", "))")
+                    Button("Close") {
+                        appState.showingImageImportError = false
+                    }
+                }.padding()
             })
     }
     
@@ -224,9 +303,12 @@ struct TagView: View {
         _ = provider.loadDataRepresentation(forTypeIdentifier: "public.file-url", completionHandler: { data, error in
             if let data, let s = String(data: data, encoding: .utf8), let originalURL = URL(string: s) {
                 if TagView.validImageExtensions.contains(originalURL.pathExtension.lowercased()) {
-                    // TODO: handle the error
-                    let (url, thumb) = try!  acquireImage(at: originalURL)
-                    setImage(url: url, thumbnail: thumb)
+                    do {
+                        tagImage = try RetainedImage(url: originalURL, withID: UUID())
+                    } catch {
+                        message = "Could not access requested image at \(originalURL)"
+                        appState.showingImageImportError = true
+                    }
                 } else {
                     appState.showingImageImportError = true
                 }
@@ -239,16 +321,29 @@ struct TagView: View {
     
     func addCurrentTag() {
         if (currentTag.isEmpty || currentTag.allSatisfy({$0.isWhitespace})) &&
-            tagImage == nil {
+            !tagImage.isPresent {
             return
         }
         var tag: Tag
-        if tagImage == nil {
+        if !tagImage.isPresent {
             tag = Tag.tag(withString: currentTag)
             currentTag = ""
+            directory.objectWillChange.send()
         } else {
-            tag = Tag.tag(imageURL: tagImage!, thumbnail: tagImageThumbnail!)
-            tagImage = nil
+            do {
+                if (tagImage.isPresent) {
+                    let newTagFile = try tagImage.persist()
+                    tag = Tag.tag(imageURL: newTagFile, thumbnail: nil, imageIdentifier: tagImage.id!)
+                    try tagImage.destroy()
+                    directory.objectWillChange.send()
+                } else {
+                    throw AddTagError.generic
+                }
+            } catch {
+                message = "An error occurred while trying to save the image: \(error.localizedDescription)"
+                appState.showingImageImportError = true
+                return
+            }
         }
         directory.addTags(tag, toAll: files.map { $0 })
         tags = files.map { $0.tags }.flatten().unique()

@@ -7,6 +7,8 @@
 
 import Foundation
 import os
+import UniformTypeIdentifiers
+
 
 extension Int {
     var bigEndianBytes: Data {
@@ -24,6 +26,12 @@ extension UUID {
     }
 }
 
+extension UTType {
+    func asDataBytes() -> Data? {
+        return Data().appending(sizedString: identifier)
+    }
+}
+
 extension Data {
     func last(_ n: Int) -> Data {
         assert(subdata(in: 0..<n).allSatisfy { $0 == 0 })
@@ -35,6 +43,22 @@ extension Data {
         rest.append(self)
         rest.append(value)
         return rest
+    }
+    
+    func appending(_ bytes: [UInt8]) -> Data {
+        var r = Data()
+        r.append(self)
+        r.append(Data(bytes))
+        return r 
+    }
+    
+    func appending(sizedString string: String) -> Data {
+        var rest = Data()
+        guard let  s = string.data(using: .utf8) else { fatalError("Could not turn string into data")}
+        rest.append(self)
+        rest.append(s.count.bigEndianBytes)
+        rest.append(s)
+        return rest 
     }
     
 }
@@ -62,6 +86,13 @@ extension Data.Iterator {
         return d
     }
     
+    mutating func nextSizedString() -> String? {
+        guard let size = nextBEInt() else { return nil }
+        guard let sdata = next(size) else { return nil }
+        let s = String(data: sdata, encoding: .utf8)
+        return s
+    }
+    
     mutating func nextUUID() -> UUID? {
         let bytes = next(16)
         return (bytes?.withUnsafeBytes {
@@ -69,6 +100,14 @@ extension Data.Iterator {
             return NSUUID(uuidBytes: ptr)
         }) as UUID?
     }
+    
+    mutating func nextUTType() -> UTType? {
+        guard var s = nextSizedString() else { return nil }
+        var uttype = UTType(s)
+        return uttype
+    }
+    
+    
 }
 
 extension Version {
@@ -94,7 +133,7 @@ class CompressedCustomTagStoreWriter: FileWriter {
     static let fileExtension: String = ".ccts"
 
     
-    func loadFrom(path: String)  throws -> TagStore {
+    func loadFrom(path: String) throws -> TagStore {
         var retValue: [String: Set<Tag>] = [:]
         var isDir: ObjCBool = false
         
@@ -112,13 +151,11 @@ class CompressedCustomTagStoreWriter: FileWriter {
         
         guard let data = try? Data(NSData(data: contents).decompressed(using: .lzma)) else {
             os_log("%s", log: .default, type: .error, "Error at getting data with path \(path)")
-
             throw FileWriterError.InvalidFileFormat
         }
         
         if data.count < 10 {
             os_log("%s", log: .default, type: .error, "Data formatted incorrectly with \(data.count) bytes")
-
             throw FileWriterError.InvalidFileFormat
         }
         
@@ -127,14 +164,12 @@ class CompressedCustomTagStoreWriter: FileWriter {
         
         if !TagStore.default.version.isReadCompatible(with: version) {
             os_log("%s", log: .default, type: .error, "Bad version \(version)")
-
             throw FileWriterError.VersionMismatch
         }
         
         guard let totalTags = iter.nextBEInt() else { throw FileWriterError.InvalidFileFormat }
-        print("Total tags \(totalTags)")
         for _ in 0..<totalTags {
-            let _ = try Tag.deserialize(from: &iter, imageFormat: .url)
+            let _ = try Tag.deserialize(from: &iter)
         }
         
         guard let totalFiles = iter.nextBEInt() else { throw FileWriterError.InvalidFileFormat }
@@ -142,7 +177,6 @@ class CompressedCustomTagStoreWriter: FileWriter {
         for _ in 0..<totalFiles {
             guard let pathLength = iter.nextBEInt(), let pathData = iter.next(Int(pathLength)), let path = String(data: pathData, encoding: .utf8) else {
                 os_log("%s", log: .default, type: .error, "Invalid path length")
-
                 throw FileWriterError.InvalidFileFormat
             }
             retValue[path] = Set()
@@ -159,7 +193,7 @@ class CompressedCustomTagStoreWriter: FileWriter {
                 if let tag = Tag.tag(fromID: id) {
                     retValue[path]!.insert(tag)
                 } else {
-                    print("Missing tag for id \(id)")
+                    reportWarning("Missing tag for id \(id)")
                 }
             }
         }
@@ -177,7 +211,11 @@ class CompressedCustomTagStoreWriter: FileWriter {
         data.append(allTags.count.bigEndianBytes)
         
         for tag in allTags {
-            data.append(try! tag.serializeToData())
+            if let d = try? tag.serializeToData() {
+                data.append(d)
+            } else {
+                fatalError("tag.serializeToData() returned nil")
+            }
         }
         
         data.append(store.tagData.count.bigEndianBytes)
@@ -195,7 +233,6 @@ class CompressedCustomTagStoreWriter: FileWriter {
                 
             }
         }
-                
         FileManager.default.createFile(atPath: path, contents: try! NSData(data: data).compressed(using: .lzma) as Data)
     }
 }

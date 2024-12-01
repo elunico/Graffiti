@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-fileprivate var thumbnailCache : NSCache<NSURL, NSImage> = NSCache(countLimit: 25)
+fileprivate var thumbnailCache : NSCache<NSURL, NSImage> = NSCache(countLimit: 50)
 
 struct ImageSelector: View {
     
@@ -93,12 +93,13 @@ struct ImageSelector: View {
     static func imageOfFile(_ url: URL?) -> Image {
         
         if let url {
+//            return Image(nsImage: NSImage(byReferencing: url))
             if let image = thumbnailCache.object(forKey: url as NSURL) {
                 return Image(nsImage: image)
             } else {
                 let nsImage = NSImage(byReferencing: url)
                 thumbnailCache.setObject(nsImage, forKey: url as NSURL)
-                return Image(nsImage:  nsImage)
+                return Image(nsImage: nsImage)
             }
         } else {
             return Image(systemName: "exclamationmark.triangle")

@@ -9,12 +9,12 @@ import Foundation
 
 import os
 
-func display(message: String, log: OSLog = .default, type: OSLogType = .error) {
-    #if DEBUG
-    print("[LOG] \(type): \(message)")
-    #else
-    os_log("%s", log: log, type: type, message)
-    #endif 
+func reportError(_ message: String) {
+    print("ERROR: \(#file)\(#line): \(message)")
+}
+
+func reportWarning(_ message: String) {
+    print("WARN: \(#file)\(#line): \(message)")
 }
 
 func printing<T>(_ t: T) -> T {
@@ -71,8 +71,18 @@ func precondition(_ condition: @autoclosure () -> Bool, _ message: String) {
         fatalError("precondition failed: \(#file):\(#line) \(message)")
     }
 }
+
+func check(_ condition: @autoclosure () -> Bool, _ message: String) {
+    if !condition() {
+        fatalError("Invalid state: \(#file):\(#line) \(message)")
+    }
+}
+
 #else
 @inlinable func precondition(_ condition: @autoclosure () -> Bool, _ message: String) {
+    
+}
+@inlinable func check(_ condition: @autoclosure () -> Bool, _ message: String) {
     
 }
 #endif

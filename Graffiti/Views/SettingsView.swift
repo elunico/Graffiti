@@ -22,20 +22,21 @@ struct SettingsView: View {
             Group {
                 
                 Text("File Control").font(.headline)
-                Section {
-                    VStack {
-                        Text("Change image save format of all tags")
-                        Picker("", selection: $appState.imageSaveFormat, content: {
-                            Text("Save Images as Links to local image files (faster; less space)").tag(Tag.ImageFormat.url)
-                            Text("Save Images as Inline full image data (portable; larger files)").tag(Tag.ImageFormat.content)
-                        }).disabled(!AppState.tagChangeableStates.contains(appState.currentState))
-                            
-                    }
-                }
-                Divider()
+//                Section {
+//                    VStack {
+//                        Text("Change image save format of all tags")
+//                        Picker("", selection: $appState.imageSaveFormat, content: {
+//                            Text("Save Images as Links to local image files (faster; less space)").tag(Tag.ImageFormat.url)
+//                            Text("Save Images as Inline full image data (portable; larger files)").tag(Tag.ImageFormat.content)
+//                        }).disabled(!AppState.tagChangeableStates.contains(appState.currentState))
+//                            
+//                    }
+//                }
+//                Divider()
                 Text("Image Thumbnail Cache").font(.subheadline)
                 Button("Clear Thumbnail Cache") {
                     try? pruneThumbnailCache()
+                    taggedDirectory.clearTagThumbnails()
                 }
             }
             Divider()
@@ -57,16 +58,16 @@ struct SettingsView: View {
             .onAppear {
                 loadDefaultSettings(to: appState)   
             }
-            .onChange(of: appState.imageSaveFormat, perform: { val in
-                print("Changing format")
-                taggedDirectory.convertTagStorage(to: appState.imageSaveFormat)
-                UserDefaults.thisAppDomain?.set(appState.imageSaveFormat == .url, forKey: SettingsView.saveImageURLsDefaultsKey)
-            })
+//            .onChange(of: appState.imageSaveFormat, perform: { val in
+//                print("Changing format")
+//                taggedDirectory.convertTagStorage(to: appState.imageSaveFormat)
+//                UserDefaults.thisAppDomain?.set(appState.imageSaveFormat == .url, forKey: SettingsView.saveImageURLsDefaultsKey)
+//            })
     }
 }
 
 func loadDefaultSettings(to appState: ApplicationState) {
-    appState.imageSaveFormat = (UserDefaults.thisAppDomain?.bool(forKey: SettingsView.saveImageURLsDefaultsKey) ?? true)  ? Tag.ImageFormat.url : Tag.ImageFormat.content
+//    appState.imageSaveFormat = (UserDefaults.thisAppDomain?.bool(forKey: SettingsView.saveImageURLsDefaultsKey) ?? true)  ? Tag.ImageFormat.url : Tag.ImageFormat.content
     appState.doImageVision = UserDefaults.thisAppDomain?.bool(forKey: SettingsView.doTextRecognition) ?? true
     appState.showSpotlightKinds = UserDefaults.thisAppDomain?.bool(forKey: SettingsView.showSpotlightKinds) ?? false
 }

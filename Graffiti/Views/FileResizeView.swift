@@ -16,7 +16,7 @@ extension CGFloat {
     }
 }
 
-extension Optional: CustomStringConvertible where Wrapped: CustomStringConvertible {
+extension Optional: @retroactive CustomStringConvertible where Wrapped: CustomStringConvertible {
     public var description: String {
         switch self {
         case .none:
@@ -33,7 +33,7 @@ extension String.StringInterpolation {
     }
 }
 
-class CGFloatFormatter: NumberFormatter {
+class CGFloatFormatter: NumberFormatter, @unchecked Sendable {
     
     override func number(from string: String) -> NSNumber? {
         if let value = Int(string) {
@@ -44,7 +44,6 @@ class CGFloatFormatter: NumberFormatter {
         if r == 0 || r.doubleValue.isNaN || r.doubleValue.isInfinite {
             return 0
         } else {
-            print("Number \(r)")
             return r
         }
     }
@@ -54,7 +53,6 @@ class CGFloatFormatter: NumberFormatter {
         if value == nil || value?.isEmpty == true {
             return "0"
         }
-        print("String \(value)")
         return value
     }
     

@@ -26,7 +26,7 @@ struct GraffitiRemoveImageTagsFromFile: AppIntent {
         
         for tag in tags {
             if let url = tag.fileURL {
-                let t = Tag.tag(imageURL: url)
+                let t = Tag.tag(imageURL: url, imageIdentifier: UUID())
                 directory.removeTag(withID: t.id, from: tagFile)
             }
         }
