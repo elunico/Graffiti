@@ -64,12 +64,7 @@ struct ContentView: View {
                     if directory != nil && formatChoice != .none {
                         self.loadUserSelection { [unowned appState] in
                             appState.showingOptions = !$0
-                            
                         }
-                        
-                        //                        self.loadUserSelection { [unowned appState] in
-                        //                            appState.showingOptions = !$0
-                        //                        }
                     }
                 } label: {
                     Label("Go!", systemImage: "arrowshape.forward")
@@ -155,9 +150,9 @@ struct ContentView: View {
                         }
                         
                     } catch {
-                        // Handle failure.
-                        print("Unable to read file contents")
-                        print(error.localizedDescription)
+                        // TODO: Handle failure.
+                        reportError("Unable to read file contents")
+                        reportError(error.localizedDescription)
                     }
                 }
                 .onOpenURL(perform: { [unowned appState] path in
@@ -224,7 +219,7 @@ struct ContentView: View {
             appState.currentState = .ShowingFileError
             completed(false)
         } catch let error {
-            print(error)
+            reportError(error.localizedDescription)
             errorString = "An unknown error occurred"
             showingError = true
             appState.isLoading = false
@@ -239,9 +234,18 @@ struct ContentView: View {
         DispatchQueue.main.async {
             guard let dir = self.directory else { return completed(false) }
             let filename = loadedFile == nil ? ContentView.defaultFilename : NSString(string: loadedFile!.lastPathComponent).deletingPathExtension
-            print("Load user selection filename is \(filename)")
             
-            taggedDirectory.setBackend(directory: dir.absolutePath, filename: filename, format: formatChoice)
+            do {
+                try taggedDirectory.setBackend(directory: dir.absolutePath, filename: filename, format: formatChoice)
+            } catch {
+                showingError = true
+                errorString = error.localizedDescription
+                appState.isLoading = false
+                appState.currentState = .StartScreen
+                self.directory = nil
+                self.loadedFile = nil
+                return 
+            }
             
             if taggedDirectory.hasTemporaryAutosave() {
                 promptAutosaveRestore = true
@@ -275,7 +279,6 @@ struct ContentView: View {
                     if let f = format.fileExtension, url.pathExtension == f {
                         directory = url.deletingLastPathComponent()
                         formatChoice = format
-                        print("before loadUserSelection loadedFile \(loadedFile)")
                         self.loadUserSelection(onDone: completeLoadOfFile)
                         matchedImport = true
                         break

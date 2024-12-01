@@ -44,7 +44,6 @@ class CGFloatFormatter: NumberFormatter, @unchecked Sendable {
         if r == 0 || r.doubleValue.isNaN || r.doubleValue.isInfinite {
             return 0
         } else {
-            print("Number \(r)")
             return r
         }
     }
@@ -54,7 +53,6 @@ class CGFloatFormatter: NumberFormatter, @unchecked Sendable {
         if value == nil || value?.isEmpty == true {
             return "0"
         }
-        print("String \(value)")
         return value
     }
     

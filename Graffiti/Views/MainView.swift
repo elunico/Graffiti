@@ -108,12 +108,13 @@ struct MainView: View {
                                     }
                                 }
                             }
+                            
+                            
                     }
                 }).onChange(of: sorter, perform: {
 //                    if let sorter = sorter.last {
                         currentFileList.sort(using: $0)
 //                    }
-                    display(message: "sizeof sorter is \(sorter.count)")
                 }).onChange(of: selected, perform: { _ in
                     if selected.count > 0 {
                         appState.currentState = .MainView(hasSelection: true)
@@ -121,7 +122,7 @@ struct MainView: View {
                     appState.select(only: selected)
                 }).onAppear {
                     _ = launch(after: .minutes(5) + .seconds(30), repeats: true) { action in
-                        display(message: "Timer activated", log: .default, type: .error)
+                        reportWarning("Timer activated")
 //                        mdCache.removeAllObjects()
                     }
                     
@@ -229,7 +230,6 @@ struct MainView: View {
                     divider(oriented: .horizontally, measure: 25.0)
                     
                     Button(action: { [unowned appState] in
-                        // TODO: Seems like images are also broken
                         appState.editing = true
                         appState.currentState = .EditingTags
                     }, label: {
@@ -380,19 +380,14 @@ struct MainView: View {
         })
         .quickLookPreview($selectedFileURL, in: selectedFileURLs)
         .onDisappear(perform: self.teardown)
-        // TODO: causes empty tag store files to be written since data is tied to window, only saving should be necessary on disappear unless the app is quit without shutting the last window 
-//        .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification), perform: {output in self.teardown()})
         .frame(minWidth: 500.0, minHeight: 500.0, alignment: .center)
         .padding()
         .navigationTitle("\(directory!.prettyPrinted) – \(files.files.count) files – \(files.files.map { $0.tags.count }.reduce(0, +)) - tags")
         .navigationDocument(directory!)
         .onAppear { [unowned files] in
             guard let path = self.directory?.absolutePath else { return }
-            
             try! self.files.load(directory: path, filename: FileTagBackend.filePrefix, format: choice)
-            files.convertTagStorage(to: appState.imageSaveFormat)
             currentFileList = files.filter(by: query, within: showOnlyUntagged)
-            
             appState.createSelectionModel()
         }
     }

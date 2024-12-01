@@ -47,8 +47,8 @@
             filePath = "Graffiti/Controllers/FileTagBackend.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "37"
-            endingLineNumber = "37"
+            startingLineNumber = "36"
+            endingLineNumber = "36"
             landmarkName = "reloadData()"
             landmarkType = "7">
          </BreakpointContent>
@@ -95,8 +95,8 @@
             filePath = "Graffiti/Models/Tag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "164"
-            endingLineNumber = "164"
+            startingLineNumber = "147"
+            endingLineNumber = "147"
             landmarkName = "tag(withString:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -111,8 +111,8 @@
             filePath = "Graffiti/Models/Tag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "167"
-            endingLineNumber = "167"
+            startingLineNumber = "150"
+            endingLineNumber = "150"
             landmarkName = "tag(withString:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -127,8 +127,8 @@
             filePath = "Graffiti/Models/Tag.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "42"
-            endingLineNumber = "42"
+            startingLineNumber = "44"
+            endingLineNumber = "44"
             landmarkName = "unknown"
             landmarkType = "0">
          </BreakpointContent>
@@ -143,9 +143,57 @@
             filePath = "Graffiti/Controllers/FileWriters/CompressedCustomTagStoreWriter.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "170"
-            endingLineNumber = "170"
+            startingLineNumber = "207"
+            endingLineNumber = "207"
             landmarkName = "saveTo(path:store:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "7B7DD10D-B396-43E4-929C-BAC1E052B208"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Graffiti/Models/Tag.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "194"
+            endingLineNumber = "194"
+            landmarkName = "init(imageURL:format:thumbnail:id:imageIdentifier:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "5FE31D0D-0D24-4856-8614-E694BE77F5CB"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Graffiti/Views/Components/ImageSelector.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "95"
+            endingLineNumber = "95"
+            landmarkName = "imageOfFile(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "3A241BEB-ACD0-4AE9-AD8E-AD1FEA405C75"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Graffiti/Models/Tag.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "233"
+            endingLineNumber = "233"
+            landmarkName = "ensureThumbnail()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

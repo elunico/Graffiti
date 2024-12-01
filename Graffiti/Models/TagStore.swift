@@ -8,7 +8,7 @@
 import Foundation
 
 struct TagStore: Equatable, Hashable, Codable {
-    var version: Version = Version(major: 10, minor: 0, patch: 0)
+    var version: Version = Version(major: 11, minor: 0, patch: 0)
     
     var tagData: [String: Set<Tag>]
     

@@ -54,8 +54,6 @@ class ApplicationState: ObservableObject {
     
 //    @Published var copyOwnedImages: Bool = true
     @Published var doImageVision: Bool = true
-    @Published var imageSaveFormat: Tag.ImageFormat = .url
-    
     @Published var showingImageImportError: Bool = false 
     
     func reset() {

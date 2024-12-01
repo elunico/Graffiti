@@ -57,22 +57,22 @@ class JSONFileWriter: FileWriter {
         let dict = object as? [String: Any]
 
         guard let dict else {
-            print("Could not get dict")
+            reportError("Could not get dict")
             throw FileWriterError.InvalidFileFormat
         }
 
         guard let version = Version(fromDescription: (dict["version"] as? String) ?? "") else {
-            print("could not get version")
+            reportError("could not get version")
             throw FileWriterError.InvalidFileFormat
         }
 
         if !version.isReadCompatible(with: TagStore.default.version) {
-            print("Incompatible version number")
+            reportError("Incompatible version number")
             throw FileWriterError.VersionMismatch
         }
 
         guard let tags = dict["tags"] as? JSONTags else {
-            print("Could not get tags ")
+            reportError("Could not get tags ")
             throw FileWriterError.InvalidFileFormat
         }
 
@@ -83,7 +83,7 @@ class JSONFileWriter: FileWriter {
                 fatalError("Invalid type string was nil")
             case "SV":
                 guard let uuid = tag["uuid"] as? String else {
-                    print("NO UUID")
+                    reportError("NO UUID")
                     throw FileWriterError.InvalidFileFormat }
                 
                 
@@ -91,17 +91,17 @@ class JSONFileWriter: FileWriter {
                     // tag already exists take no action
                 } else {
                     guard let value = tag["value"] as? String else {
-                        print("No value")
+                        reportError("No value")
                         throw FileWriterError.InvalidFileFormat }
                     // create the tag
                     _ = Tag(string: value, id: UUID(uuidString: uuid)!)
                 }
             case "IU":
                 guard let uuid = tag["uuid"] as? String else {
-                    print("NO UUID")
+                    reportError("NO UUID")
                     throw FileWriterError.InvalidFileFormat }
                 guard let s = tag["url"] as? String else {
-                    print("No url")
+                    reportError("No url")
                     throw FileWriterError.InvalidFileFormat }
                 let url = URL(fileURLWithPath: s)
                 guard let strings = tag["strings"] as? [String] else { throw FileWriterError.InvalidFileFormat }
@@ -118,7 +118,7 @@ class JSONFileWriter: FileWriter {
                 t.imageTextContent = strings
             case "BD":
                 guard let s = tag["dataSrc"] as? String else {
-                    print("No data")
+                    reportError("No data")
                     throw FileWriterError.InvalidFileFormat }
                 let content = NSData(base64Encoded: s)! as Data
                 let name = try createOwnedImageURL()
@@ -127,7 +127,7 @@ class JSONFileWriter: FileWriter {
                 guard let state = tag["recognitionState"] as? Int else { throw FileWriterError.InvalidFileFormat }
                 
                 guard let uuid = tag["uuid"] as? String else {
-                    print("NO UUID")
+                    reportError("NO UUID")
                     throw FileWriterError.InvalidFileFormat }
                 
                 

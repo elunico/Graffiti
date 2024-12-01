@@ -38,9 +38,9 @@ struct TagCharts: View {
         let textTags = tags.filter { $0.image == nil }.count
         let imageTags = tags.filter { $0.image != nil }.count
         
-        let maxTags = printing(directory.files.map { $0.tags.count }.max() ?? 0)
+        let maxTags = directory.files.map { $0.tags.count }.max() ?? 0
         
-        let ranges = printing(windows(from: 0, to: maxTags, count: 10))
+        let ranges = windows(from: 0, to: maxTags, count: 10)
         
         
         TabView(selection: $tabSelection) {

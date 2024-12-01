@@ -9,12 +9,12 @@ import Foundation
 
 import os
 
-func display(message: String, log: OSLog = .default, type: OSLogType = .error) {
-    #if DEBUG
-    print("[LOG] \(type): \(message)")
-    #else
-    os_log("%s", log: log, type: type, message)
-    #endif 
+func reportError(_ message: String) {
+    print("ERROR: \(#file)\(#line): \(message)")
+}
+
+func reportWarning(_ message: String) {
+    print("WARN: \(#file)\(#line): \(message)")
 }
 
 func printing<T>(_ t: T) -> T {

@@ -69,6 +69,7 @@ struct GraffitiApp: App {
                     NSWindow.allowsAutomaticWindowTabbing = false
                     loadDefaultSettings(to: appState)
                 }
+//            FirstView()
         }
         
         .commands(content: {
@@ -82,6 +83,15 @@ struct GraffitiApp: App {
                     clearAllTags()
                 }.disabled(canEditTags)
                     .keyboardShortcut(.delete, modifiers: [.control, .command])
+                
+                Menu("Convert all stored images (not undoable)") {
+                    Button("Convert to References (Less Space)") {
+                        taggedDirectory.convertTagStorage(to: .url)
+                    }.disabled(canEditTags)
+                    Button("Convert to Binary Data (More Portable)") {
+                        taggedDirectory.convertTagStorage(to: .content)
+                    }.disabled(canEditTags)
+                }
             })
             CommandGroup(after: .newItem, addition: {
                 Button("Open File(s)", action: {

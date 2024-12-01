@@ -59,7 +59,6 @@ extension FileWriter {
     }
 }
 
-// TODO: fix plist, csv, and json to have image attributes and recognized text
 func convert(file url: URL, isUsing currentWriter: FileWriter, willUse futureWriter: FileWriter)  throws {
     let data = try  currentWriter.loadFrom(path: url.absolutePath)
     let path = url.deletingPathExtension().appendingPathExtension(String(type(of: futureWriter).fileExtension.trimmingPrefix(/\./))).absolutePath

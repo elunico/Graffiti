@@ -31,15 +31,10 @@ class FileTagBackend: TagBackend {
     
     func reloadData() throws {
         try getSandboxedAccess(to: directory.absolutePath, thenPerform: { path in
-            do {
-                let intermediate = try writer.loadFrom(path: saveFile)
-                let data = intermediate.tagData
-                for (p, tags) in data {
-                    cachedData[p] = tags
-                }
-            } catch let error {
-                print("reloadData() error \(error)")
-                
+            let intermediate = try writer.loadFrom(path: saveFile)
+            let data = intermediate.tagData
+            for (p, tags) in data {
+                cachedData[p] = tags
             }
         })
     }
@@ -125,9 +120,7 @@ class FileTagBackend: TagBackend {
     
     func hasAutosave(suffixedWith suffix: String) -> Bool {
         let name = FileTagBackend.appending(s1: filename, s2: suffix)
-        print("The name is \(name)")
         let path = type(of: writer).writePath(in: directory, named: name)
-        print("Checking for path \(path)")
         return FileManager.default.fileExists(atPath: path)
     }
     

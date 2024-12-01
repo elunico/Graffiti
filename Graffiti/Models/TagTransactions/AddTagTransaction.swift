@@ -21,7 +21,6 @@ class AddTagTransaction: TagTransaction {
     
     func perform() {
         tag.acquire()
-        print("Performing add")
         backend.addTag(tag, to: file)
     }
     

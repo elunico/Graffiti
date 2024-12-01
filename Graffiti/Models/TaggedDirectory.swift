@@ -79,14 +79,14 @@ class TaggedDirectory: ObservableObject {
     
 
     func loadAutosave(directory: String, filename: String? = nil, format: Format, doTextRecognition: Bool = true)  throws {
-        setBackend(directory: directory, filename: filename, format: format)
+        try setBackend(directory: directory, filename: filename, format: format)
         backend!.restoreFromAutosave(suffixedWith: ".tmpstore")
         try load(directory: directory, filename: filename, format: format, doTextRecognition: doTextRecognition)
     }
     
-    func setBackend(directory: String, filename: String? = nil, format: Format) {
+    func setBackend(directory: String, filename: String? = nil, format: Format) throws {
         if backend != nil { return }
-        guard let backend = try? format.implementation(in: URL(fileURLWithPath: directory), withFileName: filename) else { return }
+        let backend = try format.implementation(in: URL(fileURLWithPath: directory), withFileName: filename)
         self.backend = backend
     }
     
@@ -105,7 +105,7 @@ class TaggedDirectory: ObservableObject {
         self.files.removeAll()
         self.directory = directory
         self.doImageVision = doTextRecognition
-        setBackend(directory: directory, filename: filename, format: format)
+        try setBackend(directory: directory, filename: filename, format: format)
         let content = try  getContentsOfDirectory(atPath: directory)
         var idx = 0
         for file in content {
@@ -243,6 +243,14 @@ class TaggedDirectory: ObservableObject {
         backend?.removeAutosave(suffix: ".tmpstore")
     }
     
+    func clearTagThumbnails() {
+        for file in files {
+            for tag in file.tags {
+                tag.thumbnail = nil
+            }
+        }
+    }
+    
     /// special characters used by the Tag backend that are
     /// prohibited from being used in Tags themselves
     var implementationProhibitedCharacters: Set<Character> { backend?.implementationProhibitedCharacters ?? [] }
@@ -256,10 +264,9 @@ class TaggedDirectory: ObservableObject {
         for file in files {
             for tag in file.tags {
                 tag.imageFormat = format
-//                print(tag.imageFormat)
             }
         }
-        persist()
+        commit()
     }
 
 }
