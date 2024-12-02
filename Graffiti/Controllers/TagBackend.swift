@@ -58,7 +58,7 @@ extension TagBackend {
 
 extension TagBackend {
     // do nothing by default
-    func commit(files: [TaggedFile]) {
+    func commit(files: [TaggedFile], force: Bool) {
 
     }
 }

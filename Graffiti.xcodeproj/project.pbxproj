@@ -848,7 +848,7 @@
 				CODE_SIGN_ENTITLEMENTS = CCTSThumbnailProvider/CCTSThumbnailProvider.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24NO29A;
+				CURRENT_PROJECT_VERSION = 24DE1F;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -863,7 +863,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 16.1.1;
+				MARKETING_VERSION = 17.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.CCTSThumbnailProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -879,7 +879,7 @@
 				CODE_SIGN_ENTITLEMENTS = CCTSThumbnailProvider/CCTSThumbnailProvider.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24NO29A;
+				CURRENT_PROJECT_VERSION = 24DE1F;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -894,7 +894,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 16.1.1;
+				MARKETING_VERSION = 17.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.CCTSThumbnailProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1039,7 +1039,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 24NO29A;
+				CURRENT_PROJECT_VERSION = 24DE1F;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Graffiti/Preview Content\"";
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
@@ -1054,7 +1054,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 16.1.1;
+				MARKETING_VERSION = 17.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1077,7 +1077,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 24NO29A;
+				CURRENT_PROJECT_VERSION = 24DE1F;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Graffiti/Preview Content\"";
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
@@ -1092,7 +1092,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 16.1.1;
+				MARKETING_VERSION = 17.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1123,7 +1123,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 16.1.1;
+				MARKETING_VERSION = 17.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.GraffitiTagFile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1154,7 +1154,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 16.1.1;
+				MARKETING_VERSION = 17.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.GraffitiTagFile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1170,7 +1170,7 @@
 				CODE_SIGN_ENTITLEMENTS = CCTSQLPlugin/CCTSQLPlugin.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24NO29A;
+				CURRENT_PROJECT_VERSION = 24DE1F;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1185,7 +1185,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 16.1.1;
+				MARKETING_VERSION = 17.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.CCTSQLPlugin;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1201,7 +1201,7 @@
 				CODE_SIGN_ENTITLEMENTS = CCTSQLPlugin/CCTSQLPlugin.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24NO29A;
+				CURRENT_PROJECT_VERSION = 24DE1F;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1216,7 +1216,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 16.1.1;
+				MARKETING_VERSION = 17.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.CCTSQLPlugin;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

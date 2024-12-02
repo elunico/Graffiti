@@ -26,31 +26,40 @@ struct ImageSelector: View {
     @State var onDroppedFile: (_ existingImage: URL?, _ providers: [NSItemProvider]) -> Bool
     @State var scaleFactor: Double = 1.0
     
+    var plusImage: some View {
+        Image(systemName: isDroppingImage ? "tray.and.arrow.down" : "plus.square")
+            .resizable()
+            .scaledToFit()
+            .scaleEffect(CGSize(width: 0.5, height: 0.5))
+            .frame(idealWidth: min, maxWidth: min, idealHeight: min, maxHeight: min, alignment: .center)
+            .offset(x: 0, y: 0)
+            .onHover(perform: {
+                scaleFactor = $0 ? ImageSelector.hoverScale : 1
+            })
+            .zIndex(2)
+            .shadow(color: .gray, radius: 25.0)
+    }
+    
     var body: some View {
         if selectedImage == nil {
             ZStack {
-                Image(systemName: "plus.square")
-                    .resizable()
-                    .scaledToFit()
-                    .scaleEffect(CGSize(width: 0.5, height: 0.5))
-                    .frame(idealWidth: min, maxWidth: min, idealHeight: min, maxHeight: min, alignment: .center)
-                    .offset(x: 0, y: 0)
-                    .onHover(perform: {
-                        scaleFactor = $0 ? ImageSelector.hoverScale : 1
-                    })
-                    .zIndex(2)
-                    .shadow(color: .gray, radius: 25.0)
-
-                
-//                RoundedRectangle(cornerRadius: 18.0)
-//                    .padding()
-//                    .frame(idealWidth: min, maxWidth: min, idealHeight: min, maxHeight: min)
-//                    .foregroundColor(Color(.systemGray))
-//                    .offset(x: 0, y: 0)
-//                    .shadow(radius: 10)
-//                    .onHover(perform: {
-//                        scaleFactor = $0 ? ImageSelector.hoverScale : 1
-//                    })
+                if isDroppingImage {
+                    if #available(macOS 14, *) {
+                        if #available(macOS 15, *) {
+                            plusImage.contentTransition(.symbolEffect(.replace)).symbolEffect(.bounce.up.byLayer, options: .repeat(.periodic(delay: 0.5)))
+                        } else {
+                            plusImage.contentTransition(.symbolEffect(.replace))
+                        }
+                    } else {
+                        plusImage
+                    }
+                } else {
+                    if #available(macOS 14, *) {
+                        plusImage.contentTransition(.symbolEffect(.replace))
+                    } else {
+                        plusImage
+                    }
+                }
             }
             .scaleEffect(x: scaleFactor, y: scaleFactor)
             .animation(.easeInOut(duration: 0.1), value: scaleFactor)
@@ -89,6 +98,8 @@ struct ImageSelector: View {
             }.frame(idealWidth: w, maxWidth: w, idealHeight: h, maxHeight: h, alignment: .center)
         }
     }
+    
+    
     
     static func imageOfFile(_ url: URL?) -> Image {
         

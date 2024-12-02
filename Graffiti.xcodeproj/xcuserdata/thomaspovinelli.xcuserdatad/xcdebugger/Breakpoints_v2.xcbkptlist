@@ -63,8 +63,8 @@
             filePath = "Graffiti/Models/TaggedDirectory.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "148"
-            endingLineNumber = "148"
+            startingLineNumber = "149"
+            endingLineNumber = "149"
             landmarkName = "addTag(_:to:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -79,8 +79,8 @@
             filePath = "Graffiti/Models/TaggedDirectory.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "140"
-            endingLineNumber = "140"
+            startingLineNumber = "141"
+            endingLineNumber = "141"
             landmarkName = "addTags(_:toAll:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -175,8 +175,8 @@
             filePath = "Graffiti/Views/Components/ImageSelector.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "95"
-            endingLineNumber = "95"
+            startingLineNumber = "106"
+            endingLineNumber = "106"
             landmarkName = "imageOfFile(_:)"
             landmarkType = "7">
          </BreakpointContent>

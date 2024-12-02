@@ -58,6 +58,7 @@ class TaggedDirectory: ObservableObject {
         directory = ""
         files = []
         indexMap = [:]
+        backend = nil
         
         filterPredicate = TaggedDirectory.alwaysTrue
         query = ""

@@ -93,6 +93,8 @@ struct TagView: View {
     @State var chosenFormat: Tag.ImageFormat = .none
     @State var tags: Array<Tag> = []
     
+    @State var isTargetedForDrop: Bool = false
+    
     var prohibitedCharacters: Set<Character>
     var done: (Set<TaggedFile>) -> ()
     
@@ -273,6 +275,10 @@ struct TagView: View {
                 } else {
                     chosenFormat = .none
                 }
+            })
+            .onDrop(of: ["public.file-url"], isTargeted: $isTargetedForDrop, perform: { b in 
+                selectedView = .image
+                return receiveDroppedImage(from: b)
             })
             .quickLookPreview($qlPreviewLink)
             .sheet(isPresented: $showingHelp, content: {

@@ -113,8 +113,7 @@ struct ContentView: View {
         })
     }
     
-    
-    
+
     var body: some View {
         if appState.isLoading {
             ProgressView().progressViewStyle(CircularProgressViewStyle()).onAppear {
@@ -137,7 +136,7 @@ struct ContentView: View {
                 }.padding()
             })
         } else if appState.showingOptions {
-            selectionView
+             selectionView
                 .fileImporter(
                     isPresented: $appState.isImporting,
                     allowedContentTypes: [.plainText],
@@ -169,6 +168,10 @@ struct ContentView: View {
                     loadDefaultSettings(to: appState)
                 }.onDisappear {
                     formatChoice = .none
+                    self.directory = nil
+                    self.loadedFile = nil
+                    self.appState.reset()
+                    self.taggedDirectory.reset()
                 }
             
         }

@@ -343,12 +343,13 @@ struct MainView: View {
                 }
                 tagFileTable
                 HStack {
-                    Button("Choose Different Format") { [unowned appState] in
+                    Button(action: { [unowned appState] in
                         // TODO: CCTS to JSON does not work. Store remains CCTS
-                        self.teardown()
                         appState.currentState = .StartScreen
                         appState.showingOptions = true
-                    }
+                    }, label: {
+                        Label("Return to Directory Selection", systemImage: "arrow.uturn.backward")
+                    })
                     Spacer()
                     Text("Showing \(currentFileList.count) of \(files.files.count) files")
                     Divider().frame(height: 20)
@@ -396,6 +397,5 @@ struct MainView: View {
         self.files.commit()
         self.appState.releaseSelectionModel()
         try? pruneThumbnailCache(maxCount: 200)
-        
     }
 }
