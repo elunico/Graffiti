@@ -44,7 +44,8 @@ struct ContentView: View {
             Spacer().frame(height: 25.0)
             Label("Choose a save format", systemImage: "2.circle")
                 .font(.title)
-            FormatSelector(formatChoice: $formatChoice)
+            FormatSelector(formatChoice: $formatChoice, showUneditable: false)
+
             Spacer().frame(height: 25.0)
         }
     }

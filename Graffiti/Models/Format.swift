@@ -13,6 +13,7 @@ enum Format: Hashable, CustomStringConvertible, CaseIterable {
         switch self {
         case .ccts: return "Custom Compressed Tag Store"
         case .json: return "JSON File"
+        case .yaml: return "YAML File"
         case .none: return "<<none>>"
         }
     }
@@ -20,7 +21,8 @@ enum Format: Hashable, CustomStringConvertible, CaseIterable {
     var contentType: UTType? {
         switch self {
         case .none: return nil
-        case .json: return UTType("public.json")
+        case .json: return UTType.json
+        case .yaml: return UTType.yaml
         case .ccts: return UTType("com.tom.ccts")
         }
     }
@@ -30,21 +32,29 @@ enum Format: Hashable, CustomStringConvertible, CaseIterable {
         case .none: return nil
         case .json: return "json"
         case .ccts: return "ccts"
+        case .yaml: return "yaml"
         }
     }
     
-    func implementation(in directory: URL, withFileName filename: String? = nil) throws -> TagBackend? {
-        var b: TagBackend? = nil
-
+    var writer: FileWriter? {
         switch self {
         case .none:
             return nil
         case .json:
-            b = try FileTagBackend(withFileName: filename, forFilesIn: directory, writer: JSONFileWriter())
+            return JSONFileWriter()
         case .ccts:
-            b = try FileTagBackend(withFileName: filename, forFilesIn: directory, writer: CompressedCustomTagStoreWriter())
+            return CompressedCustomTagStoreWriter()
+        case .yaml:
+            return YAMLFileWriter()
         }
-        return b
+    }
+    
+    func implementation(in directory: URL, withFileName filename: String? = nil) throws -> TagBackend? {
+        if self == .none {
+            return nil 
+        } else {
+            return try FileTagBackend(withFileName: filename, forFilesIn: directory, writer: self.writer!)
+        }
     }
     
     static func format(forExtension fileExtension: String) -> Format? {
@@ -56,6 +66,6 @@ enum Format: Hashable, CustomStringConvertible, CaseIterable {
         return nil 
     }
     
-    case ccts, json
+    case ccts, json, yaml
     case none
 }

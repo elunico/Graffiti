@@ -8,6 +8,7 @@
 import Foundation
 
 protocol TagBackend: NSCopying {
+    // TODO: should throw when tag is not valid because of prohibitedCharacters
     func addTag(_ tag: Tag, to file: TaggedFile)
     func removeTag(withID id: Tag.ID, from file: TaggedFile)
     func loadTags(at path: String) -> Set<Tag>

@@ -32,6 +32,10 @@
 		DC27F1BE2CFCE165001A890E /* CachedProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC27F1BB2CFCE164001A890E /* CachedProperty.swift */; };
 		DC27F1BF2CFCE165001A890E /* CachedProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC27F1BB2CFCE164001A890E /* CachedProperty.swift */; };
 		DC2809B22967722F003915A5 /* FilesEditingInspectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2809B12967722F003915A5 /* FilesEditingInspectorView.swift */; };
+		DC2F0EE52CFE98F40048B666 /* YAMLFileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F0EE42CFE98F40048B666 /* YAMLFileWriter.swift */; };
+		DC2F0EE62CFE98F40048B666 /* YAMLFileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F0EE42CFE98F40048B666 /* YAMLFileWriter.swift */; };
+		DC2F0EE72CFE98F40048B666 /* YAMLFileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F0EE42CFE98F40048B666 /* YAMLFileWriter.swift */; };
+		DC2F0EE82CFE98F40048B666 /* YAMLFileWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2F0EE42CFE98F40048B666 /* YAMLFileWriter.swift */; };
 		DC341E2629814D8F003B5153 /* FormatSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC341E2529814D8F003B5153 /* FormatSelector.swift */; };
 		DC4A7D3529A6C502002BC507 /* GraffitiRemoveImageTagsFromFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4A7D3429A6C502002BC507 /* GraffitiRemoveImageTagsFromFile.swift */; };
 		DC4E799E297DF2E3003AEE68 /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFA39C22965DD1C0002690A /* Tag.swift */; };
@@ -211,6 +215,7 @@
 		DC25CB6F2998B3D000C2EF27 /* JSONFileWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONFileWriter.swift; sourceTree = "<group>"; };
 		DC27F1BB2CFCE164001A890E /* CachedProperty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedProperty.swift; sourceTree = "<group>"; };
 		DC2809B12967722F003915A5 /* FilesEditingInspectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesEditingInspectorView.swift; sourceTree = "<group>"; };
+		DC2F0EE42CFE98F40048B666 /* YAMLFileWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YAMLFileWriter.swift; sourceTree = "<group>"; };
 		DC341E2529814D8F003B5153 /* FormatSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormatSelector.swift; sourceTree = "<group>"; };
 		DC4A7D3429A6C502002BC507 /* GraffitiRemoveImageTagsFromFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraffitiRemoveImageTagsFromFile.swift; sourceTree = "<group>"; };
 		DC4F4CD02985EB060001CCD9 /* ApplicationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationState.swift; sourceTree = "<group>"; };
@@ -445,6 +450,7 @@
 				DC25CB6F2998B3D000C2EF27 /* JSONFileWriter.swift */,
 				DCCB4F2F2985B8F000C55E15 /* FileWriterError.swift */,
 				DC21D4D22979ED900024E644 /* CompressedCustomTagStoreWriter.swift */,
+				DC2F0EE42CFE98F40048B666 /* YAMLFileWriter.swift */,
 			);
 			path = FileWriters;
 			sourceTree = "<group>";
@@ -670,6 +676,7 @@
 				DCC2A5E829A476AA00028437 /* RemoveTagTransaction.swift in Sources */,
 				DC4E79A8297DF2E3003AEE68 /* FileWriter.swift in Sources */,
 				DC4E799E297DF2E3003AEE68 /* Tag.swift in Sources */,
+				DC2F0EE72CFE98F40048B666 /* YAMLFileWriter.swift in Sources */,
 				DC14E749297DCBE8001B00AC /* ThumbnailProvider.swift in Sources */,
 				DCCB4F322985BC6A00C55E15 /* FileWriterError.swift in Sources */,
 				DC4E79A7297DF2E3003AEE68 /* CompressedCustomTagStoreWriter.swift in Sources */,
@@ -727,6 +734,7 @@
 				DC94CA492995E2F0007E64A2 /* ImageSelector.swift in Sources */,
 				DCE458B9299EEE0B00BD3685 /* FileUtilities.swift in Sources */,
 				DC21D4D32979ED910024E644 /* CompressedCustomTagStoreWriter.swift in Sources */,
+				DC2F0EE82CFE98F40048B666 /* YAMLFileWriter.swift in Sources */,
 				DCBE181529926CCE0005AEC9 /* SettingsView.swift in Sources */,
 				DCFA39C02965DCC20002690A /* TagView.swift in Sources */,
 				DC1B7BC82962299B00DEED22 /* TaggedFile.swift in Sources */,
@@ -759,6 +767,7 @@
 				DC9CCB452980ECE600A2D622 /* GraffitiIntentShortcuts.swift in Sources */,
 				DCCB4F332985BC6A00C55E15 /* FileWriterError.swift in Sources */,
 				DCC2A5DD29A476AA00028437 /* RemoveTagFromManyFilesTransaction.swift in Sources */,
+				DC2F0EE62CFE98F40048B666 /* YAMLFileWriter.swift in Sources */,
 				DC5D265F297EE8D2009D3868 /* TagBackend.swift in Sources */,
 				DC5D2668297EE93D009D3868 /* TaggedFile.swift in Sources */,
 				DCE458C4299EEEDC00BD3685 /* Utility.swift in Sources */,
@@ -790,6 +799,7 @@
 				DCC2A5E729A476AA00028437 /* RemoveTagTransaction.swift in Sources */,
 				DC09FE40297DB64000BD51D9 /* XattrBridge.m in Sources */,
 				DC09FE3E297DB62E00BD51D9 /* TagBackend.swift in Sources */,
+				DC2F0EE52CFE98F40048B666 /* YAMLFileWriter.swift in Sources */,
 				DC09FE3D297DB60E00BD51D9 /* FileTagBackend.swift in Sources */,
 				DCCB4F312985BC6A00C55E15 /* FileWriterError.swift in Sources */,
 				DC09FE36297DB41E00BD51D9 /* TaggedFile.swift in Sources */,

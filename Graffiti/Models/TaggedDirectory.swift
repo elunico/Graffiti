@@ -134,6 +134,7 @@ class TaggedDirectory: ObservableObject {
     }
     
     func addTags(_ tag: Tag, toAll files: [TaggedFile]) {
+        // TODO: should check backend for prohibited chars and throw or then add and perform transaction
 //        print("adding tags method")
         if let backend {
             transactions.append(AddTagToManyFilesTransaction(backend: backend, tag: tag, files: files))
@@ -145,6 +146,7 @@ class TaggedDirectory: ObservableObject {
     }
     
     func addTag(_ tag: Tag, to file: TaggedFile) {
+        // TODO: should check backend for prohibited chars and throw or then add and perform transaction
         if let backend {
             transactions.append(AddTagTransaction(backend: backend, tag: tag, file: file))
         }

@@ -46,6 +46,7 @@ class TaggedFile: ObservableObject, NSCopying {
     }
     
     func addTag(_ tag: Tag) {
+        // TODO: does this add tags twice?
         tags.insert(tag)
         backend?.addTag(tag, to: self)
     }

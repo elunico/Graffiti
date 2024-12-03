@@ -12,4 +12,5 @@ enum FileWriterError: Error {
     case VersionMismatch
     case DeniedFileAccess
     case IsADirectory
+    case UnsupportedLoadFormat
 }

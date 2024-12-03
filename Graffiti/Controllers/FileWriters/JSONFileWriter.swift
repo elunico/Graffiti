@@ -182,7 +182,11 @@ class JSONFileWriter: FileWriter {
 
         for tag in tags {
             var o  = (object["tags"] as! JSONTags)
-            o.append(try! jsonify(tag: tag))
+            
+            
+            let td = try! jsonify(tag: tag)
+            
+            o.append(td)
             object["tags"] = o
         }
 
@@ -192,10 +196,11 @@ class JSONFileWriter: FileWriter {
             object["files"] = o
         }
 
-        FileManager.default.createFile(atPath: path, contents: try! JSONSerialization.data(withJSONObject: object))
+        let data = try! JSONSerialization.data(withJSONObject: object, options: [.prettyPrinted])
+        FileManager.default.createFile(atPath: path, contents: data)
     }
     
-    let fileProhibitedCharacters: Set<Character> = Set(["\""])
+    let fileProhibitedCharacters: Set<Character> = Set()
     
     static let fileExtension: String = ".json"
 }

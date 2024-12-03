@@ -34,13 +34,9 @@ struct ConvertView: View {
             return
         }
         
-        let currentWriter = try? getSandboxedAccess(to: sourceFile.deletingLastPathComponent().absolutePath, thenPerform: {
-            try (beginFormat.implementation(in: URL(fileURLWithPath: $0)) as! FileTagBackend).writer
-        })
-
-        let nextWriter = try? getSandboxedAccess(to: sourceFile.deletingLastPathComponent().absolutePath, thenPerform: {
-            try (endFormat.implementation(in: URL(fileURLWithPath: $0)) as! FileTagBackend).writer
-        })
+        let currentWriter = beginFormat.writer
+        
+        let nextWriter = endFormat.writer
 
         if currentWriter == nil {
             return fail(reason: "Could not create interface to source file \(sourceFile.deletingLastPathComponent().absolutePath)")
@@ -49,6 +45,8 @@ struct ConvertView: View {
         if nextWriter == nil {
             return fail(reason: "Could not create interface to destination file")
         }
+        
+        
         
         if (try? convert(file: sourceFile, isUsing: currentWriter!, willUse: nextWriter!)) != nil {
             showingSuccess = true
@@ -89,7 +87,7 @@ struct ConvertView: View {
             VStack {
                 Text("Convert To:").font(.title2)
                 if sourceFile != nil {
-                    FormatSelector(formatChoice: $endFormat)
+                    FormatSelector(formatChoice: $endFormat, showUneditable: true)
                         .removing(formatOption: Format.none)
                         .removing(formatOption: beginFormat)
                         

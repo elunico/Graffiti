@@ -24,21 +24,21 @@ protocol FileWriter {
     /// up to the **call site** of ``loadFrom(path:)`` and ``saveTo(path:store:)``
     /// to check this property and prevent prohibited characters from entering the data
     var fileProhibitedCharacters: Set<Character> { get }
-    
+
     /// The String keys of the return value are file paths
-    func loadFrom(path: String)  throws -> TagStore
-    
+    func loadFrom(path: String) throws -> TagStore
+
     /// The String keys of the second argument are file paths
     func saveTo(path: String, store: TagStore)
-    
+
     /// Should include a period. For instance for CSV files it would be ".csv"
     static var fileExtension: String { get }
-    
+
     /// provides a default path to a writeable file with a default
     /// filename inside the directory `directory`
     /// Default implementation is provided
     static func defaultWritePath(in directory: URL) -> String
-    
+
     /// provides a path to the specified file name in the given directory
     /// Falls back to `defaultWritePath(in:)` if `filename` is nil
     /// Default implementation is provided
@@ -49,8 +49,9 @@ extension FileWriter {
     static func defaultWritePath(in directory: URL) -> String {
         "\(directory.absolutePath)\(FileTagBackend.filePrefix)\(Self.fileExtension)"
     }
-    
-    static func writePath(in directory: URL, named filename: String?) -> String {
+
+    static func writePath(in directory: URL, named filename: String?) -> String
+    {
         if let filename {
             return "\(directory.absolutePath)\(filename)\(Self.fileExtension)"
         } else {
@@ -59,8 +60,18 @@ extension FileWriter {
     }
 }
 
-func convert(file url: URL, isUsing currentWriter: FileWriter, willUse futureWriter: FileWriter)  throws {
-    let data = try  currentWriter.loadFrom(path: url.absolutePath)
-    let path = url.deletingPathExtension().appendingPathExtension(String(type(of: futureWriter).fileExtension.trimmingPrefix(/\./))).absolutePath
-     try  getSandboxedAccess(to: path, thenPerform: {futureWriter.saveTo(path: $0, store: data)})
+func convert(
+    file url: URL, isUsing currentWriter: FileWriter,
+    willUse futureWriter: FileWriter
+) throws {
+    let data = try currentWriter.loadFrom(path: url.absolutePath)
+    let path = url.deletingPathExtension().appendingPathExtension(
+        String(type(of: futureWriter).fileExtension.trimmingPrefix(/\./))
+    ).absolutePath
+    try getSandboxedAccess(
+        to: url.deletingLastPathComponent().absolutePath, thenPerform: { _ in
+            print("Writing to \(path)")
+            futureWriter.saveTo(path: path, store: data)
+        }
+    )
 }
