@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UniformTypeIdentifiers
 
 func jsonify(tag: Tag) throws -> [String: Any] {
     if let image = tag.image, tag.imageFormat == .url {
@@ -14,6 +15,8 @@ func jsonify(tag: Tag) throws -> [String: Any] {
             "uuid": tag.id.uuidString,
             "url": image.absolutePath,
             "strings": tag.imageTextContent,
+            "imageID": tag.imageIdentifier.uuidString,
+            "imageType": getTypeOfImage(url: tag.image!).identifier,
             "recognitionState": tag.recoginitionState.rawValue,
             "refCount": tag.refCount
         ] as [String: Any]
@@ -23,6 +26,8 @@ func jsonify(tag: Tag) throws -> [String: Any] {
             "type": "BD",
             "uuid": tag.id.uuidString,
             "dataSrc": try Data(contentsOf: image).base64EncodedString(),
+            "imageID": tag.imageIdentifier.uuidString,
+            "imageType": getTypeOfImage(url: tag.image!).identifier,
             "strings": tag.imageTextContent,
             "recognitionState": tag.recoginitionState.rawValue,
             "refCount": tag.refCount
@@ -49,12 +54,13 @@ class JSONFileWriter: FileWriter {
 //        var retValue: [String: Set<Tag>] = [:]
                 
         if !FileManager.default.fileExists(atPath: path) {
-            FileManager.default.createFile(atPath: path, contents: "{\"version\": \"\(TagStore.default.version.description)\", \"tags\": {}, \"files\": {}}".data(using: .utf8))
+            FileManager.default.createFile(atPath: path, contents: "{\"version\": \"\(TagStore.default.version.description)\", \"tags\": []    , \"files\": {}}".data(using: .utf8))
         }
         
         let object = try JSONSerialization.jsonObject(with: TPData(contentsOf: URL(filePath: path)))
 
         let dict = object as? [String: Any]
+        print(dict)
 
         guard let dict else {
             reportError("Could not get dict")
@@ -111,7 +117,7 @@ class JSONFileWriter: FileWriter {
                     t = tag
                 } else {
                     // create the tag
-                    t = Tag(imageURL: url, format: .url, id: UUID(uuidString: uuid)!)
+                    t = Tag(imageURL: url, format: .url, id: UUID(uuidString: uuid)!, imageIdentifier: UUID(uuidString:  tag["imageID"]! as! String))
                 }
                 guard let state = Tag.RecognitionState(rawValue: state) else { throw FileWriterError.InvalidFileFormat }
                 t.recoginitionState = state
@@ -121,8 +127,13 @@ class JSONFileWriter: FileWriter {
                     reportError("No data")
                     throw FileWriterError.InvalidFileFormat }
                 let content = NSData(base64Encoded: s)! as Data
-                let name = try createOwnedImageURL()
-                FileManager.default.createFile(atPath: name.absolutePath, contents: content)
+                let imageID = UUID(uuidString:  tag["imageID"]! as! String)!
+                let imgType = UTType(tag["imgType"]! as! String)!
+                var name = try? retrieveOwnedImage(named: imageID.uuidString, for: imgType)
+                if name == nil {
+                    name = try createOwnedImageURL(for: imgType)
+                }
+                FileManager.default.createFile(atPath: name!.absolutePath, contents: content)
                 guard let strings = tag["strings"] as? [String] else { throw FileWriterError.InvalidFileFormat }
                 guard let state = tag["recognitionState"] as? Int else { throw FileWriterError.InvalidFileFormat }
                 
@@ -136,7 +147,7 @@ class JSONFileWriter: FileWriter {
                     t = tag
                 } else {
                     // create the tag
-                    t = Tag(imageURL: name, format: .content, id: UUID(uuidString: uuid)!)
+                    t = Tag(imageURL: name!, format: .content, id: UUID(uuidString: uuid)!, imageIdentifier: imageID)
                 }
                 
 //                var t = Tag.tag(imageURL: name, format: .content)

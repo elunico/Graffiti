@@ -87,10 +87,10 @@ struct GraffitiApp: App {
                 Menu("Convert all stored images (not undoable)") {
                     Button("Convert to References (Less Space)") {
                         taggedDirectory.convertTagStorage(to: .url)
-                    }.disabled(canEditTags)
+                    }.disabled(appState.currentState != .MainView(hasSelection: false) && appState.currentState != .MainView(hasSelection: true))
                     Button("Convert to Binary Data (More Portable)") {
                         taggedDirectory.convertTagStorage(to: .content)
-                    }.disabled(canEditTags)
+                    }.disabled(appState.currentState != .MainView(hasSelection: false) && appState.currentState != .MainView(hasSelection: true))
                 }
             })
             CommandGroup(after: .newItem, addition: {

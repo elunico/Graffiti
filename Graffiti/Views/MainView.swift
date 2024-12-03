@@ -70,7 +70,7 @@ struct MainView: View {
                                         appState.editing = true
                                         appState.currentState = .EditingTags
                                     }, label: {
-                                        Label("Edit Tags of \((selected.contains(item.id) && selected.count > 1) ? "\(selected.count) items" : item.filename)", systemImage: "pencil")
+                                        Label("Edit Tags of \((selected.contains(item.id) && selected.count > 1) ? "\(selected.count) items" : item.filename)", systemImage: "custom.tag.badge.plus")
                                     })
                                     
                                     Button(action:  {
@@ -80,12 +80,12 @@ struct MainView: View {
                                         if !NSWorkspace.shared.selectFile(item.id, inFileViewerRootedAtPath: path) {
                                             NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: path)
                                         }
-                                    }, label: { Label("Reveal \(item.filename) in Finder", systemImage: "folder.badge.questionmark") })
+                                    }, label: { Label("Reveal \(item.filename) in Finder", systemImage: "document.viewfinder") })
                                     
                                     Button(action:  {
                                         NSWorkspace.shared.open(item.absoluteURL)
                                         
-                                    }, label: { Label("Open \((selected.contains(item.id) && selected.count > 1) ? "\(selected.count) items" : item.filename)" , systemImage: "doc.viewfinder") })
+                                    }, label: { Label("Open \((selected.contains(item.id) && selected.count > 1) ? "\(selected.count) items" : item.filename)" , systemImage: "macwindow.and.cursorarrow") })
                                     
                                     divider(oriented: .horizontally, measure: 25.0)
                                     
@@ -95,7 +95,7 @@ struct MainView: View {
                                         }
                                         appState.isPresentingConfirm = true
                                         appState.currentState = .ShowingConfirm
-                                    }, label: { Label("Clear All Tags for \((selected.contains(item.id) && selected.count > 1) ? "\(selected.count) items" : item.filename)", systemImage: "clear") })
+                                    }, label: { Label("Clear All Tags for \((selected.contains(item.id) && selected.count > 1) ? "\(selected.count) items" : item.filename)", systemImage: "custom.tag.badge.xmark").foregroundStyle(.red) })
                                     
                                     divider(oriented: .horizontally, measure: 25.0)
                                     
@@ -138,7 +138,7 @@ struct MainView: View {
             VStack {
                 Text("Save format: \(choice.description)")
                 if files.tagStore != nil {
-                    Label("Tag Store: \(files.tagStore?.lastPathComponent ?? "<per file>")", systemImage: "doc")
+                    Label("Tag Store: \(files.tagStore?.lastPathComponent ?? "<per file>")", systemImage: "doc").foregroundColor(.accentColor)
                     
                         .onDrag({
                             do {
@@ -162,7 +162,7 @@ struct MainView: View {
                             if files.tagStore == nil {
                                 Image(systemName: "nosign")
                             } else {
-                                Label("\(files.tagStore!.lastPathComponent)", systemImage: "doc")
+                                Label("\(files.tagStore!.lastPathComponent)", systemImage: "doc").foregroundColor(.accentColor)
                             }
                         })
                 }
@@ -233,7 +233,8 @@ struct MainView: View {
                         appState.editing = true
                         appState.currentState = .EditingTags
                     }, label: {
-                        Label("Edit Tags of \(name)", systemImage: "pencil")
+                        Label("Edit Tags of \(name)", image: "custom.tag.badge.plus")
+                        
                     }).disabled(selected.count == 0)
                         .buttonStyle(DefaultButtonStyle())
                         .keyboardShortcut(.return, modifiers: [])
@@ -245,7 +246,7 @@ struct MainView: View {
                         if !NSWorkspace.shared.selectFile(files.getFile(withID: selected.first!)!.id, inFileViewerRootedAtPath: path) {
                             NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: path)
                         }
-                    }, label: { Label("Reveal \(name) in Finder", systemImage: "folder.badge.questionmark") })
+                    }, label: { Label("Reveal \(name) in Finder", systemImage: "document.viewfinder") })
                     .keyboardShortcut(.return, modifiers: [.command])
                     .disabled(selected.count != 1)
                     .help("Reveal \(name) in Finder")
@@ -254,19 +255,20 @@ struct MainView: View {
                         for item in files.getFiles(withIDs: selected) {
                             NSWorkspace.shared.open(item.absoluteURL)
                         }
-                    }, label: { Label("Open \(name)" , systemImage: "doc.viewfinder") })
+                    }, label: { Label("Open \(name)" , systemImage: "macwindow.and.cursorarrow") })
                     .keyboardShortcut(KeyEquivalent.downArrow, modifiers: [.command])
                     .disabled(selected.count == 0)
                     .help("Open \(name)")
                     
                     divider(oriented: .horizontally, measure: 25.0)
+                        Button(action:  { [unowned appState] in
+                            appState.isPresentingConfirm = true
+                            appState.currentState = .ShowingConfirm
+                        }, label: { Label("Remove All Tags for \(name)", image: "custom.tag.badge.xmark").foregroundColor(selected.count == 0 ? .secondary : .red) })
+                        .disabled(selected.count == 0)
+                        .help("Clear All Tags for \(name)")
+//                    }
                     
-                    Button(action:  { [unowned appState] in
-                        appState.isPresentingConfirm = true
-                        appState.currentState = .ShowingConfirm
-                    }, label: { Label("Clear All Tags for \(name)", systemImage: "clear") })
-                    .disabled(selected.count == 0)
-                    .help("Clear All Tags for \(name)")
                     
                     divider(oriented: .horizontally, measure: 25.0)
                     
@@ -316,14 +318,6 @@ struct MainView: View {
                             })
                             Spacer()
                             VStack {
-//                                Toggle("Spotlight File Kinds", isOn: $richKind)
-//                                    .onChange(of: richKind, perform: { _ in
-//                                        UserDefaults.thisAppDomain?.set(richKind, forKey: MainView.kUserDefaultsRichKindKey)
-//                                    })
-                                //                                Toggle("Show Only Untagged", isOn: $showOnlyUntagged)
-                                //                                    .onChange(of: showOnlyUntagged, perform: { showOnly in
-                                //                                        currentFileList = files.filter(by: query, onlyUntagged: showOnly)
-                                //                                    })
                                 Picker("Show: ", selection: $showOnlyUntagged, content: {
                                     Text("All Files").tag(TaggedDirectory.TaggedState.all)
                                     Text("Only Untagged").tag(TaggedDirectory.TaggedState.untagged)
@@ -344,7 +338,6 @@ struct MainView: View {
                 tagFileTable
                 HStack {
                     Button(action: { [unowned appState] in
-                        // TODO: CCTS to JSON does not work. Store remains CCTS
                         appState.currentState = .StartScreen
                         appState.showingOptions = true
                     }, label: {

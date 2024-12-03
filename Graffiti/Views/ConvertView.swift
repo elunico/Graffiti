@@ -116,7 +116,6 @@ struct ConvertView: View {
             })
             .sheet(isPresented: $showingSuccess, content: {
                 VStack {
-                    // TODO: This also does not work going CCTS to JSON
                     Text("Done!").font(.title)
                     ({() -> Text in return Text("")})()
                     
