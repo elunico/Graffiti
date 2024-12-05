@@ -29,8 +29,8 @@ class ThumbnailProvider: QLThumbnailProvider {
         
         if let store = try? CompressedCustomTagStoreWriter().loadFrom(path: request.fileURL.absolutePath) {
             
-            let fileCount = store.tagData.count.description ?? "???"
-            let tagCount = store.tagData.map { (key, value) in value.count }.reduce(0, +).description ?? "???"
+            let fileCount = store.tagData.count.description
+            let tagCount = store.tagData.map { (key, value) in value.count }.reduce(0, +).description
             
             // First way: Draw the thumbnail into the current context, set up with UIKit's coordinate system.
             handler(QLThumbnailReply(contextSize: request.maximumSize, currentContextDrawing: { () -> Bool in

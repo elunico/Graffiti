@@ -21,7 +21,8 @@ class AddTagTransaction: TagTransaction {
     
     func perform() {
         tag.acquire()
-        backend.addTag(tag, to: file)
+        // checked before calling
+        try! backend.addTag(tag, to: file)
     }
     
     func undo() {

@@ -171,7 +171,7 @@ class JSONFileWriter: FileWriter {
         return TagStore(tagData: value)
     }
     
-    func saveTo(path: String, store: TagStore) {
+    func saveTo(path: String, store: TagStore) throws {
         let tags = store.uniqueTags()
 
         var object = [
@@ -184,7 +184,7 @@ class JSONFileWriter: FileWriter {
             var o  = (object["tags"] as! JSONTags)
             
             
-            let td = try! jsonify(tag: tag)
+            let td = try jsonify(tag: tag)
             
             o.append(td)
             object["tags"] = o
@@ -196,7 +196,7 @@ class JSONFileWriter: FileWriter {
             object["files"] = o
         }
 
-        let data = try! JSONSerialization.data(withJSONObject: object, options: [.prettyPrinted])
+        let data = try JSONSerialization.data(withJSONObject: object, options: [.prettyPrinted])
         FileManager.default.createFile(atPath: path, contents: data)
     }
     

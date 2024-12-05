@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 precedencegroup FoldPrecedence {
     lowerThan: AdditionPrecedence
     associativity: left

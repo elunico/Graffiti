@@ -7,9 +7,7 @@
 
 import Foundation
 
-#if DEBUG
 import AppKit
-#endif
 
 func tagToYAML(_ tag: Tag) -> String {
     var s = ""
@@ -48,19 +46,24 @@ class YAMLFileWriter: FileWriter {
     var fileProhibitedCharacters: Set<Character> = Set(["[", "]", "{", "}"])
     
     func loadFrom(path: String) throws -> TagStore {
-        #if DEBUG
-        let a = NSAlert()
-        a.messageText = "Unsupported Read Operation"
-        a.informativeText = "This application does not support load or editing YAML formatted files. You can convert an existing file to YAML for external use, but you cannot load a YAML file for editing in this program"
-        a.alertStyle = .critical
-        a.runModal()
+        modalAlert(NSAlert.Style.critical,
+                   message: "Unsupported Read Operation",
+                   information: "This application does not support load or editing YAML formatted files. You can convert an existing file to YAML for external use, but you cannot load a YAML file for editing in this program"
+        )
+        
+//        let a = NSAlert()
+//        a.messageText = "Unsupported Read Operation"
+//        a.informativeText = "This application does not support load or editing YAML formatted files. You can convert an existing file to YAML for external use, but you cannot load a YAML file for editing in this program"
+//        a.alertStyle = .critical
+//        a.runModal()
+#if DEBUG
         fatalError("Trace")
-        #else
+#else
         throw FileWriterError.UnsupportedLoadFormat
-        #endif
+#endif
     }
     
-    func saveTo(path: String, store: TagStore) {
+    func saveTo(path: String, store: TagStore) throws {
         let tags = store.uniqueTags()
         
         var s = ""
@@ -79,10 +82,7 @@ class YAMLFileWriter: FileWriter {
         }
 
         FileManager.default.createFile(atPath: path, contents: s.data(using: .utf8))
-        
     }
     
     static var fileExtension: String = ".yaml"
-    
-    
 }

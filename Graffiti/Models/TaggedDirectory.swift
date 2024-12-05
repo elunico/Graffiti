@@ -133,11 +133,13 @@ class TaggedDirectory: ObservableObject {
         (backend as? FileTagBackend)?.saveFile
     }
     
-    func addTags(_ tag: Tag, toAll files: [TaggedFile]) {
-        // TODO: should check backend for prohibited chars and throw or then add and perform transaction
-//        print("adding tags method")
+    func addTags(_ tag: Tag, toAll files: [TaggedFile]) throws {
         if let backend {
+            if !backend.isValid(tag: tag) {
+                throw TagBackendError.illegalCharacter
+            }
             transactions.append(AddTagToManyFilesTransaction(backend: backend, tag: tag, files: files))
+        // TODO: should this if go to the end of the function
         }
         transactions.last?.perform()
         invalidateRedo()
@@ -145,9 +147,12 @@ class TaggedDirectory: ObservableObject {
         didMutate()
     }
     
-    func addTag(_ tag: Tag, to file: TaggedFile) {
+    func addTag(_ tag: Tag, to file: TaggedFile) throws {
         // TODO: should check backend for prohibited chars and throw or then add and perform transaction
         if let backend {
+            if !backend.isValid(tag: tag) {
+                throw TagBackendError.illegalCharacter
+            }
             transactions.append(AddTagTransaction(backend: backend, tag: tag, file: file))
         }
         transactions.last?.perform()

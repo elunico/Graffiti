@@ -351,7 +351,12 @@ struct TagView: View {
                 return
             }
         }
-        directory.addTags(tag, toAll: files.map { $0 })
-        tags = files.map { $0.tags }.flatten().unique()
+        do {
+            try directory.addTags(tag, toAll: files.map { $0 })
+            tags = files.map { $0.tags }.flatten().unique()
+        } catch {
+            showingError = true
+            message = "\(error.localizedDescription): The tag contains an illegal character"
+        }
     }
 }

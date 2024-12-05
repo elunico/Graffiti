@@ -26,7 +26,7 @@ struct GraffitiAddTagsToFile: AppIntent {
         let (directory, tagFile) = try  setup(storageType: $storageType, file: $file)
         
         for tag in tags {
-            directory.addTag(Tag.tag(withString: tag), to: tagFile)
+            try directory.addTag(Tag.tag(withString: tag), to: tagFile)
         }
         return .result()
 

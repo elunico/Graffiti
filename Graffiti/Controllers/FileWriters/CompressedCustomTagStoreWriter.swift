@@ -203,7 +203,7 @@ class CompressedCustomTagStoreWriter: FileWriter {
     
     
     
-    func saveTo(path: String, store: TagStore) {
+    func saveTo(path: String, store: TagStore) throws {
         var data = Data()
         data.append(store.version.encodedForCCTS)
         
@@ -211,11 +211,7 @@ class CompressedCustomTagStoreWriter: FileWriter {
         data.append(allTags.count.bigEndianBytes)
         
         for tag in allTags {
-            if let d = try? tag.serializeToData() {
-                data.append(d)
-            } else {
-                fatalError("tag.serializeToData() returned nil")
-            }
+            data.append(try tag.serializeToData())
         }
         
         data.append(store.tagData.count.bigEndianBytes)

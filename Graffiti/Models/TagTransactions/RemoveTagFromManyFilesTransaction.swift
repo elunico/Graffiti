@@ -24,7 +24,7 @@ class RemoveTagFromManyFilesTransaction: TagTransaction {
     }
     
     func undo() {
-        files.forEach { backend.addTag(tag, to: $0); tag.acquire() }
+        files.forEach { /*pre checked*/ try! backend.addTag(tag, to: $0); tag.acquire() }
     }
 }
 

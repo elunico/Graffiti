@@ -29,7 +29,7 @@ protocol FileWriter {
     func loadFrom(path: String) throws -> TagStore
 
     /// The String keys of the second argument are file paths
-    func saveTo(path: String, store: TagStore)
+    func saveTo(path: String, store: TagStore) throws
 
     /// Should include a period. For instance for CSV files it would be ".csv"
     static var fileExtension: String { get }
@@ -68,10 +68,11 @@ func convert(
     let path = url.deletingPathExtension().appendingPathExtension(
         String(type(of: futureWriter).fileExtension.trimmingPrefix(/\./))
     ).absolutePath
+    // TODO: prohibitedCharacters are checked in the backend so this function writes without checking them
     try getSandboxedAccess(
         to: url.deletingLastPathComponent().absolutePath, thenPerform: { _ in
             print("Writing to \(path)")
-            futureWriter.saveTo(path: path, store: data)
+            try futureWriter.saveTo(path: path, store: data)
         }
     )
 }

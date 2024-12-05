@@ -27,7 +27,8 @@ class RemoveTagTransaction: TagTransaction {
     
     func undo() {
         tag.acquire()
-        backend.addTag(tag, to: file)
+        // prechecked
+        try! backend.addTag(tag, to: file)
     }
 }
 

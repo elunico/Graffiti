@@ -73,7 +73,10 @@ class FileTagBackend: TagBackend {
         file.tags.forEach { $0.imageTextContent.removeAll(); $0.recoginitionState = .uninitialized }
     }
     
-    func addTag(_ tag: Tag, to file: TaggedFile) {
+    func addTag(_ tag: Tag, to file: TaggedFile) throws {
+        if !isValid(tag: tag) {
+            throw TagBackendError.illegalCharacter
+        }
         file.tags.insert(tag)
     }
     
@@ -91,9 +94,10 @@ class FileTagBackend: TagBackend {
     }
     
     func commit(files: [TaggedFile], force: Bool = false) {
+        // TODO: probably want to alert the user and propogate this error
             let path = saveFile
             let tags = Dictionary(uniqueKeysWithValues: files.map { ($0.id, $0.tags) })
-            writer.saveTo(path: path, store: TagStore(tagData: tags))
+            try? writer.saveTo(path: path, store: TagStore(tagData: tags))
 
     }
     
@@ -101,7 +105,7 @@ class FileTagBackend: TagBackend {
         if let filename {
             let path = autosaveFile
             let tags = Dictionary(uniqueKeysWithValues: files.map{ ($0.id, $0.tags) })
-            writer.saveTo(path: path, store: TagStore(tagData: tags))
+            try? writer.saveTo(path: path, store: TagStore(tagData: tags))
         }
     }
     

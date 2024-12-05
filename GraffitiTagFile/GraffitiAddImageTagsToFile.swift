@@ -29,7 +29,7 @@ struct GraffitiAddImageTagsToFile: AppIntent {
             if let url = tag.fileURL {
                 let t = Tag.tag(imageURL: url, imageIdentifier: UUID())
                 try? t.ensureThumbnail()
-                directory.addTag(t, to: tagFile)
+                try directory.addTag(t, to: tagFile)
             }
         }
         return .result()

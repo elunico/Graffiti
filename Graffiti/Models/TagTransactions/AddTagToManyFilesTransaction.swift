@@ -19,7 +19,7 @@ class AddTagToManyFilesTransaction: TagTransaction {
     }
     
     func perform() {
-        files.forEach { backend.addTag(tag, to: $0); tag.acquire() }
+        files.forEach { /* checked before calling */ try! backend.addTag(tag, to: $0); tag.acquire() }
     }
     
     func undo() {

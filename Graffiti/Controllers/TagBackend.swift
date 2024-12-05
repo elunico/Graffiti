@@ -7,13 +7,21 @@
 
 import Foundation
 
+enum TagBackendError: Error {
+    case illegalCharacter
+}
+
 protocol TagBackend: NSCopying {
     // TODO: should throw when tag is not valid because of prohibitedCharacters
-    func addTag(_ tag: Tag, to file: TaggedFile)
+    func addTag(_ tag: Tag, to file: TaggedFile) throws
     func removeTag(withID id: Tag.ID, from file: TaggedFile)
     func loadTags(at path: String) -> Set<Tag>
     func clearTags(of file: TaggedFile)
     func removeTagText(from: TaggedFile)
+    
+    /// Checks all necessary parts of a tag to determine if it contains
+    /// illegal characters based on `prohibitedCharacters
+    func isValid(tag: Tag) -> Bool
     
     /// used to implement lazy backend systems or other time delay ones
     /// exists here because implementers need to see it
@@ -61,6 +69,10 @@ extension TagBackend {
     // do nothing by default
     func commit(files: [TaggedFile], force: Bool) {
 
+    }
+    
+    func isValid(tag: Tag) -> Bool {
+        return !prohibitedCharacters.map{$0}.anySatisfy { tag.value.contains($0) }
     }
 }
 

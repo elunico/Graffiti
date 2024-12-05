@@ -222,6 +222,12 @@ struct ContentView: View {
             appState.isLoading = false
             appState.currentState = .ShowingFileError
             completed(false)
+        } catch FileWriterError.UnsupportedLoadFormat {
+            errorString = "The selected file format is not editable by the program. It may be the result of an export but it cannot be used in the program"
+            showingError = true
+            appState.isLoading = false
+            appState.currentState = .ShowingFileError
+            completed(false)
         } catch let error {
             reportError(error.localizedDescription)
             errorString = "An unknown error occurred"

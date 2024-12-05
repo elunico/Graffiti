@@ -18,6 +18,10 @@
 		DC09FE3E297DB62E00BD51D9 /* TagBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC9296229C600DEED22 /* TagBackend.swift */; };
 		DC09FE40297DB64000BD51D9 /* XattrBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC42962066200DEED22 /* XattrBridge.m */; };
 		DC09FE42297DB66700BD51D9 /* TaggedDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8E14622963EAE0002E1788 /* TaggedDirectory.swift */; };
+		DC13FD412D00C0B3009084CD /* AKUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC13FD402D00C0AA009084CD /* AKUtility.swift */; };
+		DC13FD422D00C0B3009084CD /* AKUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC13FD402D00C0AA009084CD /* AKUtility.swift */; };
+		DC13FD432D00C0B3009084CD /* AKUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC13FD402D00C0AA009084CD /* AKUtility.swift */; };
+		DC13FD442D00C0B3009084CD /* AKUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC13FD402D00C0AA009084CD /* AKUtility.swift */; };
 		DC14E745297DCBE8001B00AC /* QuickLookThumbnailing.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC14E744297DCBE7001B00AC /* QuickLookThumbnailing.framework */; };
 		DC14E746297DCBE8001B00AC /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCFAEC6D297AFD3400F8A80F /* Quartz.framework */; };
 		DC14E749297DCBE8001B00AC /* ThumbnailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC14E748297DCBE8001B00AC /* ThumbnailProvider.swift */; };
@@ -201,6 +205,7 @@
 /* Begin PBXFileReference section */
 		DC0301EA29737CD500097EBF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		DC09FE3A297DB5F600BD51D9 /* Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
+		DC13FD402D00C0AA009084CD /* AKUtility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AKUtility.swift; sourceTree = "<group>"; };
 		DC14E743297DCBE7001B00AC /* CCTSThumbnailProvider.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CCTSThumbnailProvider.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC14E744297DCBE7001B00AC /* QuickLookThumbnailing.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLookThumbnailing.framework; path = System/Library/Frameworks/QuickLookThumbnailing.framework; sourceTree = SDKROOT; };
 		DC14E748297DCBE8001B00AC /* ThumbnailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailProvider.swift; sourceTree = "<group>"; };
@@ -407,6 +412,7 @@
 		DCE458B7299EEDF500BD3685 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				DC13FD402D00C0AA009084CD /* AKUtility.swift */,
 				DC09FE3A297DB5F600BD51D9 /* Utility.swift */,
 				DCE458C5299EEEE400BD3685 /* TimerUtilities.swift */,
 				DCE458B8299EEE0B00BD3685 /* FileUtilities.swift */,
@@ -671,6 +677,7 @@
 				DC94CA46299590DB007E64A2 /* MobileNetV2.mlmodel in Sources */,
 				DC4E79AD297DF3AC003AEE68 /* XattrBridge.m in Sources */,
 				DCDFF2352984414000A2B6CF /* Format.swift in Sources */,
+				DC13FD432D00C0B3009084CD /* AKUtility.swift in Sources */,
 				DCE458C8299EEEF800BD3685 /* TimerUtilities.swift in Sources */,
 				DCC2A5E029A476AA00028437 /* AddTagTransaction.swift in Sources */,
 				DCC2A5E829A476AA00028437 /* RemoveTagTransaction.swift in Sources */,
@@ -728,6 +735,7 @@
 				DC5FA2F22975032800084CB2 /* Version.swift in Sources */,
 				DCFA39CA296604740002690A /* MainView.swift in Sources */,
 				DCC2A5D429A4761200028437 /* AnySelectionModel.swift in Sources */,
+				DC13FD422D00C0B3009084CD /* AKUtility.swift in Sources */,
 				DC27F1BE2CFCE165001A890E /* CachedProperty.swift in Sources */,
 				DCC2A5DE29A476AA00028437 /* AddTagTransaction.swift in Sources */,
 				DC09FE3B297DB5F600BD51D9 /* Utility.swift in Sources */,
@@ -780,6 +788,7 @@
 				DC5D266C297EEA83009D3868 /* XattrBridge.m in Sources */,
 				DCC2A5E929A476AA00028437 /* RemoveTagTransaction.swift in Sources */,
 				DC9CCB472980ED4700A2D622 /* GraffitiRemoveTagsFromFile.swift in Sources */,
+				DC13FD412D00C0B3009084CD /* AKUtility.swift in Sources */,
 				DC5D2666297EE93D009D3868 /* TaggedDirectory.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -794,6 +803,7 @@
 				DC94CA47299590DC007E64A2 /* MobileNetV2.mlmodel in Sources */,
 				DC09FE42297DB66700BD51D9 /* TaggedDirectory.swift in Sources */,
 				DCDFF2342984413F00A2B6CF /* Format.swift in Sources */,
+				DC13FD442D00C0B3009084CD /* AKUtility.swift in Sources */,
 				DCE458C9299EEEF800BD3685 /* TimerUtilities.swift in Sources */,
 				DCC2A5DF29A476AA00028437 /* AddTagTransaction.swift in Sources */,
 				DCC2A5E729A476AA00028437 /* RemoveTagTransaction.swift in Sources */,
