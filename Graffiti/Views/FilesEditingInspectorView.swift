@@ -19,6 +19,8 @@ struct FilesEditingInspectorView: View {
 
     @State var removedFiles: [TaggedFile] = []
     
+    static var selectionIdentifier = "file-editing-view"
+    
     var body: some View {
         VStack {
             Text("Files Being Edited")
@@ -29,9 +31,19 @@ struct FilesEditingInspectorView: View {
             Button("Exclude File") {
                 guard let id = selectedFile else { return  }
                 removeFileWithID(id)
-                if let f = files.first(where: {selectedFile == $0.id}) {
-                    files.remove(f)
-                    removedFiles.append(f)
+                var fit = files.makeIterator()
+                var p: TaggedFile? = nil
+                while var f = fit.next() {
+                    p = f
+                    if selectedFile == f.id {
+                        files.remove(f)
+                        removedFiles.append(f)
+                        selectedFile = fit.next()?.id
+                        if selectedFile == nil {
+                            selectedFile = p?.id
+                        }
+                        break
+                    }
                 }
             }.disabled(selectedFile == nil)
             Button("Undo") {
@@ -50,7 +62,7 @@ struct FilesEditingInspectorView: View {
         }.padding()
             .frame(minHeight: 400.0)
             .onAppear {
-                appState.createSelectionModel()
+                appState.createSelectionModel(for: FilesEditingInspectorView.selectionIdentifier)
             }
             .onDisappear {
                 appState.releaseSelectionModel()

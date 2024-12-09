@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import LocalAuthentication
 import UniformTypeIdentifiers
 
 
@@ -75,10 +76,10 @@ struct ContentView: View {
                 Text("Other Options").font(.title)
                 Button("Convert an existing tag store") {
                     openWindow(id: "convertwindow")
-                }
+                }.frame(width: 230)
                 Button("Resize an image") {
                     openWindow(id: "imageresizewindow")
-                }
+                }.frame(width: 230)
             }
             .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
             .padding()
@@ -114,9 +115,46 @@ struct ContentView: View {
         })
     }
     
+    var lockView: some View {
+        VStack {
+            Text("Applicaiton is Locked").font(.title)
+            Text("Use the file menu to select the Unlock App action").font(.subheadline)
+            Button(action: {GraffitiApp.performUnlock(updatingState: appState)}, label: {
+                Image(systemName: iconForUnlock)
+            })
+        }.frame(alignment: .center)
+    }
 
+    var iconForUnlock: String {
+        let l = LAContext()
+        
+        if l.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil) {
+            switch l.biometryType {
+            case .none:
+                return "lock.open"
+            case .touchID:
+                return "touchid"
+            case .faceID:
+                return "faceid"
+            case .opticID:
+                return "opticid"
+            @unknown default:
+                fatalError()
+            }
+        }
+        else if l.canEvaluatePolicy(.deviceOwnerAuthenticationWithWatch, error: nil)  {
+            return "lock.open.applewatch"
+        } else {
+            return "lock.open"
+        }
+        
+        
+    }
+    
     var body: some View {
-        if appState.isLoading {
+        if appState.isLocked {
+            lockView
+        } else if appState.isLoading {
             ProgressView().progressViewStyle(CircularProgressViewStyle()).onAppear {
                 loadDefaultSettings(to: appState)            }
             .sheet(isPresented: $promptAutosaveRestore, content: {
@@ -191,7 +229,7 @@ struct ContentView: View {
                 try taggedDirectory.loadAutosave(directory: dir.absolutePath, filename: filename, format: formatChoice)
             } else {
                 taggedDirectory.removeAutosave()
-                try taggedDirectory.load(directory: dir.absolutePath, filename: filename, format: formatChoice)
+                try taggedDirectory.load(directory: dir.absolutePath, filename: filename, format: formatChoice, doTextRecognition: appState.doImageVision)
             }
             appState.isLoading = false
             showingError = false

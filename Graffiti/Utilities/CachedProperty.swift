@@ -10,17 +10,17 @@ import Foundation
 @propertyWrapper class CachedProperty<Value>: Copyable {
     var backingValue: Value? = nil
     
-    var wrappedValue: Value? {
+    var wrappedValue: Value {
         if !isSet {
             backingValue = supplier()
             isSet = true
         }
-        return backingValue
+        return backingValue!
     }
     var isSet: Bool = false
-    var supplier: () -> Value?
+    var supplier: () -> Value
 
-    init(wrappedValue: @autoclosure @escaping () -> Value?) {
+    init(wrappedValue: @autoclosure @escaping () -> Value) {
         self.supplier = wrappedValue
     }
 }

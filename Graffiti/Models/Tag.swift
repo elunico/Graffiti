@@ -90,6 +90,26 @@ final class Tag : Equatable, Hashable, Codable, Identifiable {
     
     var imageTextContent: [String] = []
     
+    var wasFreed: Bool = false
+    
+    private static var willBeDeleted: [Tag.ID: Tag] = [:]
+    
+    static func runGarbageCollection() {
+        for (id, tag) in Tag.willBeDeleted {
+            assert(tag.refCount == 0, "Refcount of dead tag is not 0")
+            tag.wasFreed = true
+            Tag.registry.removeValue(forKey: tag.id)
+            Tag.stringRegistry.removeValue(forKey: tag.value)
+            Tag.imageRegistry.removeValue(forMaybeKey: tag.image)
+            if let imageURL = tag.image {
+                try? FileManager.default.removeItem(at: imageURL)
+            }
+            if let thumbnail = tag.thumbnail {
+                try? FileManager.default.removeItem(at: thumbnail)
+            }
+        }
+    }
+    
     var searchableMetadataString: String {
         if image != nil {
             return imageTextContent.joined(separator: " ")
@@ -205,8 +225,10 @@ final class Tag : Equatable, Hashable, Codable, Identifiable {
     /// - Returns: self
     @discardableResult
     func acquire() -> Tag {
+        if Tag.willBeDeleted[id] != nil {
+            Tag.willBeDeleted.removeValue(forKey: id)
+        }
         refCount += 1
-        //        print("Tag \(id) now has rc: \(refCount)")
         return self
     }
     
@@ -215,18 +237,8 @@ final class Tag : Equatable, Hashable, Codable, Identifiable {
     /// This method is called on Tags when they are removed from a file. It decrements the `refCount` and, if necessary, removes the `Tag` from the registry that the `Tag` class keeps and, if necessary, removes the associated image file that the `Tag` has. Since this method removes filesystem resources, this method should be called whenever an entity is sure that a tag will not be needed again for the remaining lifetime of the program.
     func relieve() {
         refCount -= 1
-        //        print("Tag \(id) now has rc: \(refCount)")
         if refCount == 0 {
-            //            print("Tag \(self.id) is no longer needed by any file.")
-            Tag.registry.removeValue(forKey: self.id)
-            Tag.stringRegistry.removeValue(forKey: self.value)
-            Tag.imageRegistry.removeValue(forMaybeKey: self.image)
-            if let imageURL = image {
-                try? FileManager.default.removeItem(at: imageURL)
-            }
-            if let thumbnail {
-                try? FileManager.default.removeItem(at: thumbnail)
-            }
+            Tag.willBeDeleted[id] = self
         }
     }
     
@@ -245,6 +257,31 @@ final class Tag : Equatable, Hashable, Codable, Identifiable {
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
+    }
+}
+
+extension Tag {
+    func detectText() {
+        guard let image else { return }
+        recoginitionState = .started
+        recognizeText(in: image, onComplete: { [unowned self] strings, error in
+            recoginitionState = .recognized
+            if let strings {
+                imageTextContent.append(contentsOf: strings)
+            }
+        })
+    }
+    
+    func detectObjects() {
+        guard let image else { return }
+        recoginitionState = .started
+        guard let seen = try? recognizeObjects(in: image) else { return }
+        recoginitionState = .recognized
+        imageTextContent.append(contentsOf: seen)
+    }
+    
+    func clearImageStrings() {
+        imageTextContent = []
     }
 }
 

@@ -9,6 +9,12 @@ import Foundation
 
 import os
 
+extension Int {
+    var percent: Double {
+        return Double(self) / 100.0
+    }
+}
+
 func reportError(_ message: String) {
     print("ERROR: \(#file)\(#line): \(message)")
 }
@@ -18,7 +24,7 @@ func reportWarning(_ message: String) {
 }
 
 func printing<T>(_ t: T) -> T {
-    print(t)
+//    print(t)
     return t
 }
 

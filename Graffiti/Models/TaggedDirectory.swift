@@ -34,23 +34,26 @@ class TaggedDirectory: ObservableObject {
     @Published private(set) var transactions: [TagTransaction] = []
     @Published private(set) var redoStack: [TagTransaction] = []
     
+//    @Published var doUpdate: Bool = false
+    
     private var queue = DispatchQueue(label: "imageProcessor", qos: .userInitiated, attributes: .concurrent, autoreleaseFrequency: .workItem, target: DispatchQueue.global(qos: .userInitiated))
 
-    @Published var doImageVision: Bool = true {
-        didSet {
-            if doImageVision {
-                performVisionActions()
-            } else {
-                files.forEach { file in
-                    backend?.removeTagText(from: file)
-                    file.tags.forEach { tag in tag.recoginitionState = .uninitialized }
-                }
+    
+    func imageVisionSet(doVision: Bool) {
+        if doVision {
+            performVisionActions()
+        } else {
+            files.forEach { file in
+                backend?.removeTagText(from: file)
+                file.tags.forEach { tag in tag.recoginitionState = .uninitialized }
             }
         }
     }
     
     func didMutate() {
         print("Performing autosave commmit")
+        print("How many files? \(files.count)")
+        objectWillChange.send()
         self.performAutosave()
     }
     
@@ -105,7 +108,6 @@ class TaggedDirectory: ObservableObject {
         self.indexMap.removeAll()
         self.files.removeAll()
         self.directory = directory
-        self.doImageVision = doTextRecognition
         try setBackend(directory: directory, filename: filename, format: format)
         let content = try  getContentsOfDirectory(atPath: directory)
         var idx = 0
@@ -143,7 +145,6 @@ class TaggedDirectory: ObservableObject {
         }
         transactions.last?.perform()
         invalidateRedo()
-        performVisionActions()
         didMutate()
     }
     
@@ -157,7 +158,6 @@ class TaggedDirectory: ObservableObject {
         }
         transactions.last?.perform()
         invalidateRedo()
-        performVisionActions()
         didMutate()
     }
     
@@ -194,10 +194,12 @@ class TaggedDirectory: ObservableObject {
     
     func invalidateRedo() {
         redoStack.removeAll()
+        Tag.runGarbageCollection()
     }
     
     func invalidateUndo() {
         transactions.removeAll()
+        Tag.runGarbageCollection()
     }
     
     func undo() {
@@ -310,80 +312,17 @@ extension TaggedDirectory {
 }
 
 extension TaggedDirectory {
-    func recognizeObjects(in tag: Tag) {
-        guard let model = try? VNCoreMLModel(for: MobileNetV2(configuration: MLModelConfiguration()).model) else { return }
-        
-        let request = VNCoreMLRequest(model: model)
-        
-        guard let url = tag.image, let nsImage = NSImage(contentsOf: url), let cgImage = nsImage.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return }
-        
-        let handler = VNImageRequestHandler(ciImage: CIImage(cgImage: cgImage), options: [:])
-        
-        try? handler.perform([request])
-        
-        guard let results = request.results as? [VNClassificationObservation] else {
-            return
-        }
-        
-        let observations = results[0..<5].filter{ (!$0.hasPrecisionRecallCurve) || ($0.hasPrecisionRecallCurve && $0.hasMinimumPrecision(0.8, forRecall: 0.8)) }.map { $0.identifier }
-        
-        
-        tag.imageTextContent.append(contentsOf: observations)
-        
-    }
-    
-    func recognizeText(in tag: Tag) {
-        
-        guard let imageURL = tag.image else { return }
-        
-        guard let cgImage = NSImage(byReferencing: imageURL).cgImage(forProposedRect: nil, context: nil , hints: nil) else { return }
-        
-        // Create a new image-request handler.
-        let requestHandler = VNImageRequestHandler(cgImage: cgImage)
-        
-        // Create a new request to recognize text.
-        let request = VNRecognizeTextRequest(completionHandler: {(request: VNRequest, error: Error?) in
-            guard let observations =
-                    request.results as? [VNRecognizedTextObservation] else {
-                return
-            }
-            let recognizedStrings = observations.compactMap { observation in
-                // Return the string of the top VNRecognizedText instance.
-                return observation.topCandidates(1).first?.string
-            }
-            
-            // Process the recognized strings.
-            tag.imageTextContent.append(contentsOf: recognizedStrings)
-//            print("Recognized strings: \(recognizedStrings)")
-        })
-        
-        do {
-            // Perform the text-recognition request.
-            try requestHandler.perform([request])
-        } catch {
-//            print("Unable to perform the requests: \(error).")
-        }
-    }
-    
-    
-    
-    
     func performVisionActions() {
-        if !doImageVision { return }
         // TODO: taggedDirectory acts as a singleton in the application so there is only one instance of it active in normal use
         // but this is called in AddTag and could be called many times before completion
         queue.async { [weak self] in
             for file in self?.files ?? [] {
                 for tag in file.tags where tag.recoginitionState == .uninitialized {
-                    tag.recoginitionState = .started
-                    self?.recognizeText(in: tag)
-                    self?.recognizeObjects(in: tag)
-                    tag.recoginitionState = .recognized
+                    tag.detectText()
+                    tag.detectObjects()
                 }
             }
-            
         }
-        
     }
     
 }

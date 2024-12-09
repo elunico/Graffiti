@@ -106,7 +106,6 @@ struct ImageSelector: View {
         if let url {
 //            return Image(nsImage: NSImage(byReferencing: url))
             if let image = thumbnailCache.object(forKey: url as NSURL) {
-                print(FileManager.default.fileExists(atPath: url.absoluteString))
                 return Image(nsImage: image)
             } else {
                 if let nsImage = NSImage(contentsOf: url) {

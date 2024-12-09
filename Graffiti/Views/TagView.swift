@@ -76,11 +76,9 @@ struct RetainedImage {
 
 struct TagView: View {
     @State var files: Set<TaggedFile>
-    @State var selected: Set<Tag.ID> = []
+    @State var selected: Set<Tag.ID> = [] 
     @State var currentTag: String = ""
     @State var showingHelp = false
-//    @State var tagImage: URL? = nil
-//    @State var tagImageThumbnail: URL? = nil
     @State var tagImage: RetainedImage = RetainedImage()
     @State var qlPreviewLink: URL? = nil
     @State var selectedView: ViewSelection = .text
@@ -95,8 +93,17 @@ struct TagView: View {
     
     @State var isTargetedForDrop: Bool = false
     
+    @State var stringTag: Tag? = nil
+    
+    @State var allowAdding: Bool = true
+    @State var universalView: Bool = false 
+    
+//    @Binding var doUpdate: Bool 
+    
     var prohibitedCharacters: Set<Character>
     var done: (Set<TaggedFile>) -> ()
+    
+    static var selectionIdentifier = "tag-view"
     
     enum ViewSelection: Hashable {
         case text
@@ -104,9 +111,11 @@ struct TagView: View {
     }
     
     func performDelete()  {
+        // TODO: when doing this from the tag view on mainview it causes an inconsistent state
         for index in selected {
             let tag =  Tag.tag(fromID: index)!
             let f = files.filter { $0.tags.contains(tag) }.map { $0 }
+            print("\(f.count) Files have the tag")
             directory.removeTag(withID: index, fromAll: f)
         }
         tags = files.map { $0.tags }.flatten().unique()
@@ -154,6 +163,34 @@ struct TagView: View {
         }
     }
     
+    var showingStringsSheet: some View {
+        VStack {
+            if stringTag == nil {
+                Text("No selection").font(.headline)
+            } else {
+                Button("Copy all strings") {
+                    NSPasteboard.general.prepareForNewContents()
+                    NSPasteboard.general.setString(stringTag!.imageTextContent.joined(separator: "\n"), forType: .string)
+                }
+                List(stringTag!.imageTextContent, id: \.self) { item in
+                    HStack {
+                        Text(item).textSelection(.enabled)
+                        Spacer()
+                        Button("Copy") {
+                            NSPasteboard.general.prepareForNewContents()
+                            NSPasteboard.general.setString(item, forType: .string)
+                        }
+                    }
+                    
+                }
+            }
+            Button("Close") {
+                appState.isShowingStrings = false
+            }
+        }.padding()
+        .frame(minWidth: 600.0, minHeight: 600.0)
+    }
+    
     var addImageView: some View {
         Group {
             ImageSelector(selectedImage: $tagImage.retainedURL, onClick: { _ in
@@ -169,6 +206,74 @@ struct TagView: View {
             })
          
         }
+    }
+    
+    var isImageTagSelected: Bool {
+        if selected.isEmpty {
+            return false
+        }
+        if let id = selected.first {
+            return Tag.tag(fromID: id)?.image != nil 
+        } else {
+            return false
+        }
+    }
+    
+    var tagTable: some View {
+        Table(of: Tag.self,  selection: $selected, columns: {
+//                    TableColumn("Tag") { item in
+//                        Text(item.value)
+//                    }
+            TableColumn("Tag") { item in
+                if item.image != nil {
+                    HStack {
+                        // TODO: thumbnail is blank in table until application restart. Possibly related to NSCache thumbnailCache
+                        try? item.ensureThumbnail() =>
+                        ImageSelector.imageOfFile(item.thumbnail)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 150, height: 75, alignment: .center)
+                        Spacer()
+                        Button {
+                            if selected.contains(item.id) {
+                                if let selected = selected.first, let url = Tag.tag(fromID: selected)?.image {
+                                    qlPreviewLink = url
+                                }
+                            } else if let url = item.image {
+                                qlPreviewLink = url
+                            }
+                        } label: {
+                            Image(systemName: "eye")
+                        }
+                    }
+                } else {
+                    Text(item.value)
+                }
+            }
+        }, rows: {
+            ForEach(tags) { (item: Tag) in
+                TableRow(item)
+                    .contextMenu {
+                        Button("Rerun Image Recognition") {
+                            item.detectText()
+                            item.detectObjects()
+                        }.disabled(!isImageTagSelected)
+                        Button("Show strings") {
+                            appState.isShowingStrings = true
+                            selected.removeAll()
+                            stringTag = item
+                        }.disabled(!isImageTagSelected)
+                        
+                        Divider()
+                        Button("Edit") {
+                            appState.editing = false
+                            appState.isEditingTag = true
+                            appState.editTargetTag = item
+
+                        }
+                    }
+            }
+        })
     }
     
     var body: some View {
@@ -187,34 +292,7 @@ struct TagView: View {
                     Text("This list includes all the tags across all of the selected files. Each tag may not be present on any one individual file. Any tag added in this view will be added to all selected files")
                 }
                 
-                Table(tags, selection: $selected, columns: {
-                    TableColumn("Tag") { item in
-                        if item.image != nil {
-                            HStack {
-                                // TODO: thumbnail is blank in table until application restart. Possibly related to NSCache thumbnailCache
-                                try? item.ensureThumbnail() =>
-                                ImageSelector.imageOfFile(item.thumbnail)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 150, height: 75, alignment: .center)
-                                Spacer()
-                                Button {
-                                    if selected.contains(item.id) {
-                                        if let selected = selected.first, let url = Tag.tag(fromID: selected)?.image {
-                                            qlPreviewLink = url
-                                        }
-                                    } else if let url = item.image {
-                                        qlPreviewLink = url
-                                    }
-                                } label: {
-                                    Image(systemName: "eye")
-                                }
-                            }
-                        } else {
-                            Text(item.value)
-                        }
-                    }
-                })
+                tagTable
                 .onDeleteCommand(perform: self.performDelete)
                 
                 HStack {
@@ -234,39 +312,44 @@ struct TagView: View {
                     }.disabled(chosenFormat == .none)
                 }
                
-                
-                TabView(selection: $selectedView) {
-                    addTextView.tabItem({
-                        Text("Text")
-                    }).tag(ViewSelection.text)
+                if allowAdding {
+                    TabView(selection: $selectedView) {
+                        addTextView.tabItem({
+                            Text("Text")
+                        }).tag(ViewSelection.text)
+                        
+                        addImageView.tabItem({
+                            Text("Image")
+                        }).tag(ViewSelection.image)
+                    }.frame(width: ImageSelector.size.width + 50, height: ImageSelector.size.height + 50)
                     
-                    addImageView.tabItem({
-                        Text("Image")
-                    }).tag(ViewSelection.image)
-                }.frame(width: ImageSelector.size.width + 50, height: ImageSelector.size.height + 50)
-                
-                
-                
-                buttonBar
-                Button("Close") {
-                    done(files)
-                }.keyboardShortcut(.return, modifiers: [])
+                    
+                    
+                    buttonBar
+                    Button("Close") {
+                        done(files)
+                    }.keyboardShortcut(.return, modifiers: [])
+                }
             }
         }.frame(minWidth: 500.0, maxWidth: .infinity, minHeight: 500.0, maxHeight: .infinity, alignment: Alignment.center)
             .padding()
             .onAppear {
-                appState.createSelectionModel()
-                tags = files.map { $0.tags }.flatten().unique()
-                let types = tags.map { $0.imageFormat }.unique()
-                if types.count == 1 {
-                    chosenFormat = types.first!
-                } else {
-                    chosenFormat = .none
+                appState.createSelectionModel(for: TagView.selectionIdentifier)
+                if self.universalView {
+                    files = Set(directory.files)
                 }
+                refresh()
             }
             .onDisappear {
                 appState.releaseSelectionModel()
             }
+            .onChange(of: appState.doImageRerun, perform: { _ in
+                appState.selectionModels.last?.selectedItems.map({ Tag.tag(fromID: $0 as! Tag.ID)! }).forEach { tag in
+                    tag.clearImageStrings()
+                    tag.detectText()
+                    tag.detectObjects()
+                }
+            })
             .onChange(of: selected, perform: { _ in
                 appState.select(only: selected)
                 let f = selected.compactMap({ tag in Tag.tag(fromID: tag) })
@@ -276,13 +359,17 @@ struct TagView: View {
                     chosenFormat = .none
                 }
             })
-            .onDrop(of: ["public.file-url"], isTargeted: $isTargetedForDrop, perform: { b in 
+            .onDrop(of: ["public.file-url"], isTargeted: $isTargetedForDrop, perform: { b in
                 selectedView = .image
                 return receiveDroppedImage(from: b)
             })
             .quickLookPreview($qlPreviewLink)
+            .sheet(isPresented: $appState.isShowingStrings, content: {
+                showingStringsSheet
+                
+            })
             .sheet(isPresented: $showingHelp, content: {
-                FilesEditingInspectorView(done: { showingHelp = false }, removeFileWithID: { id in
+                FilesEditingInspectorView(done: { showingHelp = false; refresh() }, removeFileWithID: { id in
                     guard let idx = files.firstIndex(where: {$0.id == id}) else { return }
                     files.remove(at: idx)
                 }, addFileWithID: {
@@ -300,6 +387,21 @@ struct TagView: View {
                     }
                 }.padding()
             })
+    }
+    
+    func refresh() {
+//        if universalView {
+//            tags = directory.files.map { $0.tags }.flatten().unique()
+//        } else {
+            tags = files.map { $0.tags }.flatten().unique()
+//        }
+        let types = tags.map { $0.imageFormat }.unique()
+        if types.count == 1 {
+            chosenFormat = types.first!
+        } else {
+            chosenFormat = .none
+        }
+        print("Refresh complete, tag count: \(tags.count)")
     }
     
     static let validImageExtensions: Set<String> = ["bmp", "tiff", "png", "jpeg", "jpg", "gif", "dng", "heic"]
@@ -325,7 +427,7 @@ struct TagView: View {
         return true
     }
     
-    func addCurrentTag() {
+    func storeCurrentTag() {
         if (currentTag.isEmpty || currentTag.allSatisfy({$0.isWhitespace})) &&
             !tagImage.isPresent {
             return
@@ -357,6 +459,14 @@ struct TagView: View {
         } catch {
             showingError = true
             message = "\(error.localizedDescription): The tag contains an illegal character"
+        }
+    }
+    
+    func addCurrentTag() {
+        storeCurrentTag()
+        // tagWasSet
+        if appState.doImageVision {
+            directory.imageVisionSet(doVision: true)
         }
     }
 }

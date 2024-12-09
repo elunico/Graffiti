@@ -349,6 +349,7 @@ class LoggingCacheDelegate: NSObject, NSCacheDelegate {
 }
 
 func getTypeOfImage(url: URL) -> UTType {
+    print("The url is \(url)")
     let ct = try? url.resourceValues(forKeys: [.contentTypeKey])
     return ct!.contentType!
 }

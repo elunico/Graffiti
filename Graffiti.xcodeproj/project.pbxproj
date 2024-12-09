@@ -75,6 +75,10 @@
 		DC5D266C297EEA83009D3868 /* XattrBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = DC1B7BC42962066200DEED22 /* XattrBridge.m */; };
 		DC5FA2F22975032800084CB2 /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5FA2F12975032800084CB2 /* Version.swift */; };
 		DC5FA2F42975091500084CB2 /* TagStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5FA2F32975091500084CB2 /* TagStore.swift */; };
+		DC82356A2D021276008764E6 /* MLUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8235692D021276008764E6 /* MLUtilities.swift */; };
+		DC82356B2D021276008764E6 /* MLUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8235692D021276008764E6 /* MLUtilities.swift */; };
+		DC82356C2D021276008764E6 /* MLUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8235692D021276008764E6 /* MLUtilities.swift */; };
+		DC82356D2D021276008764E6 /* MLUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8235692D021276008764E6 /* MLUtilities.swift */; };
 		DC851DBA29A0714D00A9A90D /* TagCharts.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC851DB929A0714D00A9A90D /* TagCharts.swift */; };
 		DC8E14632963EAE0002E1788 /* TaggedDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC8E14622963EAE0002E1788 /* TaggedDirectory.swift */; };
 		DC92628429A1B16B00A926F3 /* FileResizeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC92628329A1B16B00A926F3 /* FileResizeView.swift */; };
@@ -238,6 +242,7 @@
 		DC5D265A297EE79F009D3868 /* Format.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Format.swift; sourceTree = "<group>"; };
 		DC5FA2F12975032800084CB2 /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
 		DC5FA2F32975091500084CB2 /* TagStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagStore.swift; sourceTree = "<group>"; };
+		DC8235692D021276008764E6 /* MLUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MLUtilities.swift; sourceTree = "<group>"; };
 		DC851DB929A0714D00A9A90D /* TagCharts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagCharts.swift; sourceTree = "<group>"; };
 		DC8E14622963EAE0002E1788 /* TaggedDirectory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaggedDirectory.swift; sourceTree = "<group>"; };
 		DC92628329A1B16B00A926F3 /* FileResizeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileResizeView.swift; sourceTree = "<group>"; };
@@ -419,6 +424,7 @@
 				DCE458BA299EEE3F00BD3685 /* ArrayUtilities.swift */,
 				DCC2A5CF29A4750E00028437 /* ViewUtilities.swift */,
 				DC27F1BB2CFCE164001A890E /* CachedProperty.swift */,
+				DC8235692D021276008764E6 /* MLUtilities.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -688,6 +694,7 @@
 				DCCB4F322985BC6A00C55E15 /* FileWriterError.swift in Sources */,
 				DC4E79A7297DF2E3003AEE68 /* CompressedCustomTagStoreWriter.swift in Sources */,
 				DC4E79A9297DF2E3003AEE68 /* TagBackend.swift in Sources */,
+				DC82356D2D021276008764E6 /* MLUtilities.swift in Sources */,
 				DCE458C0299EEE9200BD3685 /* FileUtilities.swift in Sources */,
 				DCC2A5EB29A4775100028437 /* Sorter.swift in Sources */,
 				DCC2A5E429A476AA00028437 /* AddTagToManyFilesTransaction.swift in Sources */,
@@ -734,6 +741,7 @@
 				DC2809B22967722F003915A5 /* FilesEditingInspectorView.swift in Sources */,
 				DC5FA2F22975032800084CB2 /* Version.swift in Sources */,
 				DCFA39CA296604740002690A /* MainView.swift in Sources */,
+				DC82356C2D021276008764E6 /* MLUtilities.swift in Sources */,
 				DCC2A5D429A4761200028437 /* AnySelectionModel.swift in Sources */,
 				DC13FD422D00C0B3009084CD /* AKUtility.swift in Sources */,
 				DC27F1BE2CFCE165001A890E /* CachedProperty.swift in Sources */,
@@ -778,6 +786,7 @@
 				DC2F0EE62CFE98F40048B666 /* YAMLFileWriter.swift in Sources */,
 				DC5D265F297EE8D2009D3868 /* TagBackend.swift in Sources */,
 				DC5D2668297EE93D009D3868 /* TaggedFile.swift in Sources */,
+				DC82356B2D021276008764E6 /* MLUtilities.swift in Sources */,
 				DCE458C4299EEEDC00BD3685 /* Utility.swift in Sources */,
 				DC9CCB432980ECC000A2D622 /* GraffitiGetTagsOfFile.swift in Sources */,
 				DC5D265C297EE7B5009D3868 /* Format.swift in Sources */,
@@ -814,6 +823,7 @@
 				DCCB4F312985BC6A00C55E15 /* FileWriterError.swift in Sources */,
 				DC09FE36297DB41E00BD51D9 /* TaggedFile.swift in Sources */,
 				DC09FE37297DB41E00BD51D9 /* Tag.swift in Sources */,
+				DC82356A2D021276008764E6 /* MLUtilities.swift in Sources */,
 				DCE458C1299EEE9300BD3685 /* FileUtilities.swift in Sources */,
 				DCC2A5EA29A4775100028437 /* Sorter.swift in Sources */,
 				DCC2A5E329A476AA00028437 /* AddTagToManyFilesTransaction.swift in Sources */,
@@ -868,7 +878,7 @@
 				CODE_SIGN_ENTITLEMENTS = CCTSThumbnailProvider/CCTSThumbnailProvider.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24DE1F;
+				CURRENT_PROJECT_VERSION = 24DE8F;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -883,7 +893,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 17.0.0;
+				MARKETING_VERSION = 18.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.CCTSThumbnailProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -899,7 +909,7 @@
 				CODE_SIGN_ENTITLEMENTS = CCTSThumbnailProvider/CCTSThumbnailProvider.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24DE1F;
+				CURRENT_PROJECT_VERSION = 24DE8F;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -914,7 +924,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 17.0.0;
+				MARKETING_VERSION = 18.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.CCTSThumbnailProvider;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1059,7 +1069,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 24DE1F;
+				CURRENT_PROJECT_VERSION = 24DE8F;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Graffiti/Preview Content\"";
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
@@ -1074,7 +1084,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 17.0.0;
+				MARKETING_VERSION = 18.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1097,7 +1107,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 24DE1F;
+				CURRENT_PROJECT_VERSION = 24DE8F;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Graffiti/Preview Content\"";
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
@@ -1112,7 +1122,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 17.0.0;
+				MARKETING_VERSION = 18.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -1128,7 +1138,7 @@
 				CODE_SIGN_ENTITLEMENTS = GraffitiTagFile/GraffitiTagFile.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24DE1F;
+				CURRENT_PROJECT_VERSION = 24DE8F;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1143,7 +1153,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 17.0.0;
+				MARKETING_VERSION = 18.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.GraffitiTagFile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1159,7 +1169,7 @@
 				CODE_SIGN_ENTITLEMENTS = GraffitiTagFile/GraffitiTagFile.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24DE1F;
+				CURRENT_PROJECT_VERSION = 24DE8F;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1174,7 +1184,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 17.0.0;
+				MARKETING_VERSION = 18.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.GraffitiTagFile;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1190,7 +1200,7 @@
 				CODE_SIGN_ENTITLEMENTS = CCTSQLPlugin/CCTSQLPlugin.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24DE1F;
+				CURRENT_PROJECT_VERSION = 24DE8F;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1205,7 +1215,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 17.0.0;
+				MARKETING_VERSION = 18.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.CCTSQLPlugin;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1221,7 +1231,7 @@
 				CODE_SIGN_ENTITLEMENTS = CCTSQLPlugin/CCTSQLPlugin.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 24DE1F;
+				CURRENT_PROJECT_VERSION = 24DE8F;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 9KTV75G5K9;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1236,7 +1246,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.1;
-				MARKETING_VERSION = 17.0.0;
+				MARKETING_VERSION = 18.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tom.Graffiti.CCTSQLPlugin;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

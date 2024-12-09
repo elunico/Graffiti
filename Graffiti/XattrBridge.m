@@ -12,25 +12,27 @@
 @implementation XattrBridge
 
 +(NSString *)getXAttrAttributeForFile:(NSString *)path withKey: (NSString *)key andError:(NSError **)error {
-    void *buffer = malloc(4096);
+    long attr_size = getxattr(path.UTF8String, key.UTF8String, NULL, 0, 0, 0);
+    
+    void *buffer = malloc(attr_size + 1);
     
     if (buffer == NULL) {
         NSException *e = [NSException exceptionWithName:@"MemoryError" reason:@"malloc() returned null" userInfo:nil];
         @throw e;
     }
     
-    long bytes = getxattr(path.UTF8String, key.UTF8String, buffer, 4095, 0, 0);
+    long bytes = getxattr(path.UTF8String, key.UTF8String, buffer, attr_size, 0, 0);
     
     if (bytes < 0L) {
         free(buffer);
         if (error != nil) {
-            *error = [NSError errorWithDomain:@"file not found" code:200 userInfo:nil];
+            *error = [NSError errorWithDomain:[@"Error reading xattrs: " stringByAppendingString: [NSString stringWithCString: strerror(errno) encoding: NSUTF8StringEncoding]] code:200 userInfo:nil];
         }
         return @"";
     } else {
         char * cstr = (char *)buffer;
         cstr[bytes] = '\0';
-        NSString *string = [NSString stringWithCString:(char *)buffer encoding:kUnicodeUTF8Format];
+        NSString *string = [NSString stringWithCString:(char *)buffer encoding:NSUTF8StringEncoding];
         // TODO: is this legal
         free(buffer);
         return string;

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import UniformTypeIdentifiers
+import LocalAuthentication
 
 extension UTType {
     var compressedCustomTagStore: UTType { UTType(exportedAs: "com.tom.ccts") }
@@ -45,6 +46,24 @@ struct GraffitiApp: App {
         }
     }
     
+    static func performUnlock(updatingState appState: ApplicationState) {
+        let context = LAContext()
+        context.canEvaluatePolicy(.deviceOwnerAuthentication, error: nil )
+        if  context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometricsOrWatch, error: nil){
+            tryUnlockApp(with: .deviceOwnerAuthenticationWithBiometricsOrWatch, in: context, updatingState: appState)
+        } else {
+            tryUnlockApp(with: .deviceOwnerAuthentication, in: context, updatingState: appState)
+        }
+    }
+    
+    static func tryUnlockApp(with policy: LAPolicy, in context: LAContext, updatingState appState: ApplicationState) {
+        context.evaluatePolicy(policy, localizedReason: "Unlock Graffiti to see your tags", reply: { ok, err in
+            if ok {
+                DispatchQueue.main.async { appState.isLocked = false }
+            }
+        })
+    }
+    
     func revealCurrentFolder() {
         NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: taggedDirectory.directory)
     }
@@ -73,7 +92,7 @@ struct GraffitiApp: App {
         }
         
         .commands(content: {
-            CommandMenu("Tags", content: {
+            CommandMenu("Item", content: {
                 Button("Edit Tags") {
                     editTags()
                 }
@@ -93,6 +112,18 @@ struct GraffitiApp: App {
                     }.disabled(appState.currentState != .MainView(hasSelection: false) && appState.currentState != .MainView(hasSelection: true))
                 }
             })
+            // TODO: These update UI late
+//            CommandMenu("Tag", content:{
+//                Button("Show Strings") {
+//                    appState.isShowingStrings = true
+//                    appState.objectWillChange.send()
+//
+//                }.disabled(appState.isActiveSelector(anyOf: [MainView.SelectionIdentifier.files.rawValue, TagView.selectionIdentifier]) || appState.hasSelection())
+//                Button("Rerun Image Recognition") {
+//                    appState.doImageRerun.toggle()
+//                    appState.objectWillChange.send()
+//                }.disabled(appState.isActiveSelector(anyOf: [MainView.SelectionIdentifier.tags.rawValue, TagView.selectionIdentifier]) || (appState.hasSelection()))
+//            })
             CommandGroup(after: .newItem, addition: {
                 Button("Open File(s)", action: {
                     openFiles()
@@ -113,6 +144,16 @@ struct GraffitiApp: App {
                 Button("Reveal Current Tag Store File in Finder") {
                     revealCurrentTagStore()
                 }.disabled(taggedDirectory.tagStore == nil)
+                
+                Divider()
+                
+                Button("Lock application") {
+                    appState.isLocked = true
+                }.disabled(appState.isLocked)
+                
+                Button("Unlock application") {
+                    GraffitiApp.performUnlock(updatingState: appState)
+                }.disabled(!appState.isLocked)
             })
             
             

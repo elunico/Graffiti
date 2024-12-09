@@ -17,14 +17,14 @@ enum AppState : Equatable, Hashable {
     case EditingFileView
     case ShowingConfirm
     
-    static var tagChangeableStates: Set<AppState> {
+    @CachedProperty static var tagChangeableStates: Set<AppState> = {
         var states = Set<AppState>()
         states.insert(AppState.MainView(hasSelection: true))
         states.insert(AppState.MainView(hasSelection: false))
         states.insert(AppState.EditingTags)
         states.insert(AppState.EditingFileView)
         return states
-    }
+    }()
 }
 
 
@@ -37,7 +37,7 @@ class ApplicationState: ObservableObject {
     @Published var isConverting: Bool = false
     @Published var isLoading: Bool = false {
         didSet {
-            if !isLoading {
+            if !isLoading && !NSApplication.shared.isActive {
                 NSApplication.shared.requestUserAttention(.informationalRequest)
             }
         }
@@ -51,10 +51,19 @@ class ApplicationState: ObservableObject {
     @Published var showingHelp = false
     
     @Published var selectionModels: [AnySelectionModel] = []
+    @Published var identifierStack: [String] = []
+    
+    @Published var isLocked = false
     
 //    @Published var copyOwnedImages: Bool = true
     @Published var doImageVision: Bool = true
-    @Published var showingImageImportError: Bool = false 
+    @Published var showingImageImportError: Bool = false
+    
+    @Published var isShowingStrings: Bool = false
+    @Published var doImageRerun: Bool = false
+
+    @Published var isEditingTag: Bool = false
+    @Published var editTargetTag: Tag = Tag(string: "")
     
     func reset() {
         currentState = .StartScreen
@@ -63,6 +72,7 @@ class ApplicationState: ObservableObject {
         isLoading = false
         editing = false
         isPresentingConfirm = false
+        isShowingStrings = false
         showingMoreInfo = false
         showingOptions = true
         showingHelp = false
@@ -95,15 +105,30 @@ class ApplicationState: ObservableObject {
     }
     
     @discardableResult
-    func createSelectionModel() -> AnySelectionModel {
+    func createSelectionModel(for view: String) -> AnySelectionModel {
         let model = AnySelectionModel()
         selectionModels.append(model)
+        identifierStack.append(view)
         return model
     }
     
     @discardableResult
-    func releaseSelectionModel() -> AnySelectionModel? {
-        selectionModels.popLast()
+    func releaseSelectionModel() -> (AnySelectionModel?, String?) {
+        return (selectionModels.popLast(), identifierStack.popLast())
+        
+    }
+    
+    func isActiveSelector(anyOf identifiers: [String]) -> Bool {
+        return identifiers.anySatisfy { $0 == identifierStack.last }
+    }
+    
+    func isActiveSelector(id: String) -> Bool {
+        return id == identifierStack.last
+    }
+    
+    func hasSelection() -> Bool {
+        guard let model = selectionModels.last else { return false }
+        return !model.selectedItems.isEmpty
     }
     
     //    @Published var showingError: Bool = false
