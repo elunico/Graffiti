@@ -9,9 +9,9 @@ import Foundation
 import AppIntents
 
 struct GraffitiAddImageTagsToFile: AppIntent {
-    static var title: LocalizedStringResource = "Add tags to a File"
+    static let title: LocalizedStringResource = "Add tags to a File"
     
-    static var description: IntentDescription = IntentDescription("Add a tag to the given file by adding it to the specified tag store")
+    static let description: IntentDescription = IntentDescription("Add a tag to the given file by adding it to the specified tag store")
     
     @Parameter(title: "File")
     var file: IntentFile

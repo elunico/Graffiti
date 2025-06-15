@@ -245,8 +245,9 @@ class TaggedDirectory: ObservableObject {
     
     func commit(files: [TaggedFile]) {
         persist()
-        self.indexMap.removeAll()
-        self.files.removeAll(keepingCapacity: true)
+        // TODO: why is this here? removing it seems to fix an issue with converting image format erasing all data from the tagstore
+//        self.indexMap.removeAll()
+//        self.files.removeAll(keepingCapacity: true)
         invalidateUndo()
         invalidateRedo()
         print("Removing autosave temporary file")

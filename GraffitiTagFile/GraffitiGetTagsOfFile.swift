@@ -9,9 +9,9 @@ import Foundation
 import AppIntents
 
 struct GraffitiGetTagsOfFile: AppIntent {
-    static var title: LocalizedStringResource = "Get tags of File"
+    static let title: LocalizedStringResource = "Get tags of File"
     
-    static var description: IntentDescription = IntentDescription("Retrieve the tags of a file as a list of strings")
+    static let description: IntentDescription = IntentDescription("Retrieve the tags of a file as a list of strings")
     
     @Parameter(title: "File")
     var file: IntentFile

@@ -10,4 +10,8 @@ import Foundation
 class AnySelectionModel: ObservableObject {
     @Published var selectedItems: [Any] = []
     var isSingleSelected: Bool = false
+    
+    var selectedCount: Int {
+        return selectedItems.count
+    }
 }

@@ -9,9 +9,9 @@ import Foundation
 import AppIntents
 
 struct GraffitiRemoveTagsFromFile: AppIntent {
-    static var title: LocalizedStringResource = "Remove tags from a File"
+    static let title: LocalizedStringResource = "Remove tags from a File"
     
-    static var description: IntentDescription = IntentDescription("Remove the specified tags from the given file in the specified tag store. If the tag does not exist on the file, no action is taken")
+    static let description: IntentDescription = IntentDescription("Remove the specified tags from the given file in the specified tag store. If the tag does not exist on the file, no action is taken")
     
     @Parameter(title: "File")
     var file: IntentFile

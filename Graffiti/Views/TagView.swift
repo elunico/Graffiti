@@ -82,13 +82,14 @@ struct TagView: View {
     @State var tagImage: RetainedImage = RetainedImage()
     @State var qlPreviewLink: URL? = nil
     @State var selectedView: ViewSelection = .text
+    var query: Binding<String>
     @EnvironmentObject var directory: TaggedDirectory
     @EnvironmentObject var appState: ApplicationState
     
     @State var message: String = ""
     @State var showingError: Bool = false
     
-    @State var chosenFormat: Tag.ImageFormat = .none
+    @State var chosenFormat: Tag.ImageFormat = .url
     @State var tags: Array<Tag> = []
     
     @State var isTargetedForDrop: Bool = false
@@ -111,7 +112,6 @@ struct TagView: View {
     }
     
     func performDelete()  {
-        // TODO: when doing this from the tag view on mainview it causes an inconsistent state
         for index in selected {
             let tag =  Tag.tag(fromID: index)!
             let f = files.filter { $0.tags.contains(tag) }.map { $0 }
@@ -219,6 +219,35 @@ struct TagView: View {
         }
     }
     
+    private func tagMatchesString(string: String, tag: Tag) -> Bool {
+        let substr = string[string.index(after: string.startIndex)...]
+        print("Checking for match", tag.debugDescription, string)
+        if string.hasPrefix("!") {
+            return !tag.searchableMetadataString.contains(substr)
+        } else {
+            return tag.searchableMetadataString.contains(string)
+        }
+    }
+    
+    func filter(by query: String) -> [Tag] {
+        var filterPredicate: (Tag) -> Bool = { _ in true }
+        if query.isEmpty {
+            filterPredicate = { _ in true }
+        } else {
+            let results = query.split(separator: "|").map{ $0.trimmingCharacters(in: .whitespacesAndNewlines) }.map{ $0.split(separator: "&").map{ s in s.trimmingCharacters(in: .whitespacesAndNewlines)} }
+            filterPredicate = {
+                tag in results.anySatisfy {
+                    conjunction in conjunction.allSatisfy {
+                        text in
+                        return tagMatchesString(string: text, tag: tag)
+                        
+                    }
+                }
+            }
+        }
+        return tags.filter(filterPredicate)
+    }
+    
     var tagTable: some View {
         Table(of: Tag.self,  selection: $selected, columns: {
 //                    TableColumn("Tag") { item in
@@ -227,7 +256,7 @@ struct TagView: View {
             TableColumn("Tag") { item in
                 if item.image != nil {
                     HStack {
-                        // TODO: thumbnail is blank in table until application restart. Possibly related to NSCache thumbnailCache
+                        // TODO: thumbnail is blank when first added but back after any view update
                         try? item.ensureThumbnail() =>
                         ImageSelector.imageOfFile(item.thumbnail)
                             .resizable()
@@ -251,7 +280,7 @@ struct TagView: View {
                 }
             }
         }, rows: {
-            ForEach(tags) { (item: Tag) in
+            ForEach(filter(by: query.wrappedValue)) { (item: Tag) in
                 TableRow(item)
                     .contextMenu {
                         Button("Rerun Image Recognition") {
@@ -299,7 +328,6 @@ struct TagView: View {
                     Picker(selection: $chosenFormat, content: {
                         Text("References").tag(Tag.ImageFormat.url)
                         Text("Image Data").tag(Tag.ImageFormat.content)
-                        Text("").tag(Tag.ImageFormat.none).disabled(true)
                     }, label: {
                         Text("Save Format")
                     }).disabled(
@@ -309,7 +337,7 @@ struct TagView: View {
                     Spacer().frame(width: 20.0)
                     Button("Change Formats") {
                         selected.forEach { Tag.tag(fromID: $0)!.imageFormat = chosenFormat }
-                    }.disabled(chosenFormat == .none)
+                    }
                 }
                
                 if allowAdding {
@@ -354,9 +382,9 @@ struct TagView: View {
                 appState.select(only: selected)
                 let f = selected.compactMap({ tag in Tag.tag(fromID: tag) })
                 if f.allSatisfy({ $0.image != nil }) && f.map({ $0.imageFormat }).allSame() {
-                    chosenFormat = f.first?.imageFormat ?? .none
+                    chosenFormat = f.first?.imageFormat ?? .url
                 } else {
-                    chosenFormat = .none
+                    chosenFormat = .url
                 }
             })
             .onDrop(of: ["public.file-url"], isTargeted: $isTargetedForDrop, perform: { b in
@@ -399,7 +427,7 @@ struct TagView: View {
         if types.count == 1 {
             chosenFormat = types.first!
         } else {
-            chosenFormat = .none
+            chosenFormat = .url
         }
         print("Refresh complete, tag count: \(tags.count)")
     }

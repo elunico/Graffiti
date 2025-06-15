@@ -12,8 +12,9 @@ enum TagBackendError: Error {
 }
 
 protocol TagBackend: NSCopying {
-    // TODO: should throw when tag is not valid because of prohibitedCharacters
+    /// If the tag being added is not acceptable due to containing `prohibitedCharacters` in the `value`, or`imageTextContent`this method should throw
     func addTag(_ tag: Tag, to file: TaggedFile) throws
+    
     func removeTag(withID id: Tag.ID, from file: TaggedFile)
     func loadTags(at path: String) -> Set<Tag>
     func clearTags(of file: TaggedFile)

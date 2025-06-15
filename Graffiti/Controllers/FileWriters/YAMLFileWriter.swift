@@ -50,12 +50,6 @@ class YAMLFileWriter: FileWriter {
                    message: "Unsupported Read Operation",
                    information: "This application does not support load or editing YAML formatted files. You can convert an existing file to YAML for external use, but you cannot load a YAML file for editing in this program"
         )
-        
-//        let a = NSAlert()
-//        a.messageText = "Unsupported Read Operation"
-//        a.informativeText = "This application does not support load or editing YAML formatted files. You can convert an existing file to YAML for external use, but you cannot load a YAML file for editing in this program"
-//        a.alertStyle = .critical
-//        a.runModal()
 #if DEBUG
         fatalError("Trace")
 #else
@@ -84,5 +78,5 @@ class YAMLFileWriter: FileWriter {
         FileManager.default.createFile(atPath: path, contents: s.data(using: .utf8))
     }
     
-    static var fileExtension: String = ".yaml"
+    static let fileExtension: String = ".yaml"
 }

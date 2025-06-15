@@ -24,7 +24,6 @@ extension String {
 }
 
 
-
 /// The `Tag` class represents a `String` or an `NSImage` that tags a particular file
 ///
 /// `Tag` instances are unique across runs of the program. Every file that is
@@ -50,8 +49,8 @@ final class Tag : Equatable, Hashable, Codable, Identifiable {
     
     private static var registry: [Tag.ID: Tag] = [:]
     private static var stringRegistry: [String: Tag.ID] = [:]
-    private static var imageRegistry: [URL: Tag.ID] = [:]
-    
+    static var imageRegistry: [URL: Tag.ID] = [:]
+        
     var id: UUID = UUID()
     
     static func == (lhs: Tag, rhs: Tag) -> Bool {
@@ -61,7 +60,7 @@ final class Tag : Equatable, Hashable, Codable, Identifiable {
     enum ImageFormat: Codable {
         case url, content
         /* DO NOT USE THIS CASE */
-        case none
+//        case none
     }
     
     enum RecognitionState: Int, Codable {
@@ -85,7 +84,11 @@ final class Tag : Equatable, Hashable, Codable, Identifiable {
     var imageType: UTType? = nil
     var thumbnail: URL? = nil
     var imageIdentifier: UUID = UUID()
-    var imageFormat: ImageFormat = .url
+    var imageFormat: ImageFormat = .url {
+        didSet {
+            print("TODO: Need to update save state for image format change!")
+        }
+    }
     var recoginitionState : RecognitionState = .uninitialized
     
     var imageTextContent: [String] = []
@@ -293,10 +296,8 @@ extension Tag {
     func serializeToData() throws -> Data {
         let initData = Data()
         if image != nil {
-            precondition(imageFormat != .none, "cannot save an image tag with a format of .none")
+//            precondition(imageFormat != .none, "cannot save an image tag with a format of .none")
             switch imageFormat {
-            case .none:
-                fatalError("I told you not to use it")
             case .url:
                 let imPath = image!.absolutePath.data(using: .utf8)!
                 let magic: [UInt8] = [73, 85]
@@ -377,14 +378,12 @@ extension Tag {
         // if thumbnail is nil because no thumbnail exists, one will be created in the init
         var t = Tag(imageURL: imageURL, format: .url, thumbnail: thumbnail, id: id, imageIdentifier: imageId)
         t.imageFormat = .url
-//        print("Deserializing \(String(reflecting: t))")
+
         if t.recoginitionState == .uninitialized {
             try deserilizeRecognizedStrings(count: stringCount, fromIterator: &iter, to: &t)
-            
             guard let recognitionState = iter.nextBEInt() else { throw DeserializeTagError.noState }
             t.recoginitionState = RecognitionState(rawValue: recognitionState)!
         } else {
-            // TODO: Do not store strings for every tag
             try skipRecognizedStrings(count: stringCount, fromIterator: &iter)
             // discard state
             iter.nextBEInt()
@@ -424,13 +423,11 @@ extension Tag {
         t.imageFormat = .content
 
         if t.recoginitionState == .uninitialized {
-            
             try deserilizeRecognizedStrings(count: stringCount, fromIterator: &iter, to: &t)
             
             guard let recognitionState = iter.nextBEInt() else { throw DeserializeTagError.noState }
             t.recoginitionState = RecognitionState(rawValue: recognitionState)!
         } else {
-            // TODO: Do not store strings for every tag
             try skipRecognizedStrings(count: stringCount, fromIterator: &iter)
 
             // discard state

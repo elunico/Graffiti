@@ -60,6 +60,38 @@ extension FileWriter {
     }
 }
 
+/// This function should not be necessary if the futureWriter implementation does not list any prohibited characters
+/// The `convert` function which uses this **always** uses a `FileTagBackend` which defines illegal
+/// characters only based on its writer, so if there are no new illegal characters in the `futureWriter` no additional
+/// illegal characters will need to be tested. The `TagBackend` does define illegal characters but they are not
+/// allowed to be typed into the application regardless of backend implementation. Therefore, this should not be needed
+/// unless the file being converted was edited outside the application or the new `futureWriter` defines illegal
+/// characters that were not also defined by the originating `FileWriter`
+///
+/// Therefore converting between two stores with the same implementationProhibitedCharacters means this check should not be needed
+func validateStore(store: TagStore, futureWriter: FileWriter) throws {
+    let f = FileTagBackend()
+    f.writer = futureWriter
+    
+    let re = try Regex("[\(f.prohibitedCharacters.map { String($0) }.joined(separator: ""))]")
+    for (file, tags) in store.tagData {
+        
+        if file.firstMatch(of: re) != nil {
+            throw TagBackendError.illegalCharacter
+        }
+        for tag in tags {
+            if tag.image == nil && tag.value.firstMatch(of: re) != nil {
+                throw TagBackendError.illegalCharacter
+            }
+            for s in tag.imageTextContent {
+                if s.firstMatch(of: re) != nil {
+                    throw TagBackendError.illegalCharacter
+                }
+            }
+        }
+    }
+}
+
 func convert(
     file url: URL, isUsing currentWriter: FileWriter,
     willUse futureWriter: FileWriter
@@ -68,7 +100,15 @@ func convert(
     let path = url.deletingPathExtension().appendingPathExtension(
         String(type(of: futureWriter).fileExtension.trimmingPrefix(/\./))
     ).absolutePath
-    // TODO: prohibitedCharacters are checked in the backend so this function writes without checking them
+    
+    let original = currentWriter.fileProhibitedCharacters
+    let upcoming = futureWriter.fileProhibitedCharacters
+    
+    // SEE DOC COMMENT FOR EXPLANATION
+    if !(original.subtracting(upcoming).count == 0 && upcoming.subtracting(original).count == 0) {
+        try validateStore(store: data, futureWriter: futureWriter)
+    }
+    
     try getSandboxedAccess(
         to: url.deletingLastPathComponent().absolutePath, thenPerform: { _ in
             print("Writing to \(path)")

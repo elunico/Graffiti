@@ -52,7 +52,7 @@ struct MainView: View {
     }
     
     var tagListTable: some View {
-        TagView(files: [], allowAdding: false, universalView: true, prohibitedCharacters: files.prohibitedCharacters,  done: { _ in })
+        TagView(files: [], query: $query, allowAdding: false, universalView: true, prohibitedCharacters: files.prohibitedCharacters, done: { _ in })
             .environmentObject(files)
         
     }
@@ -69,7 +69,7 @@ struct MainView: View {
                 Text(item.image?.absolutePath ?? "<none>")
             }
             TableColumn("Image Storage Format") { item in
-                Text(item.imageFormat == .none ? "N/A": (item.imageFormat == .content ? "Entire Image" : "Image Reference"))
+                Text((item.imageFormat == .content ? "Entire Image" : "Image Reference"))
             }
         }, rows: {
             ForEach(currentTagList, id: \.self) { item in
@@ -458,7 +458,7 @@ struct MainView: View {
                 }
             })
             .sheet(isPresented: $appState.editing,  content: {
-                TagView(files: files.getFiles(withIDs: selected),  universalView: false, prohibitedCharacters: files.prohibitedCharacters, done: { _ in
+                TagView(files: files.getFiles(withIDs: selected), query: $query, universalView: false, prohibitedCharacters: files.prohibitedCharacters, done: { _ in
                     appState.editing = false
                     appState.currentState = .MainView(hasSelection: selected.count > 0)
                 })
@@ -471,6 +471,7 @@ struct MainView: View {
                         if appState.editTargetTag.image == nil {
                             TextField("Value", text: $appState.editTargetTag.value)
                         } else {
+                            // TODO: cannot change image from the main tag view
                             ImageSelector(selectedImage: $appState.editTargetTag.image,  onClick: { url in
                                 // TODO: image selector needs to be totally revamped so that I don't have to provide this, it should do all the copying adn owning and only bind to the URL
                             }, onDroppedFile: {(url, provider) in

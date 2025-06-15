@@ -55,9 +55,7 @@ func createOwnedImageURL(for imageType: UTType?, in directory: String="owned-ima
     
     return try  getSandboxedAccess(to: imageDirectory.absolutePath, thenPerform: { imageDirectoryString in
         let imageDirectory = URL(fileURLWithPath: imageDirectoryString)
-        
         let ownedURL = imageDirectory.appending(path: name.uuidString).appendingPathExtension(for: imageType ?? .data)
-        
         var isdir: ObjCBool = false
         let exists = FileManager.default.fileExists(atPath: imageDirectory.absolutePath, isDirectory: &isdir)
         if exists {

@@ -95,10 +95,9 @@ class FileTagBackend: TagBackend {
     
     func commit(files: [TaggedFile], force: Bool = false) {
         // TODO: probably want to alert the user and propogate this error
-            let path = saveFile
-            let tags = Dictionary(uniqueKeysWithValues: files.map { ($0.id, $0.tags) })
-            try? writer.saveTo(path: path, store: TagStore(tagData: tags))
-
+        let path = saveFile
+        let tags = Dictionary(uniqueKeysWithValues: files.map { ($0.id, $0.tags) })
+        try? writer.saveTo(path: path, store: TagStore(tagData: tags))
     }
     
     func performAutosave(files: [TaggedFile], suffix: String) {
