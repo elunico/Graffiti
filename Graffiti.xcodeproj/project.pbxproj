@@ -124,6 +124,10 @@
 		DCCB4F312985BC6A00C55E15 /* FileWriterError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCB4F2F2985B8F000C55E15 /* FileWriterError.swift */; };
 		DCCB4F322985BC6A00C55E15 /* FileWriterError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCB4F2F2985B8F000C55E15 /* FileWriterError.swift */; };
 		DCCB4F332985BC6A00C55E15 /* FileWriterError.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCB4F2F2985B8F000C55E15 /* FileWriterError.swift */; };
+		DCCFB4272DFFD3D000586B1B /* SearchFilesToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFB4262DFFD3D000586B1B /* SearchFilesToken.swift */; };
+		DCCFB4282DFFD3D000586B1B /* SearchFilesToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFB4262DFFD3D000586B1B /* SearchFilesToken.swift */; };
+		DCCFB4292DFFD3D000586B1B /* SearchFilesToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFB4262DFFD3D000586B1B /* SearchFilesToken.swift */; };
+		DCCFB42A2DFFD3D000586B1B /* SearchFilesToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFB4262DFFD3D000586B1B /* SearchFilesToken.swift */; };
 		DCDFF2342984413F00A2B6CF /* Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D265A297EE79F009D3868 /* Format.swift */; };
 		DCDFF2352984414000A2B6CF /* Format.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D265A297EE79F009D3868 /* Format.swift */; };
 		DCE458B9299EEE0B00BD3685 /* FileUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE458B8299EEE0B00BD3685 /* FileUtilities.swift */; };
@@ -274,6 +278,7 @@
 		DCC2A5D929A476AA00028437 /* RemoveTagTransaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoveTagTransaction.swift; sourceTree = "<group>"; };
 		DCC2A5ED29A47DB600028437 /* GraffitiAddImageTagsToFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraffitiAddImageTagsToFile.swift; sourceTree = "<group>"; };
 		DCCB4F2F2985B8F000C55E15 /* FileWriterError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileWriterError.swift; sourceTree = "<group>"; };
+		DCCFB4262DFFD3D000586B1B /* SearchFilesToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFilesToken.swift; sourceTree = "<group>"; };
 		DCE458B8299EEE0B00BD3685 /* FileUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileUtilities.swift; sourceTree = "<group>"; };
 		DCE458BA299EEE3F00BD3685 /* ArrayUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayUtilities.swift; sourceTree = "<group>"; };
 		DCE458C5299EEEE400BD3685 /* TimerUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerUtilities.swift; sourceTree = "<group>"; };
@@ -514,6 +519,7 @@
 				DCC2A5D529A4762F00028437 /* TagTransactions */,
 				DC4F4CD02985EB060001CCD9 /* ApplicationState.swift */,
 				DCC2A5D329A4761200028437 /* AnySelectionModel.swift */,
+				DCCFB4262DFFD3D000586B1B /* SearchFilesToken.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -752,6 +758,7 @@
 				DCDFF2352984414000A2B6CF /* Format.swift in Sources */,
 				DC13FD432D00C0B3009084CD /* AKUtility.swift in Sources */,
 				DCE458C8299EEEF800BD3685 /* TimerUtilities.swift in Sources */,
+				DCCFB4272DFFD3D000586B1B /* SearchFilesToken.swift in Sources */,
 				DCC2A5E029A476AA00028437 /* AddTagTransaction.swift in Sources */,
 				DCC2A5E829A476AA00028437 /* RemoveTagTransaction.swift in Sources */,
 				DC4E79A8297DF2E3003AEE68 /* FileWriter.swift in Sources */,
@@ -808,6 +815,7 @@
 				DC2809B22967722F003915A5 /* FilesEditingInspectorView.swift in Sources */,
 				DC5FA2F22975032800084CB2 /* Version.swift in Sources */,
 				DCFA39CA296604740002690A /* MainView.swift in Sources */,
+				DCCFB4282DFFD3D000586B1B /* SearchFilesToken.swift in Sources */,
 				DC82356C2D021276008764E6 /* MLUtilities.swift in Sources */,
 				DCC2A5D429A4761200028437 /* AnySelectionModel.swift in Sources */,
 				DC13FD422D00C0B3009084CD /* AKUtility.swift in Sources */,
@@ -854,6 +862,7 @@
 				DC5D265F297EE8D2009D3868 /* TagBackend.swift in Sources */,
 				DC5D2668297EE93D009D3868 /* TaggedFile.swift in Sources */,
 				DC82356B2D021276008764E6 /* MLUtilities.swift in Sources */,
+				DCCFB42A2DFFD3D000586B1B /* SearchFilesToken.swift in Sources */,
 				DCE458C4299EEEDC00BD3685 /* Utility.swift in Sources */,
 				DC9CCB432980ECC000A2D622 /* GraffitiGetTagsOfFile.swift in Sources */,
 				DC5D265C297EE7B5009D3868 /* Format.swift in Sources */,
@@ -888,6 +897,7 @@
 				DCDFF2342984413F00A2B6CF /* Format.swift in Sources */,
 				DC13FD442D00C0B3009084CD /* AKUtility.swift in Sources */,
 				DCE458C9299EEEF800BD3685 /* TimerUtilities.swift in Sources */,
+				DCCFB4292DFFD3D000586B1B /* SearchFilesToken.swift in Sources */,
 				DCC2A5DF29A476AA00028437 /* AddTagTransaction.swift in Sources */,
 				DCC2A5E729A476AA00028437 /* RemoveTagTransaction.swift in Sources */,
 				DC09FE40297DB64000BD51D9 /* XattrBridge.m in Sources */,

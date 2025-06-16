@@ -20,7 +20,13 @@ struct MainView: View {
     @EnvironmentObject var appState: ApplicationState
     @State private var selected: Set<TaggedFile.ID> = Set()
     @State private var oselected: Set<Tag.ID> = Set()
+    
+    // Search items
     @State private var query: String = ""
+    @State private var searchFileTokens: [SearchFilesToken] = []
+    @State private var recSFT: [SearchFilesToken] = [.Tagged, .Untagged]
+    @State private var showSearch: Bool = false
+
     
     @State private var selectedFileURLs: [URL] = []
     @State private var selectedFileURL: URL? = nil
@@ -52,7 +58,7 @@ struct MainView: View {
     }
     
     var tagListTable: some View {
-        TagView(files: [], query: $query, allowAdding: false, universalView: true, prohibitedCharacters: files.prohibitedCharacters, done: { _ in })
+        TagView(files: [], query: $query, tokens: $searchFileTokens,  allowAdding: false, universalView: true, prohibitedCharacters: files.prohibitedCharacters, done: { _ in })
             .environmentObject(files)
         
     }
@@ -278,97 +284,16 @@ struct MainView: View {
             .help("Redo")
     }
     
-    func MainToolbar() -> some View {
-        Group {
-            HStack {
-                Group {
-                    HStack {
-                        if #available(macOS 14, *) {
-                            undoButton()
-                        } else {
-                            fallbackUndoButton()
-                        }
-                        
-                        if #available(macOS 14, *) {
-                            redoButton()
-                        } else {
-                            fallbackRedoButton()
-                        }
-                    }
-                    
-                    divider(oriented: .horizontally, measure: 25.0)
-                    
-                    Button(action: { [unowned appState] in
-                        appState.editing = true
-                        appState.currentState = .EditingTags
-                    }, label: {
-                        Label("Edit Tags of \(name)", image: "custom.tag.badge.plus")
-                        
-                    }).disabled(selected.count == 0)
-                        .buttonStyle(DefaultButtonStyle())
-                        .keyboardShortcut(.return, modifiers: [])
-                        .help("Edit Tags of \(name)")
-                    
-                    Button(action:  { [unowned files] in
-                        guard let path = directory?.absolutePath else { return }
-                        
-                        if !NSWorkspace.shared.selectFile(files.getFile(withID: selected.first!)!.id, inFileViewerRootedAtPath: path) {
-                            NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: path)
-                        }
-                    }, label: { Label("Reveal \(name) in Finder", systemImage: "document.viewfinder") })
-                    .keyboardShortcut(.return, modifiers: [.command])
-                    .disabled(selected.count != 1)
-                    .help("Reveal \(name) in Finder")
-                    
-                    Button(action:  { [unowned files] in
-                        for item in files.getFiles(withIDs: selected) {
-                            NSWorkspace.shared.open(item.absoluteURL)
-                        }
-                    }, label: { Label("Open \(name)" , systemImage: "macwindow.and.cursorarrow") })
-                    .keyboardShortcut(KeyEquivalent.downArrow, modifiers: [.command])
-                    .disabled(selected.count == 0)
-                    .help("Open \(name)")
-                    
-                    divider(oriented: .horizontally, measure: 25.0)
-                    Button(action:  { [unowned appState] in
-                        appState.isPresentingConfirm = true
-                        appState.currentState = .ShowingConfirm
-                    }, label: { Label("Remove All Tags for \(name)", image: "custom.tag.badge.xmark").foregroundColor(selected.count == 0 ? .secondary : .red) })
-                    .disabled(selected.count == 0)
-                    .help("Clear All Tags for \(name)")
-                    //                    }
-                    
-                    
-                    divider(oriented: .horizontally, measure: 25.0)
-                    
-                    Button { [unowned files] in
-                        guard selected.count > 0 else { return }
-                        self.selectedFileURLs = files.getFiles(withIDs: selected).map { URL(fileURLWithPath: $0.id) }
-                        self.selectedFileURL = URL(fileURLWithPath: files.getFile(withID: selected.first!)!.id)
-                    } label: {
-                        Label("QuickLook", systemImage: "eye")
-                    }.disabled(selected.count == 0)
-                        .keyboardShortcut(.space, modifiers: [])
-                        .help("QuickLook")
-                }
-            }
-            TextField("Search", text: $query)
-                .onChange(of: query, perform: { [unowned files] _ in
-                    
-                    currentFileList = files.filter(by: query, within: showOnlyUntagged)
-                    var noLongerSeen = selected
-                    currentFileList.forEach { noLongerSeen.remove($0.id) }
-                    selected.subtract(noLongerSeen)
-                    if let sorter = sorter.first {
-                        currentFileList.sort(using: sorter)
-                    }
-                    
-                })
-                .frame(minWidth: 200.0, maxWidth: 500.0, alignment: .topTrailing)
-                .help("Enter your search term. Use & and | for boolean operations. Use !word to avoid 'word' in results ")
-            
+    func performSearch() {
+        currentFileList = files.filter(by: query, and: searchFileTokens, within: showOnlyUntagged)
+        var noLongerSeen = selected
+        currentFileList.forEach { noLongerSeen.remove($0.id) }
+        selected.subtract(noLongerSeen)
+        if let sorter = sorter.first {
+            currentFileList.sort(using: sorter)
         }
     }
+
     
     var topBarWithInfo: some View {
         VStack {
@@ -383,21 +308,116 @@ struct MainView: View {
                     }
                 })
                 Spacer()
-                if mainTab == 1 {
-                    VStack {
-                        Picker("Show: ", selection: $showOnlyUntagged, content: {
-                            Text("All Files").tag(TaggedDirectory.TaggedState.all)
-                            Text("Only Untagged").tag(TaggedDirectory.TaggedState.untagged)
-                            Text("Only Tagged").tag(TaggedDirectory.TaggedState.tagged)
-                        }).onChange(of: showOnlyUntagged, perform: {
-                            currentFileList = files.filter(by: query, within: $0)
-                        }).frame(width: 200, alignment: .bottomTrailing)
-                    }
-                }
+                // TODO: Search with tokens allows the user to filter for tagged or not already, is this picker needed?
+//                if mainTab == 1 {
+//                    VStack {
+//                        Picker("Show: ", selection: $showOnlyUntagged, content: {
+//                            Text("All Files").tag(TaggedDirectory.TaggedState.all)
+//                            Text("Only Untagged").tag(TaggedDirectory.TaggedState.untagged)
+//                            Text("Only Tagged").tag(TaggedDirectory.TaggedState.tagged)
+//                        }).onChange(of: showOnlyUntagged, perform: {
+//                            currentFileList = files.filter(by: query, and: searchFileTokens, within: $0)
+//                        }).frame(width: 200, alignment: .bottomTrailing)
+//                    }
+//                }
                 
             }
             if appState.showingMoreInfo {
                 MoreInfo()
+            }
+        }
+    }
+    
+    func mainToolbar() -> some ToolbarContent {
+        Group {
+            if #available(macOS 14, *) {
+                ToolbarItem {
+                    undoButton()
+                }
+                
+            } else {
+                ToolbarItem {
+                    fallbackUndoButton()
+                }
+            }
+            
+            if #available(macOS 14, *) {
+                ToolbarItem {
+                    redoButton()
+                }
+            } else {
+                ToolbarItem {
+                    fallbackRedoButton()
+                }
+            }
+            
+            //            divider(oriented: .horizontally, measure: 25.0)
+            //            if #available(macOS 26.0, *) {
+            //                ToolbarSpacer(.fixed)
+            //            } else {
+            //                divider(oriented: .horizontally, measure: 25.0)
+            //            }
+            
+            //
+            ToolbarItem {
+                Button(action: { [unowned appState] in
+                    appState.editing = true
+                    appState.currentState = .EditingTags
+                }, label: {
+                    Label("Edit Tags of \(name)", image: "custom.tag.badge.plus")
+                    
+                }).disabled(selected.count == 0)
+                    .buttonStyle(DefaultButtonStyle())
+                    .keyboardShortcut(.return, modifiers: [])
+                    .help("Edit Tags of \(name)")
+            }
+            //
+            //
+            //
+            ToolbarItem {
+                Button(action:  { [unowned files] in
+                    guard let path = directory?.absolutePath else { return }
+                    
+                    if !NSWorkspace.shared.selectFile(files.getFile(withID: selected.first!)!.id, inFileViewerRootedAtPath: path) {
+                        NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: path)
+                    }
+                }, label: { Label("Reveal \(name) in Finder", systemImage: "document.viewfinder") })
+                .keyboardShortcut(.return, modifiers: [.command])
+                .disabled(selected.count != 1)
+                .help("Reveal \(name) in Finder")
+            }
+            ToolbarItem {
+                Button(action:  { [unowned files] in
+                    for item in files.getFiles(withIDs: selected) {
+                        NSWorkspace.shared.open(item.absoluteURL)
+                    }
+                }, label: { Label("Open \(name)" , systemImage: "macwindow.and.cursorarrow") })
+                .keyboardShortcut(KeyEquivalent.downArrow, modifiers: [.command])
+                .disabled(selected.count == 0)
+                .help("Open \(name)")
+            }
+            //
+            //                divider(oriented: .horizontally, measure: 25.0)
+            ToolbarItem {
+                Button(action:  { [unowned appState] in
+                    appState.isPresentingConfirm = true
+                    appState.currentState = .ShowingConfirm
+                }, label: { Label("Remove All Tags for \(name)", image: "custom.tag.badge.xmark").foregroundColor(selected.count == 0 ? .secondary : .red) })
+                .disabled(selected.count == 0)
+                .help("Clear All Tags for \(name)")
+                //                    }
+            }
+            
+            ToolbarItem {
+                Button { [unowned files] in
+                    guard selected.count > 0 else { return }
+                    self.selectedFileURLs = files.getFiles(withIDs: selected).map { URL(fileURLWithPath: $0.id) }
+                    self.selectedFileURL = URL(fileURLWithPath: files.getFile(withID: selected.first!)!.id)
+                } label: {
+                    Label("QuickLook", systemImage: "eye")
+                }.disabled(selected.count == 0)
+                    .keyboardShortcut(.space, modifiers: [])
+                    .help("QuickLook")
             }
         }
     }
@@ -424,30 +444,64 @@ struct MainView: View {
         }
     }
     
-    var body: some View {
-        GeometryReader { geometry in
-            VStack {
-                HStack {
-                    topBarWithInfo
-                    Spacer()
-                }
-                Group {
-                    TabView(selection: $mainTab) {
-                        tagFileTable.tabItem({
-                            Label("Files", systemImage: "doc")
-                        }).tag(1)
-                        
-                        tagListTable.tabItem {
-                            Label("Tags", systemImage: "tag")
-                        }.tag(2)
-                    }
-                    footerSection
-                }
-                
+    var mainStack: some View {
+        VStack {
+            HStack {
+                topBarWithInfo
+                Spacer()
             }
+            Group {
+                TabView(selection: $mainTab) {
+                    tagFileTable.tabItem({
+                        Label("Files", systemImage: "doc")
+                    }).tag(1)
+                    
+                    tagListTable.tabItem {
+                        Label("Tags", systemImage: "tag")
+                    }.tag(2)
+                    
+                }.onChange(of: mainTab, perform: { newVal in
+                    if newVal == 1 {
+                        self.recSFT = [.Tagged, .Untagged]
+                    } else if newVal == 2 {
+                        self.recSFT = [.Image, .String]
+                    }
+                })
+                footerSection
+            }
+            
+        }
+    }
+    
+    var isEditingTagView: some View {
+        VStack {
+            Text("Tag \(appState.editTargetTag.id.uuidString)").font(.headline)
+            VStack {
+                Text("Value").font(.caption)
+                if appState.editTargetTag.image == nil {
+                    TextField("Value", text: $appState.editTargetTag.value)
+                } else {
+                    // TODO: cannot change image from the main tag view
+                    ImageSelector(selectedImage: $appState.editTargetTag.image,  onClick: { url in
+                        // TODO: image selector needs to be totally revamped so that I don't have to provide this, it should do all the copying adn owning and only bind to the URL
+                    }, onDroppedFile: {(url, provider) in
+                        return false
+                    })
+                }
+            }.frame(alignment: .trailing)
+            
+            Button("Close") {
+                appState.isEditingTag = false
+            }
+        }
+    }
+    
+    var bodyRoot: some View {
+        GeometryReader { geometry in
+            mainStack
             .onClearAll(message: (selected.count == 0 ? "This will remove EVERY tag from EVERY file currently in view in the table" : "This will remove EVERY tag from every SELECTED file in the table") + "\nYou cannot undo this action", isPresented: $appState.isPresentingConfirm, clearAction: { [unowned files] in
                 if selected.count == 0 {
-                    for file in files.filter(by: query, within: showOnlyUntagged) {
+                    for file in files.filter(by: query, and: searchFileTokens, within: showOnlyUntagged) {
                         files.clearTags(of: file)
                     }
                     
@@ -458,37 +512,42 @@ struct MainView: View {
                 }
             })
             .sheet(isPresented: $appState.editing,  content: {
-                TagView(files: files.getFiles(withIDs: selected), query: $query, universalView: false, prohibitedCharacters: files.prohibitedCharacters, done: { _ in
+                TagView(files: files.getFiles(withIDs: selected), query: $query, tokens: $searchFileTokens, universalView: false, prohibitedCharacters: files.prohibitedCharacters, done: { _ in
                     appState.editing = false
                     appState.currentState = .MainView(hasSelection: selected.count > 0)
                 })
             })
             .sheet(isPresented: $appState.isEditingTag, content: {
-                VStack {
-                    Text("Tag \(appState.editTargetTag.id.uuidString)").font(.headline)
-                    VStack {
-                        Text("Value").font(.caption)
-                        if appState.editTargetTag.image == nil {
-                            TextField("Value", text: $appState.editTargetTag.value)
-                        } else {
-                            // TODO: cannot change image from the main tag view
-                            ImageSelector(selectedImage: $appState.editTargetTag.image,  onClick: { url in
-                                // TODO: image selector needs to be totally revamped so that I don't have to provide this, it should do all the copying adn owning and only bind to the URL
-                            }, onDroppedFile: {(url, provider) in
-                                return false
-                            })
-                        }
-                    }.frame(alignment: .trailing)
-                    
-                    Button("Close") {
-                        appState.isEditingTag = false
-                    }
-                }.padding()
+               isEditingTagView.padding()
                 
             })
         }
-        .toolbar(content: {
-            MainToolbar()
+        .toolbar {
+            mainToolbar()
+        }
+    }
+    
+    var bodyRootWithSearch: some View {
+        
+        if #available(macOS 14.0, *) {
+            AnyView(bodyRoot
+                .searchable(text: $query, tokens: $searchFileTokens, isPresented: $showSearch, placement: .sidebar, prompt: "Search by name or tag", token: { token in Text(token.description) }))
+        } else {
+            AnyView(bodyRoot
+                .searchable(text: $query, tokens: $searchFileTokens, placement: .sidebar, prompt: "Search by name or tag", token: { token in Text(token.description) }))
+        }
+        
+        //        .help("Enter your search term. Use & and | for boolean operations. Use !word to avoid 'word' in results ")
+        
+    }
+    
+    var body: some View {
+        bodyRootWithSearch
+        .onChange(of: query, perform: { _ in
+            performSearch()
+        })
+        .onChange(of: searchFileTokens, perform: { _ in
+            performSearch()
         })
         .onChange(of: appState.doImageVision, perform: { recognize in
             files.imageVisionSet(doVision: recognize)
@@ -502,7 +561,7 @@ struct MainView: View {
         .onAppear { [unowned files] in
             guard let path = self.directory?.absolutePath else { return }
             try! self.files.load(directory: path, filename: FileTagBackend.filePrefix, format: choice, doTextRecognition: appState.doImageVision)
-            currentFileList = files.filter(by: query, within: showOnlyUntagged)
+            currentFileList = files.filter(by: query, and: searchFileTokens, within: showOnlyUntagged)
             //            appState.createSelectionModel(for: MainView.selectionIdenfitier)
         }
     }

@@ -285,7 +285,7 @@ class TaggedDirectory: ObservableObject {
 // Functions for filtering
 extension TaggedDirectory {
 
-    func filter(by query: String, within state: TaggedState = .all) -> [TaggedFile] {
+    func filter(by query: String, and tokens: [SearchFilesToken],  within state: TaggedState = .all) -> [TaggedFile] {
         self.query = query
         if query.isEmpty {
             filterPredicate = TaggedDirectory.alwaysTrue
@@ -301,14 +301,29 @@ extension TaggedDirectory {
                 }
             }
         }
-        switch state {
-        case .all:
-            return files.filter(filterPredicate)
-        case .untagged:
-            return files.filter { $0.tags.count == 0 && filterPredicate($0) }
-        case .tagged:
-            return files.filter { $0.tags.count > 0 && filterPredicate($0) }
+        if tokens.count == 2 {
+            return []
+        } else if tokens.count == 1 {
+            if tokens.first == .Tagged && state == .untagged {
+                return []
+            } else if tokens.first == .Tagged {
+                return files.filter { $0.tags.count > 0 && filterPredicate($0) }
+            } else if tokens.first == .Untagged && state == .tagged {
+                return []
+            } else if tokens.first == .Untagged {
+                return files.filter { $0.tags.count == 0 && filterPredicate($0) }
+            }
+        } else {
+            switch state {
+            case .all:
+                return files.filter(filterPredicate)
+            case .untagged:
+                return files.filter { $0.tags.count == 0 && filterPredicate($0) }
+            case .tagged:
+                return files.filter { $0.tags.count > 0 && filterPredicate($0) }
+            }
         }
+        return [] 
     }
 }
 

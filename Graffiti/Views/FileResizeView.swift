@@ -246,6 +246,9 @@ struct FileResizeView: View {
                 resizeImage(source: oldImage, newSize: newSize) { newImage in
                     let rep = NSBitmapImageRep(data: newImage.tiffRepresentation!)
                     let png = rep?.representation(using: .png, properties: [:])
+                    if destinationURL != nil && destinationURL?.pathExtension == "" {
+                        destinationURL = destinationURL?.appendingPathExtension(sourceURL.pathExtension)
+                    }
                     success = (try? png?.write(to: destinationURL ?? sourceURL)) != nil
                     loading = false
                     done = true

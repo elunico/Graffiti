@@ -83,6 +83,7 @@ struct TagView: View {
     @State var qlPreviewLink: URL? = nil
     @State var selectedView: ViewSelection = .text
     var query: Binding<String>
+    var tokens: Binding<[SearchFilesToken]>
     @EnvironmentObject var directory: TaggedDirectory
     @EnvironmentObject var appState: ApplicationState
     
@@ -245,6 +246,16 @@ struct TagView: View {
                 }
             }
         }
+        if tokens.count == 2 {
+            return tags.filter(filterPredicate)
+        } else if tokens.count == 1 {
+            if tokens.wrappedValue.first == .Image {
+                return tags.filter { $0.image != nil && filterPredicate($0) }
+            } else if tokens.wrappedValue.first == .String {
+                return tags.filter { $0.image == nil && filterPredicate($0) }
+            }
+        }
+        
         return tags.filter(filterPredicate)
     }
     
@@ -280,7 +291,9 @@ struct TagView: View {
                 }
             }
         }, rows: {
-            ForEach(filter(by: query.wrappedValue)) { (item: Tag) in
+            // If we are looking at all tags in the program in the main view, allow search
+            // if we are inspecting a file or group of files tags then display them all regardless of the search state of the main view
+            ForEach(self.universalView ? filter(by: query.wrappedValue) : tags) { (item: Tag) in
                 TableRow(item)
                     .contextMenu {
                         Button("Rerun Image Recognition") {
